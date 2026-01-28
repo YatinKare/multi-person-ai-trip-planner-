@@ -31,9 +31,8 @@
       and functionality.
     </div>
     <div class="my-2">
-      The <a href="/account/billing" class="link">billing</a> and
-      <a href="/account/settings" class="link">settings</a> pages are functional
-      demos.
+      The <a href="/account/settings" class="link">settings</a> page is a functional
+      demo.
     </div>
   </div>
 </div>

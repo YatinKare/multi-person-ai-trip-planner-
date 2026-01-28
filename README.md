@@ -21,7 +21,7 @@
 
 # SaaS Starter: A SvelteKit Boilerplate/Template
 
-- [Feature Rich](#features): user auth, user dashboard, marketing site, blog engine, billing/subscriptions, pricing page, search, emails, and more.
+- [Feature Rich](#features): user auth, user dashboard, marketing site, blog engine, pricing page, search, emails, and more.
 - [Lightning Performance](#performance--best-practices): fast pre-rendered pages which score 100/100 on Google PageSpeed.
 - [Delighful Developer Experience](#tech-stack): tools you'll love working with, including SvelteKit, Tailwind, DaisyUI, Postgres, and Supabase.
 - Extensible: all the tools you need to make additional marketing pages, UI components, user dashboards, admin portals, database backends, API endpoints, and more.
@@ -63,14 +63,12 @@ Everything you need to get started for a SaaS company:
 - User Authentication: Sign up, sign out, forgot password, email verification, and oAuth. Powered by Supabase Auth. GDPR cookie warning for European users.
 - Marketing Page with SEO optimization and Sitemap
 - Blog engine with rich formatting, RSS and SEO optimization.
-- User Dashboard with user profile, user settings, update email/password, billing, and more
-- Subscriptions powered by Stripe Checkout
+- User Dashboard with user profile, user settings, update email/password, and more
 - Pricing page
 - Emails: send emails to users, including template support
 - Search: lightning fast site search, without a backend
 - Contact-us form
-- Billing portal: self serve to change card, upgrade, cancel, or download receipts
-- Onboarding flow after signup: collect user data, and select a payment plan
+- Onboarding flow after signup: collect user data
 - Style toolkit: theming and UI components
 - Responsive: designed for mobile and desktop.
 - Extensible: all the tools you need to make additional marketing pages, UI components, admin portals, database backends, API endpoints, and more.
@@ -90,9 +88,6 @@ Want to learn why we picked the technologies we did, and how to keep your fork l
   - Serverless compute: Cloudflare Workers
   - Authentication: Supabase Auth
   - Database: Supabase Postgres
-- Payments
-  - Stripe Checkout
-  - Stripe Portal
 
 ## Suggested Hosting Stack
 
@@ -236,28 +231,6 @@ If you find build, formatting or linting rules too tedious, you can disable enfo
 - Test authentication
   - Open the `/login` page in your browser, and ensure you can sign up, confirm email, log in, and edit your account.
 
-## Setup Stripe
-
-- Create a Stripe account
-- Create a product and price Tiers
-  - Create your [products](https://stripe.com/docs/api/products) and their [prices](https://stripe.com/docs/api/prices) in the Dashboard or with the Stripe CLI.
-  - SaaS Starter works best if you define each tier as a separate product (eg, `SaaS Starter Free`, `Saas Starter Pro`, `Saas Starter Enterprise`). Include a monthly and annual price for each product if you want to support multiple billing periods.
-  - You do not need to create a free plan in Stripe. The free plan is managed within the app.
-- Setup your environment
-  - Get your [Secret API](https://dashboard.stripe.com/test/apikeys) key, and add it as an environment variable PRIVATE_STRIPE_API_KEY (`.env.local` locally, and Cloudflare environment for prod). Be sure to use test keys for development, and keep your production/live keys secret and secure.
-- Optional: theme your Stripe integration
-  - Change the colors and fonts to match your brand [here](https://dashboard.stripe.com/settings/branding)
-- Update your pricing plan data to align to your stripe data
-  - See `/src/routes/(marketing)/pricing/pricing_plans.ts` and Fill in all fields for each plan. stripe_price_id and stripe_product_id should only be omitted on a single “free” plan. Multiple free plans are not supported.
-    - The product in Stripe can contain several prices for the same product (annual, monthly, etc). The stripe_price_id you choose to put in this json will be the default we use for the checkout experience. However, if you have more prices configured for a product configured, the user can switch between them in the management portal.
-  - Set the `defaultPlanId` to the plan the user will see as their “current plan” after signup, but before subscribing to a paid plan (typically “free”). It should align to the plan with no stripe_price_id.
-  - if you want an item highlighted on `/pricing`, specify that plan ID in `/src/routes/(marketing)/pricing/+page.svelte`
-- Update your portal configuration
-  - Open [stripe portal config](https://dashboard.stripe.com/test/settings/billing/portal) and make the following changes
-    - Disallow editing email under customer information (since we allow editing in primary portal)
-    - Optional: setup a custom domain so Stripe pages use your own domain
-- Repeat steps in production environment
-
 ## Deploy
 
 We document the process of deploying SaaS Starter on Cloudflare Pages. However, it can be hosted anywhere you can host a SvelteKit app.
@@ -269,7 +242,7 @@ Our [official demo](https://saasstarter.work) is hosted on Cloudflare Pages, and
 Cloudflare Pages and Workers is one of the most popular options for deploying SvelteKit and we recommend it. [Follow Cloudflare’s instructions](https://developers.cloudflare.com/pages/get-started/git-integration/) to deploy in a few clicks. Be sure to select “SvelteKit” as framework, and the rest of the defaults will work.
 
 When prompted: add environment variables for your production environment (PUBLIC_SUPABASE_URL,
-PUBLIC_SUPABASE_ANON_KEY, PRIVATE_SUPABASE_SERVICE_ROLE, and PRIVATE_STRIPE_API_KEY).
+PUBLIC_SUPABASE_ANON_KEY, and PRIVATE_SUPABASE_SERVICE_ROLE).
 
 Optional: enable [Cloudflare Analytics](https://www.cloudflare.com/en-ca/application-services/products/analytics/) for usage metrics.
 

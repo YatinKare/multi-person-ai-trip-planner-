@@ -54,8 +54,7 @@
               </div>
             {:else}
               <a
-                href={"/account/subscribe/" +
-                  (plan?.stripe_price_id ?? "free_plan")}
+                href="/account"
                 class="btn btn-primary w-[80%] mx-auto"
               >
                 {callToAction}

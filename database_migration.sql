@@ -22,16 +22,6 @@ create policy "Users can insert their own profile." on profiles
 create policy "Users can update own profile." on profiles
   for update using (auth.uid() = id);
 
--- Create Stripe Customer Table
--- One stripe customer per user (PK enforced)
--- Limit RLS policies -- mostly only server side access
-create table stripe_customers (
-  user_id uuid references auth.users on delete cascade not null primary key,
-  updated_at timestamp with time zone,
-  stripe_customer_id text unique
-);
-alter table stripe_customers enable row level security;
-
 -- Create a table for "Contact Us" form submissions
 -- Limit RLS policies -- only server side access
 create table contact_requests (
