@@ -13,6 +13,7 @@ import os
 from dotenv import load_dotenv
 
 from api.middleware import TokenData, get_current_user
+from api.database import check_database_connection, get_supabase_client
 
 # Load environment variables
 load_dotenv()
@@ -53,10 +54,13 @@ async def root():
 @app.get("/health")
 async def health_check():
     """Detailed health check endpoint."""
+    # Check database connection
+    db_healthy = await check_database_connection()
+
     return {
-        "status": "healthy",
+        "status": "healthy" if db_healthy else "degraded",
         "api": "operational",
-        "database": "not_yet_implemented",
+        "database": "operational" if db_healthy else "connection_failed",
         "ai": "not_yet_implemented"
     }
 
