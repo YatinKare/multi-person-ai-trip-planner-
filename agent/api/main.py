@@ -7,10 +7,12 @@ Main entry point for the FastAPI backend that handles:
 - Preference aggregation
 - JWT token validation from Supabase Auth
 """
-from fastapi import FastAPI
+from fastapi import FastAPI, Depends
 from fastapi.middleware.cors import CORSMiddleware
 import os
 from dotenv import load_dotenv
+
+from api.middleware import TokenData, get_current_user
 
 # Load environment variables
 load_dotenv()
@@ -56,6 +58,22 @@ async def health_check():
         "api": "operational",
         "database": "not_yet_implemented",
         "ai": "not_yet_implemented"
+    }
+
+
+@app.get("/api/me")
+async def get_current_user_info(user: TokenData = Depends(get_current_user)):
+    """
+    Protected endpoint that returns current user info from JWT token.
+    Requires valid Authorization: Bearer <token> header.
+
+    This endpoint demonstrates JWT validation middleware in action.
+    """
+    return {
+        "user_id": user.user_id,
+        "email": user.email,
+        "role": user.role,
+        "message": "Successfully authenticated"
     }
 
 
