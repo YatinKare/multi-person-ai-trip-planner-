@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>TripSync - Create Trip Flow</title>
+
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com" rel="preconnect" />
+    <link crossorigin href="https://fonts.gstatic.com" rel="preconnect" />
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap"
+        rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
+        rel="stylesheet" />
+
+    <!-- DaisyUI + Tailwind Browser -->
+    <link href="https://cdn.jsdelivr.net/npm/daisyui@5" rel="stylesheet" type="text/css" />
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+
+    <!-- Custom Theme -->
+    <link href="../tripsync-theme.css" rel="stylesheet" />
+</head>
+
+<body
+    class="bg-base-100 text-white font-[Plus_Jakarta_Sans] overflow-hidden h-screen flex flex-col relative group/design-root"
+    data-theme="dark">
+    <!-- Background Dashboard (Simulated App Context) -->
+    <div
+        class="absolute inset-0 z-0 flex flex-col w-full h-full filter blur-[4px] opacity-40 select-none pointer-events-none bg-base-300">
+        <!-- Header from component list (modified for background context) -->
+        <header
+            class="flex items-center justify-between whitespace-nowrap border-b border-base-300 px-10 py-3 bg-base-200">
+            <div class="flex items-center gap-4 text-white">
+                <div class="size-8 text-primary">
+                    <span class="material-symbols-outlined text-3xl">flight_takeoff</span>
+                </div>
+                <h2 class="text-white text-lg font-bold leading-tight tracking-[-0.015em]">TripSync</h2>
+            </div>
+            <div class="flex flex-1 justify-end gap-8">
+                <!-- User Avatar -->
+                <div class="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-10 border border-base-300"
+                    style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuDWWJH2g59R8neRbkD1XQH2Tk3pdF1SW5xa8o0Hmzat3zJypHA7jLjSN8iRg7Y6uf1wIKKYHM2vzVp_KfAa3dp8IZRtYEikMoOAYkDUarHHtISfKXMUtuqFdfzNeZ1nWi8-k2Q6ArsmnIOngn9LaNGyF4FinoMIpZClBoKyHNSEaeoAoogTAbSjgzt2ZSumJTrMTymcGPOaDClXcEtMxonVFy3FY6gGDkEu7MTn_ACXgGJbAVdWXhSRIShTSctQpjjSxe1c9z4qiUP-");'>
+                </div>
+            </div>
+        </header>
+        <!-- Dummy Dashboard Content -->
+        <div class="flex-1 p-10 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div class="rounded-xl bg-base-200 border border-base-300 h-64 w-full"></div>
+            <div class="rounded-xl bg-base-200 border border-base-300 h-64 w-full"></div>
+            <div class="rounded-xl bg-base-200 border border-base-300 h-64 w-full"></div>
+            <div class="rounded-xl bg-base-200 border border-base-300 h-64 w-full"></div>
+        </div>
+    </div>
+
+    <!-- Main Overlay Container -->
+    <div
+        class="absolute inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center overflow-y-auto py-10 px-4">
+        <!-- Presentation Wrapper: Showing Flow Steps Side-by-Side -->
+        <div class="flex flex-col xl:flex-row gap-12 items-center xl:items-start justify-center w-full max-w-6xl">
+            <!-- STEP 1: INPUT STATE -->
+            <div class="flex flex-col items-center gap-4 w-full max-w-[480px]">
+                <span class="text-xs font-bold tracking-widest text-primary uppercase opacity-80">Step 1: Create</span>
+                <div
+                    class="w-full bg-base-200 border border-base-300 rounded-2xl shadow-[0_20px_40px_-10px_rgba(0,0,0,0.5)] flex flex-col relative overflow-hidden group hover:shadow-[0_0_40px_rgba(19,236,182,0.1)] transition-shadow duration-500">
+                    <!-- Close Button -->
+                    <button
+                        class="absolute top-4 right-4 text-white/60 hover:text-white transition-colors p-2 rounded-full hover:bg-white/5">
+                        <span class="material-symbols-outlined text-[20px]">close</span>
+                    </button>
+                    <!-- Modal Header -->
+                    <div class="pt-8 pb-2 px-8 text-center">
+                        <h2 class="text-[28px] font-bold text-base-content mb-3 tracking-tight">Where are we going?</h2>
+                        <p class="text-white/60 text-base font-normal leading-normal">Give your trip a name to get
+                            started.</p>
+                    </div>
+                    <!-- Modal Body (Form) -->
+                    <div class="px-8 pb-8 pt-4 flex flex-col gap-5">
+                        <!-- Field 1: Trip Name -->
+                        <div class="flex flex-col gap-2">
+                            <label class="text-base font-medium text-base-content">Trip Name</label>
+                            <div class="relative flex items-center group/input">
+                                <input
+                                    class="w-full bg-base-100 border border-base-300 text-base-content placeholder:text-base-content/40 rounded-lg h-14 pl-4 pr-12 focus:ring-1 focus:ring-primary focus:border-primary outline-none transition-all text-base font-normal"
+                                    placeholder="e.g. Summer in Italy" type="text" />
+                                <!-- AI Sparkle Icon -->
+                                <div
+                                    class="absolute right-0 h-full aspect-square flex items-center justify-center text-primary pointer-events-none border-l border-base-300 bg-base-100 rounded-r-lg group-focus-within/input:border-primary">
+                                    <span class="material-symbols-outlined text-[24px]">auto_awesome</span>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Field 2: Timeframe -->
+                        <div class="flex flex-col gap-2">
+                            <label class="text-base font-medium text-base-content">Timeframe / Vibe</label>
+                            <div class="relative flex items-center">
+                                <input
+                                    class="w-full bg-base-100 border border-base-300 text-base-content placeholder:text-base-content/40 rounded-lg h-14 px-4 focus:ring-1 focus:ring-primary focus:border-primary outline-none transition-all text-base font-normal"
+                                    placeholder="e.g. Late August" type="text" />
+                            </div>
+                        </div>
+                        <!-- Action Button -->
+                        <button class="btn btn-primary btn-lg w-full text-base-300 font-bold gap-2 mt-4">
+                            <span>Create Trip</span>
+                        </button>
+                    </div>
+                    <!-- Bottom Decorative Glow -->
+                    <div
+                        class="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-transparent via-primary/30 to-transparent">
+                    </div>
+                </div>
+            </div>
+
+            <!-- STEP 2: SUCCESS STATE -->
+            <div class="flex flex-col items-center gap-4 w-full max-w-[480px]">
+                <span class="text-xs font-bold tracking-widest text-primary uppercase opacity-80">Step 2: Success</span>
+                <div
+                    class="w-full bg-base-200 border border-base-300 rounded-2xl shadow-[0_20px_40px_-10px_rgba(0,0,0,0.5)] flex flex-col relative overflow-hidden group hover:shadow-[0_0_40px_rgba(19,236,182,0.1)] transition-shadow duration-500">
+                    <!-- Close Button -->
+                    <button
+                        class="absolute top-4 right-4 text-white/60 hover:text-white transition-colors p-2 rounded-full hover:bg-white/5">
+                        <span class="material-symbols-outlined text-[20px]">close</span>
+                    </button>
+                    <!-- Modal Header -->
+                    <div class="pt-10 pb-4 px-8 text-center flex flex-col items-center">
+                        <div
+                            class="h-20 w-20 bg-primary/10 border border-primary/20 rounded-full flex items-center justify-center mb-6 text-primary shadow-[0_0_30px_rgba(19,236,182,0.2)] animate-pulse">
+                            <span class="material-symbols-outlined text-5xl">check_circle</span>
+                        </div>
+                        <h2 class="text-[28px] font-bold text-base-content mb-3 tracking-tight">Japan 2025 is ready!
+                        </h2>
+                        <p class="text-white/60 text-base font-normal leading-normal px-4">Share this link with your
+                            friends to let them join the planning.</p>
+                    </div>
+                    <!-- Modal Body (Actions) -->
+                    <div class="px-8 pb-8 pt-2 flex flex-col gap-6">
+                        <!-- Copy Link Component -->
+                        <div class="flex flex-col gap-2">
+                            <label class="text-base font-medium text-base-content">Invite Link</label>
+                            <div class="flex gap-3">
+                                <div
+                                    class="flex-1 bg-base-100 border border-base-300 rounded-lg h-12 px-4 flex items-center text-white/60 text-sm truncate select-all font-mono">
+                                    tripsync.ai/join/jp25
+                                </div>
+                                <button class="btn btn-neutral border-base-300 h-12 font-bold gap-2 group/copy">
+                                    <span
+                                        class="material-symbols-outlined text-[20px] group-hover/copy:scale-110 transition-transform">content_copy</span>
+                                    <span>Copy</span>
+                                </button>
+                            </div>
+                        </div>
+                        <!-- Divider -->
+                        <div class="relative flex py-1 items-center">
+                            <div class="flex-grow border-t border-base-300"></div>
+                            <span
+                                class="flex-shrink-0 mx-4 text-white/40 text-xs uppercase tracking-wider font-semibold">Or
+                                share via</span>
+                            <div class="flex-grow border-t border-base-300"></div>
+                        </div>
+                        <!-- Social Shortcuts -->
+                        <div class="flex items-center justify-center gap-4">
+                            <!-- WhatsApp -->
+                            <button aria-label="Share to WhatsApp"
+                                class="btn btn-circle btn-neutral border-base-300 hover:border-primary hover:bg-primary/10 hover:text-primary transition-all">
+                                <span class="material-symbols-outlined text-[22px]">chat</span>
+                            </button>
+                            <!-- Email -->
+                            <button aria-label="Share via Email"
+                                class="btn btn-circle btn-neutral border-base-300 hover:border-primary hover:bg-primary/10 hover:text-primary transition-all">
+                                <span class="material-symbols-outlined text-[22px]">mail</span>
+                            </button>
+                            <!-- Generic Share -->
+                            <button aria-label="More share options"
+                                class="btn btn-circle btn-neutral border-base-300 hover:border-primary hover:bg-primary/10 hover:text-primary transition-all">
+                                <span class="material-symbols-outlined text-[22px]">ios_share</span>
+                            </button>
+                        </div>
+                        <!-- Secondary Action -->
+                        <button class="btn btn-ghost w-full">
+                            Go to Trip Dashboard
+                        </button>
+                    </div>
+                    <!-- Bottom Decorative Glow -->
+                    <div
+                        class="absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r from-transparent via-primary/30 to-transparent">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>

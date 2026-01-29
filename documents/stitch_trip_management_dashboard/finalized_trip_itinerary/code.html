@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>TripSync - Finalized Itinerary</title>
+
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com" rel="preconnect" />
+    <link crossorigin href="https://fonts.gstatic.com" rel="preconnect" />
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap"
+        rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
+        rel="stylesheet" />
+
+    <!-- DaisyUI + Tailwind Browser -->
+    <link href="https://cdn.jsdelivr.net/npm/daisyui@5" rel="stylesheet" type="text/css" />
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+
+    <!-- Custom Theme -->
+    <link href="../tripsync-theme.css" rel="stylesheet" />
+</head>
+
+<body class="bg-base-100 text-white font-[Plus_Jakarta_Sans]" data-theme="dark">
+    <div class="drawer lg:drawer-open">
+        <input id="app-drawer" type="checkbox" class="drawer-toggle" />
+
+        <!-- Main content area -->
+        <div class="drawer-content flex flex-col min-h-screen">
+            <!-- Mobile navbar -->
+            <div class="navbar bg-base-200 border-b border-base-300 lg:hidden sticky top-0 z-50">
+                <div class="flex-none">
+                    <label for="app-drawer" class="btn btn-ghost btn-square">
+                        <span class="material-symbols-outlined">menu</span>
+                    </label>
+                </div>
+                <div class="flex-1">
+                    <span class="text-xl font-bold">TripSync</span>
+                </div>
+                <div class="flex-none">
+                    <div class="avatar">
+                        <div class="w-10 rounded-full">
+                            <img src="https://lh3.googleusercontent.com/aida-public/AB6AXuD6R937qdbqMB6rOe5vyDSLBinCLP4xAyEIa3kXYdz49vlkwyzvDlbM9Gcy9P0J3DvP0nJ1Qprc2nINR7p4ZSCsoUciRWoKecNGil33n3N6simdP58AZeULdWmPgkD7XRiAV-Ze0PXs3oFQtkUwPgTJHyUNnquFY0JW_4_-_ykAfPRFjwib92PfTlZ-af83IbsxvU0ez-wa5RCfJo7JtxiyPY-Ic4k5XfKkzka-K3wztLIvWRmLalePNPmq9CFh4W7GHToCjDd96L_c"
+                                alt="User" />
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Page content -->
+            <main class="flex-1 container mx-auto px-4 sm:px-6 lg:px-8 py-8 max-w-7xl">
+                <!-- Header & Status Area -->
+                <div
+                    class="flex flex-col md:flex-row justify-between items-start md:items-end gap-6 mb-10 border-b border-base-300 pb-8">
+                    <div class="flex flex-col gap-3">
+                        <div class="flex items-center gap-3">
+                            <h1
+                                class="text-4xl md:text-5xl font-black leading-tight tracking-[-0.033em] text-base-content">
+                                Kyoto, Japan</h1>
+                            <div
+                                class="hidden md:flex h-8 items-center justify-center gap-x-2 rounded-full bg-primary/10 border border-primary/20 pl-2 pr-4">
+                                <span class="material-symbols-outlined text-primary text-[20px]">check_circle</span>
+                                <p class="text-primary text-sm font-bold uppercase tracking-wider">Finalized</p>
+                            </div>
+                        </div>
+                        <p class="text-base-content/60 text-lg font-medium flex items-center gap-2">
+                            <span class="material-symbols-outlined text-[20px]">calendar_month</span>
+                            Oct 15 - Oct 20, 2023 <span class="text-base-content/40">•</span> 5 Days
+                        </p>
+                        <!-- Mobile Only Status Chip -->
+                        <div
+                            class="md:hidden flex w-fit mt-2 h-8 items-center justify-center gap-x-2 rounded-full bg-primary/10 border border-primary/20 pl-2 pr-4">
+                            <span class="material-symbols-outlined text-primary text-[20px]">check_circle</span>
+                            <p class="text-primary text-sm font-bold uppercase tracking-wider">Finalized</p>
+                        </div>
+                    </div>
+                    <div class="flex gap-3 w-full md:w-auto">
+                        <button class="btn btn-neutral flex-1 md:flex-none gap-2">
+                            <span class="material-symbols-outlined text-[20px]">ios_share</span>
+                            Share
+                        </button>
+                        <button
+                            class="btn btn-primary flex-1 md:flex-none gap-2 text-base-300 font-bold shadow-[0_0_15px_rgba(19,236,182,0.3)]">
+                            <span class="material-symbols-outlined text-[20px]">edit</span>
+                            Edit Plan
+                        </button>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 relative">
+                    <!-- Main Itinerary Column -->
+                    <div class="lg:col-span-8 flex flex-col gap-10">
+                        <!-- Day 1 -->
+                        <section class="relative pl-6 sm:pl-0">
+                            <!-- Vertical Line Connector (Visual only) -->
+                            <div
+                                class="absolute left-0 sm:left-[-1px] top-14 bottom-0 w-0.5 bg-base-300 hidden sm:block">
+                            </div>
+                            <div
+                                class="flex items-center gap-4 mb-6 sticky top-[0px] lg:top-[0px] z-10 bg-base-100 py-2">
+                                <div
+                                    class="hidden sm:flex size-10 rounded-full bg-primary text-base-300 items-center justify-center font-bold text-lg shadow-lg z-20">
+                                    1</div>
+                                <h2 class="text-2xl font-bold text-base-content">Day 1: Arrival & Historic Start</h2>
+                                <span class="badge badge-neutral text-base-content/60 font-medium p-3">Oct 15</span>
+                            </div>
+                            <div class="flex flex-col gap-6 sm:ml-14">
+                                <!-- Morning Block -->
+                                <div
+                                    class="group flex gap-4 p-5 rounded-xl bg-base-200 border border-base-300 hover:border-primary/50 transition-all shadow-sm">
+                                    <div class="flex flex-col items-center gap-2 min-w-[60px]">
+                                        <span
+                                            class="material-symbols-outlined text-amber-500 bg-amber-500/10 p-2 rounded-lg">wb_sunny</span>
+                                        <span
+                                            class="text-xs font-bold text-base-content/60 uppercase tracking-wider">Morning</span>
+                                    </div>
+                                    <div class="flex flex-col gap-2 flex-1">
+                                        <div class="flex justify-between items-start">
+                                            <h3 class="text-lg font-bold text-base-content">Airport Transfer & Hotel
+                                                Check-in</h3>
+                                            <span
+                                                class="badge badge-ghost text-primary bg-primary/10 border-primary/20 font-bold">$45</span>
+                                        </div>
+                                        <p class="text-base-content/80 text-sm leading-relaxed">Private shuttle from
+                                            Kansai International Airport (KIX) to Kyoto Central. Drop off bags at hotel.
+                                        </p>
+                                        <div class="flex items-center gap-2 mt-2 text-xs text-base-content/60">
+                                            <span class="material-symbols-outlined text-[16px]">lightbulb</span>
+                                            <span>Tip: Purchase an ICOCA transit card at the airport station.</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <!-- Afternoon Block -->
+                                <div
+                                    class="group flex gap-4 p-5 rounded-xl bg-base-200 border border-base-300 hover:border-primary/50 transition-all shadow-sm">
+                                    <div class="flex flex-col items-center gap-2 min-w-[60px]">
+                                        <span
+                                            class="material-symbols-outlined text-blue-400 bg-blue-400/10 p-2 rounded-lg">partly_cloudy_day</span>
+                                        <span
+                                            class="text-xs font-bold text-base-content/60 uppercase tracking-wider">Afternoon</span>
+                                    </div>
+                                    <div class="flex flex-col gap-2 flex-1">
+                                        <div class="flex justify-between items-start">
+                                            <h3 class="text-lg font-bold text-base-content">Fushimi Inari Shrine Hike
+                                            </h3>
+                                            <span
+                                                class="badge badge-ghost text-primary bg-primary/10 border-primary/20 font-bold">Free</span>
+                                        </div>
+                                        <p class="text-base-content/80 text-sm leading-relaxed">Explore the thousands of
+                                            vermilion torii gates. A 2-3 hour hike up the mountain offers stunning views
+                                            of Kyoto.</p>
+                                    </div>
+                                    <!-- Image insert -->
+                                    <div class="w-24 h-24 hidden sm:block rounded-lg bg-cover bg-center shrink-0"
+                                        data-alt="Orange Torii gates at Fushimi Inari Shrine"
+                                        style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuDtzsDySIoT6cHFJcAyYjKZL-WpLz8UVqquUhZnChT1-Az4nmTPtGrcqHLW8ZAKCXfOMcYWQsTgQ3IMhfzUC8zJbMe0T9IJf0YrEyCVv1wcvlaRQxrpMkO-B-2llQ5k-DcFSKCKQqRiTo-xF4ai_RLm2D3nWwVLCdPSQ6W_G02O9OYUhQjhwIGTMPRN-rHHtXhbndUVGxr1_NMH_w73zWuamtxHuwNYD0_sfwANpnP2rqJanXPEbT6nUJ1hjwlHGGSeUIXD3rLrvVuk');">
+                                    </div>
+                                </div>
+                                <!-- Evening Block -->
+                                <div
+                                    class="group flex gap-4 p-5 rounded-xl bg-base-200 border border-base-300 hover:border-primary/50 transition-all shadow-sm">
+                                    <div class="flex flex-col items-center gap-2 min-w-[60px]">
+                                        <span
+                                            class="material-symbols-outlined text-indigo-400 bg-indigo-400/10 p-2 rounded-lg">dark_mode</span>
+                                        <span
+                                            class="text-xs font-bold text-base-content/60 uppercase tracking-wider">Evening</span>
+                                    </div>
+                                    <div class="flex flex-col gap-2 flex-1">
+                                        <div class="flex justify-between items-start">
+                                            <h3 class="text-lg font-bold text-base-content">Pontocho Alley Dinner</h3>
+                                            <span
+                                                class="badge badge-ghost text-primary bg-primary/10 border-primary/20 font-bold">$60</span>
+                                        </div>
+                                        <p class="text-base-content/80 text-sm leading-relaxed">Atmospheric dining in a
+                                            narrow alley along the Kamogawa River. Reservation at 'Kibune' for Kaiseki
+                                            cuisine.</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </section>
+                        <!-- Day 2 -->
+                        <section class="relative pl-6 sm:pl-0">
+                            <!-- Vertical Line Connector -->
+                            <div
+                                class="absolute left-0 sm:left-[-1px] top-14 bottom-0 w-0.5 bg-base-300 hidden sm:block">
+                            </div>
+                            <div
+                                class="flex items-center gap-4 mb-6 sticky top-[0px] lg:top-[0px] z-10 bg-base-100 py-2">
+                                <div
+                                    class="hidden sm:flex size-10 rounded-full bg-base-200 border border-base-300 text-base-content items-center justify-center font-bold text-lg">
+                                    2</div>
+                                <h2 class="text-2xl font-bold text-base-content">Day 2: Bamboo & Temples</h2>
+                                <span class="badge badge-neutral text-base-content/60 font-medium p-3">Oct 16</span>
+                            </div>
+                            <div class="flex flex-col gap-6 sm:ml-14">
+                                <!-- Morning Block -->
+                                <div
+                                    class="group flex gap-4 p-5 rounded-xl bg-base-200 border border-base-300 hover:border-primary/50 transition-all shadow-sm">
+                                    <div class="flex flex-col items-center gap-2 min-w-[60px]">
+                                        <span
+                                            class="material-symbols-outlined text-amber-500 bg-amber-500/10 p-2 rounded-lg">wb_sunny</span>
+                                        <span
+                                            class="text-xs font-bold text-base-content/60 uppercase tracking-wider">Morning</span>
+                                    </div>
+                                    <div class="flex flex-col gap-2 flex-1">
+                                        <div class="flex justify-between items-start">
+                                            <h3 class="text-lg font-bold text-base-content">Arashiyama Bamboo Grove</h3>
+                                            <span
+                                                class="badge badge-ghost text-primary bg-primary/10 border-primary/20 font-bold">Free</span>
+                                        </div>
+                                        <p class="text-base-content/80 text-sm leading-relaxed">Early morning walk to
+                                            beat the crowds. Visit Tenryu-ji Temple gardens right after.</p>
+                                        <div class="flex items-center gap-2 mt-2 text-xs text-base-content/60">
+                                            <span class="material-symbols-outlined text-[16px]">schedule</span>
+                                            <span>Suggested start time: 7:00 AM</span>
+                                        </div>
+                                    </div>
+                                    <!-- Image insert -->
+                                    <div class="w-24 h-24 hidden sm:block rounded-lg bg-cover bg-center shrink-0"
+                                        data-alt="Arashiyama Bamboo Grove green path"
+                                        style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuBvVv_fs1nVKepkZjFEr466H4OdjYUTFBbtXy0oh6O9NP9_ExUg8Btz1Z4yTVGeVJnZPYJkLzQBNkXCkrGPXgZpDbWwqr6YuseaKL0ituTMpGHuVIgTiG-mO8joSbhRL5lzMAFtylerFVC2cXCXXUMLRIry0JYqix1UsyrNkw5cwbzcbeOqjiEeyvv8BgA7Pei53p-ku6ncrQ9ocEF_Gz4BScTVKM_Inkr7ahxyerQD9ZBHV8d0xf_l_egfbedpzn0evLfFl77ve5U0');">
+                                    </div>
+                                </div>
+                                <!-- Afternoon Block -->
+                                <div
+                                    class="group flex gap-4 p-5 rounded-xl bg-base-200 border border-base-300 hover:border-primary/50 transition-all shadow-sm">
+                                    <div class="flex flex-col items-center gap-2 min-w-[60px]">
+                                        <span
+                                            class="material-symbols-outlined text-blue-400 bg-blue-400/10 p-2 rounded-lg">partly_cloudy_day</span>
+                                        <span
+                                            class="text-xs font-bold text-base-content/60 uppercase tracking-wider">Afternoon</span>
+                                    </div>
+                                    <div class="flex flex-col gap-2 flex-1">
+                                        <div class="flex justify-between items-start">
+                                            <h3 class="text-lg font-bold text-base-content">Kinkaku-ji (Golden Pavilion)
+                                            </h3>
+                                            <span
+                                                class="badge badge-ghost text-primary bg-primary/10 border-primary/20 font-bold">$5</span>
+                                        </div>
+                                        <p class="text-base-content/80 text-sm leading-relaxed">The famous Zen Buddhist
+                                            temple covered in gold leaf. Stunning reflection in the pond.</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </section>
+                        <!-- Hint of more content -->
+                        <div class="flex justify-center py-8">
+                            <button
+                                class="btn btn-ghost text-base-content/60 flex flex-col items-center gap-2 hover:text-primary transition-colors h-auto">
+                                <span class="material-symbols-outlined animate-bounce">expand_more</span>
+                                View Days 3-5
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Sidebar Summary (Sticky) -->
+                    <div class="lg:col-span-4 relative">
+                        <div class="sticky top-6 flex flex-col gap-6">
+                            <!-- Cost Summary Card -->
+                            <div class="card bg-base-200 border border-base-300 shadow-lg">
+                                <div class="card-body p-6">
+                                    <div class="flex items-center gap-3 mb-6">
+                                        <div class="p-2 rounded-full bg-primary/20 text-primary">
+                                            <span class="material-symbols-outlined">payments</span>
+                                        </div>
+                                        <h3 class="card-title text-base-content">Trip Estimate</h3>
+                                    </div>
+                                    <div class="flex flex-col gap-4 mb-6">
+                                        <div
+                                            class="flex justify-between items-center pb-3 border-b border-base-content/10">
+                                            <span class="text-base-content/60 text-sm">Activities & Tours</span>
+                                            <span class="text-base-content font-medium">$450</span>
+                                        </div>
+                                        <div
+                                            class="flex justify-between items-center pb-3 border-b border-base-content/10">
+                                            <span class="text-base-content/60 text-sm">Transport</span>
+                                            <span class="text-base-content font-medium">$200</span>
+                                        </div>
+                                        <div
+                                            class="flex justify-between items-center pb-3 border-b border-base-content/10">
+                                            <span class="text-base-content/60 text-sm">Food & Dining</span>
+                                            <span class="text-base-content font-medium">$600</span>
+                                        </div>
+                                    </div>
+                                    <div class="flex justify-between items-end mb-6">
+                                        <span class="text-base-content/60 font-medium">Total / Person</span>
+                                        <span class="text-3xl font-black text-primary tracking-tight">$1,250</span>
+                                    </div>
+                                    <div class="flex flex-col gap-3">
+                                        <button class="btn btn-primary w-full gap-2 text-base-300 font-bold">
+                                            <span class="material-symbols-outlined text-[20px]">calendar_add_on</span>
+                                            Add to Google Calendar
+                                        </button>
+                                        <button class="btn btn-outline w-full gap-2">
+                                            <span class="material-symbols-outlined text-[20px]">picture_as_pdf</span>
+                                            Export PDF
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- Map Preview Card -->
+                            <div
+                                class="card bg-base-200 border border-base-300 overflow-hidden shadow-lg group cursor-pointer relative">
+                                <div class="w-full h-48 bg-cover bg-center transition-transform duration-500 group-hover:scale-110"
+                                    data-alt="Map view of Kyoto streets" data-location="Kyoto"
+                                    style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuCpsFz9vejoa-_GhnqAvYPWKgtkD17fIqCu8VP1o9WmWUa8343rhikU_303ZrzgFB9vsrtM8mKwJG1PlI1_9Nz0wJZyShjUCmifRjuscibFqgo2V2BjxDJYy0ospZxTLJk_GFxcf7Wg9NLtwZvql8C0eBkMaqk9QKs3Zm1ZDvdRweHvn8HGIzTkaigXyZedKi8iMs3jCJrcXzXT34ZglzmX-vmsazgI4D5dsu-G7Nq2h71EC0-Vo8_ESP5j-jlKRpNgt80yVvVqK1nq");'>
+                                    <!-- Overlay for legibility -->
+                                    <div class="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent"></div>
+                                </div>
+                                <div class="absolute bottom-0 left-0 right-0 p-4">
+                                    <div class="flex justify-between items-center">
+                                        <span class="text-white font-bold flex items-center gap-1">
+                                            <span class="material-symbols-outlined text-primary text-[18px]">map</span>
+                                            View Route Map
+                                        </span>
+                                        <span class="material-symbols-outlined text-white/80">arrow_forward</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- Weather Mini Widget -->
+                            <div class="card bg-base-200 border border-base-300 shadow-sm">
+                                <div class="card-body p-4 flex-row items-center justify-between">
+                                    <div class="flex flex-col">
+                                        <span
+                                            class="text-xs text-base-content/60 font-bold uppercase tracking-wide">Forecast</span>
+                                        <span class="text-base-content font-medium">Mostly Sunny</span>
+                                    </div>
+                                    <div class="flex items-center gap-2">
+                                        <span class="text-xl font-bold text-base-content">22°C</span>
+                                        <span class="material-symbols-outlined text-amber-500">wb_sunny</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </main>
+
+            <!-- Footer -->
+            <footer class="footer footer-center p-10 bg-base-300 text-base-content">
+                <aside>
+                    <p class="font-bold">TripSync</p>
+                    <p>Copyright © 2023 - All right reserved</p>
+                </aside>
+            </footer>
+        </div>
+
+        <!-- Sidebar -->
+        <div class="drawer-side z-40">
+            <label for="app-drawer" aria-label="close sidebar" class="drawer-overlay"></label>
+            <aside class="bg-base-200 w-72 min-h-full border-r border-base-300 flex flex-col">
+                <!-- Logo -->
+                <div class="p-6 flex items-center gap-3">
+                    <div class="bg-primary/20 p-2 rounded-lg text-primary">
+                        <span class="material-symbols-outlined text-2xl">flight_takeoff</span>
+                    </div>
+                    <h1 class="text-xl font-bold">TripSync</h1>
+                </div>
+
+                <!-- Menu -->
+                <ul class="menu flex-1 px-4 gap-1">
+                    <li>
+                        <a class="bg-primary/10 text-primary font-bold">
+                            <span class="material-symbols-outlined">dashboard</span>
+                            Dashboard
+                        </a>
+                    </li>
+                    <li>
+                        <a class="flex items-center gap-3 active">
+                            <span class="material-symbols-outlined filled">map</span>
+                            My Trips
+                        </a>
+                    </li>
+                    <li>
+                        <a class="flex items-center gap-3">
+                            <span class="material-symbols-outlined">notifications</span>
+                            Notifications
+                            <span class="badge badge-primary badge-sm ml-auto">3</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a class="flex items-center gap-3">
+                            <span class="material-symbols-outlined">settings</span>
+                            Settings
+                        </a>
+                    </li>
+                </ul>
+
+                <!-- User profile -->
+                <div class="p-4 border-t border-base-300">
+                    <div class="flex items-center gap-3 p-3 rounded-xl bg-base-300">
+                        <div class="avatar">
+                            <div class="w-10 rounded-full">
+                                <img src="https://lh3.googleusercontent.com/aida-public/AB6AXuD6R937qdbqMB6rOe5vyDSLBinCLP4xAyEIa3kXYdz49vlkwyzvDlbM9Gcy9P0J3DvP0nJ1Qprc2nINR7p4ZSCsoUciRWoKecNGil33n3N6simdP58AZeULdWmPgkD7XRiAV-Ze0PXs3oFQtkUwPgTJHyUNnquFY0JW_4_-_ykAfPRFjwib92PfTlZ-af83IbsxvU0ez-wa5RCfJo7JtxiyPY-Ic4k5XfKkzka-K3wztLIvWRmLalePNPmq9CFh4W7GHToCjDd96L_c"
+                                    alt="User" />
+                            </div>
+                        </div>
+                        <div class="flex flex-col overflow-hidden">
+                            <p class="truncate text-sm font-bold">Sarah Chen</p>
+                            <p class="truncate text-xs text-base-content/60">sarah@tripsync.com</p>
+                        </div>
+                    </div>
+                </div>
+            </aside>
+        </div>
+    </div>
+</body>
+
+</html>

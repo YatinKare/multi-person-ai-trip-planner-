@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8" />
+  <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+  <title>TripSync - Dashboard</title>
+
+  <!-- Fonts -->
+  <link href="https://fonts.googleapis.com" rel="preconnect" />
+  <link crossorigin href="https://fonts.gstatic.com" rel="preconnect" />
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap"
+    rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
+    rel="stylesheet" />
+
+  <!-- DaisyUI + Tailwind Browser -->
+  <link href="https://cdn.jsdelivr.net/npm/daisyui@5" rel="stylesheet" type="text/css" />
+  <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+
+  <!-- Custom Theme -->
+  <link href="../tripsync-theme.css" rel="stylesheet" />
+</head>
+
+<body class="bg-base-100 text-white font-[Plus_Jakarta_Sans]" data-theme="dark">
+  <div class="drawer lg:drawer-open">
+    <input id="app-drawer" type="checkbox" class="drawer-toggle" />
+
+    <!-- Main content area -->
+    <div class="drawer-content flex flex-col min-h-screen">
+      <!-- Mobile navbar -->
+      <div class="navbar bg-base-200 border-b border-base-300 lg:hidden sticky top-0 z-50">
+        <div class="flex-none">
+          <label for="app-drawer" class="btn btn-ghost btn-square">
+            <span class="material-symbols-outlined">menu</span>
+          </label>
+        </div>
+        <div class="flex-1">
+          <span class="text-xl font-bold">TripSync</span>
+        </div>
+        <div class="flex-none">
+          <div class="avatar">
+            <div class="w-10 rounded-full">
+              <img
+                src="https://lh3.googleusercontent.com/aida-public/AB6AXuAq6AIRsSpgRg7idJJCOjeOkz7vD6c-n0mSsSrUgEO2vUNZU4WsbccZYdqsvOxAjIew0aHIn4tyh-S8YNNSOnkImXTyNN-Y-XQSb-xHEgOiRzY5CtVtADcR7EjzmNBdMH0v5wVqbWMErgfKQLJzZEf8Cxbp8xw4nTr52soq32o03wATDesYEr6ISe0XjjMcFWHm2obgBQfpWEtdL86tfyKiTOdgW9Jot6uXq8-TbIXZNHcYLo9V0Isa7cMAygkA935EAYO-5v3u5m3o"
+                alt="User avatar" />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Page content -->
+      <main class="flex-1 flex flex-col items-center justify-center w-full px-4 py-8 md:py-12 overflow-y-auto">
+        <div class="w-full max-w-4xl flex flex-col gap-12 md:gap-16">
+          <!-- Empty State Section -->
+          <div class="flex flex-col items-center gap-8 text-center animate-fade-in-up">
+            <div class="relative w-full max-w-xs aspect-square flex items-center justify-center">
+              <!-- Illustration -->
+              <div class="w-full h-full bg-center bg-contain bg-no-repeat opacity-90 rounded-2xl"
+                style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuBQjy-0gJqTBW9ESgJahftB5Y2YTbWmOqRvT78VetUiklotzIGQFlyphHtGg7ela30OBIwbJrQSfpwNXILtmZ3F1uGI8mlcB4YGgbXh_mMcZZbSyiTDPtQrmoDQ4Bal5Gx1XuZB9LHQvw0gtxGkOSmM27zWEoOdS6EYpnrxwzRz57RsW4XOvlXYXOOpwrowpkN9Com3ZQceliZ9s9qMhQQuCzSM_fKF0MgwokPBYFBk3Q5xrt-Mg_ydBi34uIeyF2HKWMMprB2H5eXB");'
+                data-alt="Illustration of a traveler looking at a map with a backpack">
+              </div>
+            </div>
+
+            <div class="flex flex-col items-center gap-3 max-w-md">
+              <h1 class="text-3xl md:text-4xl font-bold leading-tight tracking-tight">
+                No trips yet?
+              </h1>
+              <p class="text-base-content/60 text-base md:text-lg">
+                Adventure is just a click away. Start planning your next group getaway in seconds.
+              </p>
+            </div>
+
+            <button class="btn btn-primary btn-lg gap-2">
+              <span class="material-symbols-outlined text-xl">add_circle</span>
+              <span>Create Your First Trip</span>
+            </button>
+          </div>
+
+          <!-- Feature Section -->
+          <div class="w-full border-t border-base-300 pt-12 md:pt-16">
+            <div class="flex flex-col gap-8">
+              <h3 class="text-center text-xl md:text-2xl font-bold tracking-tight">How TripSync Works</h3>
+
+              <div class="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6">
+                <!-- Step 1 -->
+                <div
+                  class="card bg-base-200 border border-base-300 hover:border-primary/50 transition-colors duration-300">
+                  <div class="card-body items-center md:items-start text-center md:text-left gap-4">
+                    <div class="w-12 h-12 rounded-lg bg-base-300/50 flex items-center justify-center text-primary">
+                      <span class="material-symbols-outlined text-2xl">auto_awesome</span>
+                    </div>
+                    <div class="flex flex-col gap-1">
+                      <h4 class="card-title text-lg">1. Create</h4>
+                      <p class="text-base-content/60 text-sm">Let our AI build your perfect itinerary based on your
+                        interests.</p>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Step 2 -->
+                <div
+                  class="card bg-base-200 border border-base-300 hover:border-primary/50 transition-colors duration-300">
+                  <div class="card-body items-center md:items-start text-center md:text-left gap-4">
+                    <div class="w-12 h-12 rounded-lg bg-base-300/50 flex items-center justify-center text-primary">
+                      <span class="material-symbols-outlined text-2xl">group_add</span>
+                    </div>
+                    <div class="flex flex-col gap-1">
+                      <h4 class="card-title text-lg">2. Invite</h4>
+                      <p class="text-base-content/60 text-sm">Sync up with friends instantly and collaborate in
+                        real-time.</p>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Step 3 -->
+                <div
+                  class="card bg-base-200 border border-base-300 hover:border-primary/50 transition-colors duration-300">
+                  <div class="card-body items-center md:items-start text-center md:text-left gap-4">
+                    <div class="w-12 h-12 rounded-lg bg-base-300/50 flex items-center justify-center text-primary">
+                      <span class="material-symbols-outlined text-2xl">flight_takeoff</span>
+                    </div>
+                    <div class="flex flex-col gap-1">
+                      <h4 class="card-title text-lg">3. Go!</h4>
+                      <p class="text-base-content/60 text-sm">Enjoy stress-free travel with all your plans in one place.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </main>
+
+      <!-- Footer at bottom of drawer content -->
+      <footer class="footer footer-center p-6 bg-base-200 border-t border-base-300 text-base-content z-10">
+        <nav class="flex flex-wrap items-center justify-center gap-6">
+          <a class="link link-hover text-sm">Privacy Policy</a>
+          <a class="link link-hover text-sm">Terms of Service</a>
+          <a class="link link-hover text-sm">Support</a>
+        </nav>
+        <aside>
+          <p class="text-xs text-base-content/50">&copy; 2024 TripSync. All rights reserved.</p>
+        </aside>
+      </footer>
+    </div>
+
+    <!-- Sidebar -->
+    <div class="drawer-side z-40">
+      <label for="app-drawer" aria-label="close sidebar" class="drawer-overlay"></label>
+      <aside class="bg-base-200 w-72 min-h-full border-r border-base-300 flex flex-col">
+        <!-- Logo -->
+        <div class="p-6 flex items-center gap-3">
+          <div class="bg-primary/20 p-2 rounded-lg text-primary">
+            <span class="material-symbols-outlined text-2xl">flight_takeoff</span>
+          </div>
+          <h1 class="text-xl font-bold">TripSync</h1>
+        </div>
+
+        <!-- Menu -->
+        <ul class="menu flex-1 px-4 gap-1">
+          <li>
+            <a class="bg-primary/10 text-primary font-bold">
+              <span class="material-symbols-outlined">dashboard</span>
+              Dashboard
+            </a>
+          </li>
+          <li>
+            <a class="flex items-center gap-3">
+              <span class="material-symbols-outlined">map</span>
+              My Trips
+            </a>
+          </li>
+          <li>
+            <a class="flex items-center gap-3">
+              <span class="material-symbols-outlined">notifications</span>
+              Notifications
+              <span class="badge badge-primary badge-sm ml-auto">3</span>
+            </a>
+          </li>
+          <li>
+            <a class="flex items-center gap-3">
+              <span class="material-symbols-outlined">settings</span>
+              Settings
+            </a>
+          </li>
+        </ul>
+
+        <!-- User profile -->
+        <div class="p-4 border-t border-base-300">
+          <div class="flex items-center gap-3 p-3 rounded-xl bg-base-300">
+            <div class="avatar">
+              <div class="w-10 rounded-full">
+                <img
+                  src="https://lh3.googleusercontent.com/aida-public/AB6AXuAq6AIRsSpgRg7idJJCOjeOkz7vD6c-n0mSsSrUgEO2vUNZU4WsbccZYdqsvOxAjIew0aHIn4tyh-S8YNNSOnkImXTyNN-Y-XQSb-xHEgOiRzY5CtVtADcR7EjzmNBdMH0v5wVqbWMErgfKQLJzZEf8Cxbp8xw4nTr52soq32o03wATDesYEr6ISe0XjjMcFWHm2obgBQfpWEtdL86tfyKiTOdgW9Jot6uXq8-TbIXZNHcYLo9V0Isa7cMAygkA935EAYO-5v3u5m3o"
+                  alt="User avatar" />
+              </div>
+            </div>
+            <div class="flex flex-col overflow-hidden">
+              <p class="truncate text-sm font-bold">Sarah Chen</p>
+              <p class="truncate text-xs text-base-content/60">sarah@tripsync.com</p>
+            </div>
+          </div>
+        </div>
+      </aside>
+    </div>
+  </div>
+</body>
+
+</html>

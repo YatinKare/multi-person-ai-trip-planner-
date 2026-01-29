@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8" />
+  <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+  <title>TripSync - Dashboard with Conflicts</title>
+
+  <!-- Fonts -->
+  <link href="https://fonts.googleapis.com" rel="preconnect" />
+  <link crossorigin href="https://fonts.gstatic.com" rel="preconnect" />
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap"
+    rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
+    rel="stylesheet" />
+
+  <!-- DaisyUI + Tailwind Browser -->
+  <link href="https://cdn.jsdelivr.net/npm/daisyui@5" rel="stylesheet" type="text/css" />
+  <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+
+  <!-- Custom Theme -->
+  <link href="../tripsync-theme.css" rel="stylesheet" />
+</head>
+
+<body class="bg-base-100 text-white font-[Plus_Jakarta_Sans]" data-theme="dark">
+  <div class="drawer lg:drawer-open">
+    <input id="app-drawer" type="checkbox" class="drawer-toggle" />
+
+    <!-- Main content area -->
+    <div class="drawer-content flex flex-col min-h-screen">
+      <!-- Mobile navbar -->
+      <div class="navbar bg-base-200 border-b border-base-300 lg:hidden sticky top-0 z-50">
+        <div class="flex-none">
+          <label for="app-drawer" class="btn btn-ghost btn-square">
+            <span class="material-symbols-outlined">menu</span>
+          </label>
+        </div>
+        <div class="flex-1">
+          <span class="text-xl font-bold">TripSync</span>
+        </div>
+        <div class="flex-none">
+          <div class="avatar">
+            <div class="w-10 rounded-full">
+              <img
+                src="https://lh3.googleusercontent.com/aida-public/AB6AXuC2ZofkPnUVZJrKyvebceMotNv3HC5DznqTXTW4zdP1yn0sao2x5rRxbzq26_nhq4RddVGI81MCtVDd5qdr_vaRnzF3Nmm0hwl0tezZfWTqRby6Yhfs8KvXH677dpUwwOOuVLICT8s55JIPoOzZFTC7aucRewVZ018IJGAK_GdSGsO5E-aDayxpULaBXGiqwYrZYFqSXUt0u3jrEjjHE9Z7RV0LsyhqgV5AwMBx3hvchIaQVheU_JnGuFx7EG_ANzgYkWwVjG54A-zU"
+                alt="User" />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Page content -->
+      <main class="flex-1 p-4 md:p-6 lg:p-10">
+        <div class="w-full max-w-6xl mx-auto flex flex-col gap-6">
+          <!-- Page Heading & Alert -->
+          <div class="flex flex-col gap-4">
+            <div class="flex flex-wrap justify-between items-end gap-4 pb-2 border-b border-base-300">
+              <div class="flex flex-col gap-1">
+                <h1 class="text-3xl md:text-4xl font-black tracking-tight">Trip Dashboard</h1>
+                <div class="flex items-center gap-2 text-base-content/60">
+                  <span class="material-symbols-outlined text-lg">location_on</span>
+                  <span class="text-base">Summer in Kyoto • 5 Members</span>
+                </div>
+              </div>
+              <div class="flex items-center gap-2">
+                <span class="text-sm text-base-content/60">Jun 10 - Jun 25</span>
+                <button class="btn btn-ghost btn-circle btn-sm text-primary">
+                  <span class="material-symbols-outlined text-xl">edit_calendar</span>
+                </button>
+              </div>
+            </div>
+
+            <!-- Alert Banner -->
+            <div class="alert alert-error">
+              <div class="p-2 bg-error/20 rounded-full">
+                <span class="material-symbols-outlined">warning</span>
+              </div>
+              <div class="flex flex-col gap-1">
+                <span class="font-bold">Action Needed</span>
+                <span class="text-sm text-error/80">Critical scheduling and budget conflicts detected. Please resolve
+                  these to proceed with booking.</span>
+              </div>
+              <button class="btn btn-error btn-sm">Review All</button>
+            </div>
+          </div>
+
+          <!-- Main Layout Grid -->
+          <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <!-- Left Column: Scheduling Conflict (2/3 width) -->
+            <div class="lg:col-span-2 flex flex-col gap-6">
+              <!-- Conflict Resolution Card -->
+              <div class="card bg-base-200 border border-base-300 shadow-lg overflow-hidden relative">
+                <div class="absolute -top-10 -right-10 w-40 h-40 bg-primary/5 blur-[80px] rounded-full"></div>
+                <div class="card-body gap-6">
+                  <div class="flex items-center justify-between">
+                    <h3 class="card-title gap-2">
+                      <span class="material-symbols-outlined text-primary">calendar_clock</span>
+                      Scheduling Conflict
+                    </h3>
+                    <span class="badge badge-error">Blocking</span>
+                  </div>
+
+                  <div class="flex flex-col md:flex-row gap-6 items-stretch">
+                    <div class="flex-1 flex flex-col gap-4">
+                      <div class="bg-base-100 rounded-lg p-4 border-l-4 border-error">
+                        <p class="font-semibold mb-2">No date overlap found</p>
+                        <p class="text-base-content/60 text-sm">
+                          <strong class="text-white">Sarah</strong> is available June 10-16, but <strong
+                            class="text-white">Mark</strong> can only arrive after June 18. This leaves a <span
+                            class="text-error font-bold">2-day gap</span> where the full group cannot be together.
+                        </p>
+                      </div>
+
+                      <div class="flex flex-col gap-2">
+                        <p class="text-xs font-bold text-base-content/60 uppercase tracking-wider">AI Recommendation</p>
+                        <button
+                          class="btn btn-ghost bg-primary/10 border border-primary/30 justify-between group h-auto py-3">
+                          <div class="flex items-center gap-3">
+                            <div
+                              class="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center text-primary shrink-0">
+                              <span class="material-symbols-outlined text-lg">auto_awesome</span>
+                            </div>
+                            <div class="flex flex-col items-start text-left">
+                              <span class="font-bold text-sm">Suggest Compromise</span>
+                              <span class="text-primary text-xs">Find split-stay options or overlap alternatives</span>
+                            </div>
+                          </div>
+                          <span
+                            class="material-symbols-outlined text-primary group-hover:translate-x-1 transition-transform">arrow_forward</span>
+                        </button>
+                      </div>
+                    </div>
+
+                    <!-- Mini Visualization -->
+                    <div
+                      class="flex-1 min-h-40 bg-base-100 rounded-lg p-4 border border-base-300 flex flex-col justify-between relative overflow-hidden">
+                      <div class="absolute inset-0 opacity-20 bg-cover bg-center"
+                        style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuC_g4UNLenb1OInFGiYkFu9nS8j8aOX9i6yMyW9C4NiSu1jXzujHVS_xfjs3O_D23bVvzbpbwZIUN3M1xhWy2W-uqvMbtXP_TRgcSaIMadijqCVgWHcVI5ulc3TaWj3e7IGBiRhYwNKWQBpMS5xQhiHxxQ9JXFbzeGsoEpjOLbwiCRK_NcdLj4wXqxhpVPrr49uabKhRWQIv4mpAMQrlHR4buQ68Dod7bJ4DnJZG16Ex6ciP4ByoB_kei8dX3GQ6zUz1IJhgjqbB7Nk');">
+                      </div>
+                      <div class="absolute inset-0 bg-gradient-to-t from-base-100 to-transparent"></div>
+
+                      <div class="relative z-10 flex justify-between items-center text-xs text-base-content/60 mb-2">
+                        <span>June 10</span>
+                        <span>June 24</span>
+                      </div>
+
+                      <!-- Gantt bars -->
+                      <div class="relative z-10 flex flex-col gap-3 flex-1 justify-center">
+                        <div class="flex items-center gap-2">
+                          <div class="avatar placeholder">
+                            <div class="bg-purple-500/20 text-purple-300 text-xs w-6 rounded-full"><span>S</span></div>
+                          </div>
+                          <progress class="progress progress-primary w-full h-2" value="45" max="100"></progress>
+                        </div>
+
+                        <div class="pl-8 h-8 flex items-center">
+                          <div class="w-full h-full border-x border-dashed border-white/10 flex items-center">
+                            <div
+                              class="ml-[45%] w-[15%] h-6 bg-error/20 pattern-diagonal-lines rounded border border-error/30 flex items-center justify-center">
+                              <span class="material-symbols-outlined text-error text-sm">close</span>
+                            </div>
+                          </div>
+                        </div>
+
+                        <div class="flex items-center gap-2">
+                          <div class="avatar placeholder">
+                            <div class="bg-blue-500/20 text-blue-300 text-xs w-6 rounded-full"><span>M</span></div>
+                          </div>
+                          <div class="w-full h-2 bg-base-300 rounded-full overflow-hidden relative">
+                            <div class="absolute right-0 w-[40%] h-full bg-primary rounded-full"></div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Full Timeline Visualization -->
+              <div class="flex flex-col gap-3">
+                <div class="flex items-center justify-between px-1">
+                  <h4 class="text-lg font-bold">Group Availability</h4>
+                  <div class="flex items-center gap-4 text-xs text-base-content/60">
+                    <div class="flex items-center gap-1.5"><span
+                        class="w-2 h-2 rounded-full bg-primary"></span>Available</div>
+                    <div class="flex items-center gap-1.5"><span class="w-2 h-2 rounded-full bg-base-300"></span>Busy
+                    </div>
+                    <div class="flex items-center gap-1.5"><span class="w-2 h-2 rounded-full bg-error"></span>Conflict
+                    </div>
+                  </div>
+                </div>
+
+                <div class="card bg-base-200 border border-base-300 p-4 overflow-x-auto">
+                  <div class="min-w-[600px] flex flex-col gap-4">
+                    <!-- Calendar Header -->
+                    <div class="flex ml-32 text-xs text-base-content/60 font-mono border-b border-white/5 pb-2">
+                      <div class="flex-1 text-center">10</div>
+                      <div class="flex-1 text-center">11</div>
+                      <div class="flex-1 text-center">12</div>
+                      <div class="flex-1 text-center">13</div>
+                      <div class="flex-1 text-center">14</div>
+                      <div class="flex-1 text-center">15</div>
+                      <div class="flex-1 text-center text-error bg-error/10">16</div>
+                      <div class="flex-1 text-center text-error bg-error/10">17</div>
+                      <div class="flex-1 text-center text-error bg-error/10">18</div>
+                      <div class="flex-1 text-center">19</div>
+                      <div class="flex-1 text-center">20</div>
+                      <div class="flex-1 text-center">21</div>
+                      <div class="flex-1 text-center">22</div>
+                      <div class="flex-1 text-center">23</div>
+                    </div>
+
+                    <!-- Row 1: Sarah -->
+                    <div class="flex items-center">
+                      <div class="w-32 flex items-center gap-2 pr-4 shrink-0">
+                        <div class="avatar">
+                          <div class="w-8 rounded-full"><img
+                              src="https://lh3.googleusercontent.com/aida-public/AB6AXuDkGYZd9EBNZ6mSZCEOPhttdw9y5PpstORNMmlOmZY1nRhRWa2OV6140dTwZjEeYQPjkq9wbE2ZNlIDdCwF37RritvLvsHFJeV8k-ZPpcpiomG_DNsAAVZfPWL0kKX2IkcGlFRpF_1QZSUwpYuaS5JcCQmVFXxw-TpE8N5RnDUakGEpPVu6aPVhEgG-JXwAuTU4uHPMJ00yYQC8xdE7RcpuhXIloEK_U7-w4tBPTZ6t4-irEt9KqbQBNlgVoT8isXGU3iuT6bW5Xr3N"
+                              alt="Sarah" /></div>
+                        </div>
+                        <span class="text-sm font-medium">Sarah</span>
+                      </div>
+                      <div class="flex-1 h-8 bg-base-100 rounded relative overflow-hidden">
+                        <div class="absolute left-0 w-[50%] h-full bg-primary/80 rounded-l"></div>
+                        <div class="absolute right-0 w-[50%] h-full bg-base-300/30 pattern-diagonal-lines opacity-30">
+                        </div>
+                      </div>
+                    </div>
+
+                    <!-- Row 2: Mark -->
+                    <div class="flex items-center">
+                      <div class="w-32 flex items-center gap-2 pr-4 shrink-0">
+                        <div class="avatar">
+                          <div class="w-8 rounded-full"><img
+                              src="https://lh3.googleusercontent.com/aida-public/AB6AXuCzNf4OcU_MmOT717Z4ENbA44KklHrH7wGuSLOtoyG-F6vnMXcUNZhvzX6PcTTvKvxNzFh9q6ofMHJdFmlu6Y2aP8ZehrbEhxJCUoNk950-6cmJKCo8xWrWvKJ-5nV5ssITttL9sOURVIlpziNBTs17mkKrU0L1U6cVNNzEx8gIGM850bDdXb3MC5OYiCfJuQu3osKF-gns1NyCvrRoXB5BTnGWoSLQcuJWe2PnLZ5Ufl4Vcv0Cqf207HbFL3RXE_Z1YBU9koUlWCaG"
+                              alt="Mark" /></div>
+                        </div>
+                        <span class="text-sm font-medium">Mark</span>
+                      </div>
+                      <div class="flex-1 h-8 bg-base-100 rounded relative overflow-hidden">
+                        <div class="absolute left-0 w-[57%] h-full bg-base-300/30 pattern-diagonal-lines opacity-30">
+                        </div>
+                        <div class="absolute right-0 w-[43%] h-full bg-primary/80 rounded-r"></div>
+                      </div>
+                    </div>
+
+                    <!-- Row 3: Jen -->
+                    <div class="flex items-center opacity-60">
+                      <div class="w-32 flex items-center gap-2 pr-4 shrink-0">
+                        <div class="avatar placeholder">
+                          <div class="bg-orange-500/20 text-orange-400 w-8 rounded-full text-xs"><span>J</span></div>
+                        </div>
+                        <span class="text-sm font-medium">Jen</span>
+                      </div>
+                      <div class="flex-1 h-8 bg-base-100 rounded relative">
+                        <div
+                          class="w-full h-full bg-primary/30 rounded border border-primary/20 flex items-center justify-center text-xs text-primary tracking-widest uppercase">
+                          Full Availability</div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Right Column: Budget & Info -->
+            <div class="flex flex-col gap-6">
+              <!-- Budget Health Card -->
+              <div class="card bg-base-200 border border-base-300">
+                <div class="card-body">
+                  <div class="flex items-center justify-between pb-2 border-b border-base-300">
+                    <h3 class="card-title text-lg">Budget Health</h3>
+                    <button class="btn btn-ghost btn-circle btn-sm">
+                      <span class="material-symbols-outlined">more_horiz</span>
+                    </button>
+                  </div>
+
+                  <!-- Budget Alert -->
+                  <div class="alert alert-warning py-2 mt-2">
+                    <span class="material-symbols-outlined text-xl">trending_down</span>
+                    <div>
+                      <p class="text-sm font-bold">Low Budget Alert</p>
+                      <p class="text-xs text-base-content/60">Alex's budget is 68% lower than the group average.</p>
+                    </div>
+                  </div>
+
+                  <!-- Budget Chart -->
+                  <div class="mt-4 h-40 flex items-end justify-between gap-2 px-2">
+                    <div class="flex flex-col items-center gap-2 w-full">
+                      <div class="w-full bg-base-100 rounded-t h-32 flex items-end justify-center">
+                        <div class="w-4 bg-primary/60 rounded-t h-[80%]"></div>
+                      </div>
+                      <span class="text-xs text-base-content/60">Sarah</span>
+                    </div>
+                    <div class="flex flex-col items-center gap-2 w-full">
+                      <div class="w-full bg-base-100 rounded-t h-32 flex items-end justify-center">
+                        <div class="w-4 bg-primary/60 rounded-t h-[90%]"></div>
+                      </div>
+                      <span class="text-xs text-base-content/60">Mark</span>
+                    </div>
+                    <div class="flex flex-col items-center gap-2 w-full">
+                      <div class="relative w-full bg-base-100 rounded-t h-32 flex items-end justify-center">
+                        <div class="w-4 bg-warning rounded-t h-[30%] animate-pulse"></div>
+                        <span class="absolute top-2 text-xs font-bold text-warning">$800</span>
+                      </div>
+                      <span class="text-xs font-bold">Alex</span>
+                    </div>
+                    <div class="flex flex-col items-center gap-2 w-full">
+                      <div class="w-full bg-base-100 rounded-t h-32 flex items-end justify-center">
+                        <div class="w-4 bg-primary/60 rounded-t h-[75%]"></div>
+                      </div>
+                      <span class="text-xs text-base-content/60">Jen</span>
+                    </div>
+                    <div class="flex flex-col items-center gap-2 w-full">
+                      <div class="w-full bg-base-100 rounded-t h-32 flex items-end justify-center">
+                        <div class="w-4 bg-primary/60 rounded-t h-[85%]"></div>
+                      </div>
+                      <span class="text-xs text-base-content/60">You</span>
+                    </div>
+                  </div>
+
+                  <div
+                    class="flex items-center justify-between text-xs text-base-content/60 pt-2 border-t border-base-300 mt-2">
+                    <span>Group Average</span>
+                    <span class="font-bold text-white">$2,500</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Member Status Widget -->
+              <div class="card bg-base-200 border border-base-300">
+                <div class="card-body">
+                  <h3 class="card-title text-lg mb-2">Member Status</h3>
+                  <div class="flex flex-col gap-3">
+                    <div class="flex items-center justify-between">
+                      <div class="flex items-center gap-3">
+                        <div class="avatar">
+                          <div class="w-8 rounded-full"><img
+                              src="https://lh3.googleusercontent.com/aida-public/AB6AXuCT1gB7lmVKK1yuSJeWGpJMQ9FgwkAc9ivdWk6QTs6qB4tG9Y2talH_SbvzsqzudLy0TeUt5GaU4wjclkwf2NnrA3YqIklZFpNYgkuBlxPMf25zyqrSlCUhXy3XccHF_MqUjewMWrUOGGnz7U8Upyj8BXhAT1ISezwM39qR5-L5Yv8ITmrUUo9QqiXIBnSMkpQiQpo9iB2yQbNCYBXRCAtAuVg6DxJFewOlSnwR-Rl5Bqpbj5K6ZCDTVBp26wTGoKVSryhUTRQ8tZos"
+                              alt="" /></div>
+                        </div>
+                        <div class="flex flex-col">
+                          <span class="text-sm font-medium">Sarah</span>
+                          <span class="text-xs text-base-content/60">Organizer</span>
+                        </div>
+                      </div>
+                      <span class="material-symbols-outlined text-primary text-sm">check_circle</span>
+                    </div>
+                    <div class="flex items-center justify-between">
+                      <div class="flex items-center gap-3">
+                        <div class="avatar">
+                          <div class="w-8 rounded-full"><img
+                              src="https://lh3.googleusercontent.com/aida-public/AB6AXuDHWtUxH3uvclV052T9RORyIQcOVKJ6DWTCFHhlI_w-knPT6yOTQtEgnh-xP7MCt5ZdW-LPhN9ZKQyAKupeRoIkWzj4GgpNI3awzvu3RpglWG0TjlfWQrs_dVmJC3qYSXaVbCf0EOpsN0iwl6opxlOlYpa3hH7FeWtZo8Pwz0OF3Np1esat4ZWdfBT7kXzdWubQs-s283sYDLrEqD_peRRbAJFLr_HuvpN75o_Qan75D8HmiE-ItrxVabPnzzGyzEMWRqaIsNeX7dd6"
+                              alt="" /></div>
+                        </div>
+                        <div class="flex flex-col">
+                          <span class="text-sm font-medium">Mark</span>
+                          <span class="text-xs text-error">Conflict</span>
+                        </div>
+                      </div>
+                      <span class="material-symbols-outlined text-error text-sm">error</span>
+                    </div>
+                    <div class="flex items-center justify-between opacity-75">
+                      <div class="flex items-center gap-3">
+                        <div class="avatar placeholder">
+                          <div class="bg-base-300 text-xs w-8 rounded-full"><span>A</span></div>
+                        </div>
+                        <span class="text-sm font-medium">Alex</span>
+                      </div>
+                      <span class="material-symbols-outlined text-warning text-sm">warning</span>
+                    </div>
+                    <div class="flex items-center justify-between opacity-50">
+                      <div class="flex items-center gap-3">
+                        <div class="avatar placeholder">
+                          <div class="bg-base-300 text-xs w-8 rounded-full"><span>J</span></div>
+                        </div>
+                        <span class="text-sm font-medium">Jen</span>
+                      </div>
+                      <span class="material-symbols-outlined text-base-content/60 text-sm">pending</span>
+                    </div>
+                  </div>
+                  <button class="link link-primary text-sm text-left mt-2">Manage Members</button>
+                </div>
+              </div>
+
+              <!-- Destination Map Preview -->
+              <div class="card bg-base-200 border border-base-300 overflow-hidden h-40 relative group cursor-pointer">
+                <div class="w-full h-full bg-cover bg-center transition-transform duration-500 group-hover:scale-110"
+                  style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuBUeL7foGmUyn9rMVupjsN638sGr_fiN_Pc_eKo8HLVtmPeB374SNDdEW-4RBQGu4BdWtwTTPVm9sXlv8lhCfdnj7ncXRSA18DvntVKh3eVljwjG25sUwoW2jDEOmy9D6iFhsKcn4Ue5t642aF9dW-OskcPzKLBce5O2GDTdKPJenNWGHNOvd8HDwsgqc3BafnmsL0iWtOf0eHCKUWDQkcoo4zfav-_nJMc6zDjlPmlgtJwQJSLFebXlt2W--Pdt_YSLrfUTFUziLQy');">
+                </div>
+                <div
+                  class="absolute inset-0 bg-black/40 group-hover:bg-black/20 transition-colors flex items-center justify-center">
+                  <div class="btn btn-ghost bg-base-200/90 backdrop-blur gap-2">
+                    <span class="material-symbols-outlined text-primary text-sm">map</span>
+                    Open Map
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </main>
+    </div>
+
+    <!-- Sidebar -->
+    <div class="drawer-side z-40">
+      <label for="app-drawer" aria-label="close sidebar" class="drawer-overlay"></label>
+      <aside class="bg-base-200 w-72 min-h-full border-r border-base-300 flex flex-col">
+        <!-- Logo -->
+        <div class="p-6 flex items-center gap-3">
+          <div class="bg-primary/20 p-2 rounded-lg text-primary">
+            <span class="material-symbols-outlined text-2xl">flight_takeoff</span>
+          </div>
+          <h1 class="text-xl font-bold">TripSync</h1>
+        </div>
+
+        <!-- Menu -->
+        <ul class="menu flex-1 px-4 gap-1">
+          <li>
+            <a class="active bg-primary/10 text-primary font-bold">
+              <span class="material-symbols-outlined">dashboard</span>
+              Dashboard
+            </a>
+          </li>
+          <li>
+            <a class="flex items-center gap-3">
+              <span class="material-symbols-outlined">map</span>
+              My Trips
+            </a>
+          </li>
+          <li>
+            <a class="flex items-center gap-3">
+              <span class="material-symbols-outlined">notifications</span>
+              Notifications
+              <span class="badge badge-primary badge-sm ml-auto">3</span>
+            </a>
+          </li>
+          <li>
+            <a class="flex items-center gap-3">
+              <span class="material-symbols-outlined">settings</span>
+              Settings
+            </a>
+          </li>
+        </ul>
+
+        <!-- User profile -->
+        <div class="p-4 border-t border-base-300">
+          <div class="flex items-center gap-3 p-3 rounded-xl bg-base-300">
+            <div class="avatar">
+              <div class="w-10 rounded-full">
+                <img
+                  src="https://lh3.googleusercontent.com/aida-public/AB6AXuC2ZofkPnUVZJrKyvebceMotNv3HC5DznqTXTW4zdP1yn0sao2x5rRxbzq26_nhq4RddVGI81MCtVDd5qdr_vaRnzF3Nmm0hwl0tezZfWTqRby6Yhfs8KvXH677dpUwwOOuVLICT8s55JIPoOzZFTC7aucRewVZ018IJGAK_GdSGsO5E-aDayxpULaBXGiqwYrZYFqSXUt0u3jrEjjHE9Z7RV0LsyhqgV5AwMBx3hvchIaQVheU_JnGuFx7EG_ANzgYkWwVjG54A-zU"
+                  alt="User" />
+              </div>
+            </div>
+            <div class="flex flex-col overflow-hidden">
+              <p class="truncate text-sm font-bold">Sarah Chen</p>
+              <p class="truncate text-xs text-base-content/60">sarah@tripsync.com</p>
+            </div>
+          </div>
+        </div>
+      </aside>
+    </div>
+  </div>
+</body>
+
+</html>

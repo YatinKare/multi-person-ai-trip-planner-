@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8" />
+  <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+  <title>TripSync - Destination Voting</title>
+
+  <!-- Fonts -->
+  <link href="https://fonts.googleapis.com" rel="preconnect" />
+  <link crossorigin href="https://fonts.gstatic.com" rel="preconnect" />
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap"
+    rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
+    rel="stylesheet" />
+
+  <!-- DaisyUI + Tailwind Browser -->
+  <link href="https://cdn.jsdelivr.net/npm/daisyui@5" rel="stylesheet" type="text/css" />
+  <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+
+  <!-- Custom Theme -->
+  <link href="../tripsync-theme.css" rel="stylesheet" />
+</head>
+
+<body class="bg-base-100 text-white font-[Plus_Jakarta_Sans]" data-theme="dark">
+  <div class="drawer lg:drawer-open">
+    <input id="app-drawer" type="checkbox" class="drawer-toggle" />
+
+    <!-- Main content area -->
+    <div class="drawer-content flex flex-col min-h-screen">
+      <!-- Mobile navbar -->
+      <div class="navbar bg-base-200 border-b border-base-300 lg:hidden sticky top-0 z-50">
+        <div class="flex-none">
+          <label for="app-drawer" class="btn btn-ghost btn-square">
+            <span class="material-symbols-outlined">menu</span>
+          </label>
+        </div>
+        <div class="flex-1">
+          <span class="text-xl font-bold">TripSync</span>
+        </div>
+        <div class="flex-none">
+          <div class="avatar">
+            <div class="w-10 rounded-full">
+              <img
+                src="https://lh3.googleusercontent.com/aida-public/AB6AXuBur6MCH6l97WdUub9rJj6HKLtL9U8pnzHroXV1z2rx-2SQi4jFqB77WEuW9wKrLIwOX6c3f7rs7qgGTkPXDcCd-wuy7Au8RCMy-dQD3na16Vv74FgVP8Taj4TU9fYYl6J8nekJQfbyh9Y3dB45g1JLfNZ6TVwUBtzOdHLdUEhApwWnRQxs-b50bVjAjiQ2AfHKdE9L4kQL97c4cJq-efU4279BgczHWPPdsc3EJ3xZPUaMzrf3XT7vW9HP-TjoVp7XitFsvGfOMPUW"
+                alt="User" />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Page content -->
+      <main class="flex-1 flex flex-col items-center py-6 px-4 md:px-8 lg:px-16 w-full max-w-7xl mx-auto">
+        <!-- Page Header -->
+        <div
+          class="w-full flex flex-col md:flex-row justify-between items-start md:items-center gap-6 mb-10 border-b border-base-300 pb-6">
+          <div class="flex flex-col gap-2">
+            <h1 class="text-3xl md:text-4xl font-black tracking-tight">Summer 2024 Reunion</h1>
+            <div class="flex items-center gap-2">
+              <span class="material-symbols-outlined text-primary text-sm">auto_awesome</span>
+              <p class="text-base-content/60 text-base">AI-Suggested Destinations based on your group's preferences.</p>
+            </div>
+          </div>
+
+          <!-- Voting Members -->
+          <div class="flex flex-col items-end gap-2">
+            <span class="badge badge-ghost text-xs">Voting In Progress</span>
+            <div class="avatar-group -space-x-3">
+              <div class="avatar">
+                <div class="w-10"><img
+                    src="https://lh3.googleusercontent.com/aida-public/AB6AXuDeHozuooEjYcwTXOEr0GCLpJA3rNm2AZVyeLXU__9lBf8RyZJxOgqimeZZUA6x9GGZcpt06DowQijur3-cVH_Q1SwxKSnmTBpXZTdTmSi_xdwpFi3WGMJIk5P-dy06I2gDxzDfVmxli0xwycH11ZxrnrmpXHYjvtcrUI02suOFr2bxg3GDhsVex8qtd3qDPXT8F048bS4-C3lNv3P22NTHdqSAQ7C8kKZYah73PrzHeGSvtNQFPTjWh3Gh-nRUGvWZswbRHVk3WsIz"
+                    alt="" /></div>
+              </div>
+              <div class="avatar">
+                <div class="w-10"><img
+                    src="https://lh3.googleusercontent.com/aida-public/AB6AXuCVAtuDSD_RENM-PIjFfaF9XwKDXem1LxBGS3ro9gZsTb5IOQgzOT-EDjrLki0HOKaTbSLse3zdVn-ZUBhNbkal0IGlIvlyAjlnSLTIqr-vzRdvVypOwTbsalDPFgsatGYg05onX52Uvm-npwpoouxssbJgVE20TNbt_U8Ik8DMDdWdTZXG2lMggxgJzh9HKx7CD0vNU6lto43ND8t2ocZU31fMW0c2oBxrHnbeRadvwij7fdY9vocek3wxRiqaxuniGohP8GKtiPAC"
+                    alt="" /></div>
+              </div>
+              <div class="avatar">
+                <div class="w-10"><img
+                    src="https://lh3.googleusercontent.com/aida-public/AB6AXuAF6pBHfqisWhf_7JhWPsEFc8nMInsZUG0Qpx9yazYtr43cYuxcOVweoNfadEm8E1v5IDahbxZWs8vx3QNo-2hLIFDHM9qocsJLIHlZRxnPqRjb7887sNYEJQkmd610OSHxs7kfPhXyQOLFAxc2KFI9dW-7sO2P19wRsMVKyANdvAdsn0vsbQ1cSdnf6IMtlFwerYuLD712KwqTHgyB0FgB2GQBGQCxgX0ND_VghWdyX88vP0NrevF0XexuG2-qTPiIgzYO4cnZByKN"
+                    alt="" /></div>
+              </div>
+              <div class="avatar">
+                <div class="w-10"><img
+                    src="https://lh3.googleusercontent.com/aida-public/AB6AXuBEsJLdw-mpnlPiIc9VnwyHOX4gg6EJ_PRFe2uaY-4tyBi1TQdxUJ9Fx_GQZ7f9P1BrTbUVqUp-LKbp8yHm8w8Uc-gAXCQTL2YB7YTB65ce7WxnqhAwG3Wf3xdnci_pSkQVKxfrbsqUDdIsvf-uiWC7DrBqvUeDeYGzWzmjzqGkT2pfvRvQLTXfa9-VOFZywxyn_lxViHojJyPG7RPdovyLh9U3Uo2c8Uxe4G4bmTxGjsRsM3ORqwdknU62w9wNNPMAb1KN1Ho3i2uD"
+                    alt="" /></div>
+              </div>
+              <div class="avatar placeholder">
+                <div class="bg-base-300 w-10"><span class="text-xs font-bold">+2</span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Destination Cards Grid -->
+        <div class="w-full grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 lg:gap-8 mb-20">
+          <!-- Card 1: Kyoto -->
+          <div
+            class="card bg-base-200 border border-base-300 hover:border-primary/50 transition-all duration-300 shadow-lg overflow-hidden group">
+            <!-- Top Badge -->
+            <div class="absolute top-4 right-4 z-10">
+              <div class="badge badge-primary gap-1.5">
+                <span class="material-symbols-outlined text-sm">verified</span>
+                98% MATCH
+              </div>
+            </div>
+
+            <!-- Image -->
+            <figure class="relative h-64 w-full overflow-hidden">
+              <div class="absolute inset-0 bg-gradient-to-t from-base-200 to-transparent opacity-60 z-[1]"></div>
+              <div class="w-full h-full bg-center bg-cover transition-transform duration-700 group-hover:scale-105"
+                style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuCpsFz9vejoa-_GhnqAvYPWKgtkD17fIqCu8VP1o9WmWUa8343rhikU_303ZrzgFB9vsrtM8mKwJG1PlI1_9Nz0wJZyShjUCmifRjuscibFqgo2V2BjxDJYy0ospZxTLJk_GFxcf7Wg9NLtwZvql8C0eBkMaqk9QKs3Zm1ZDvdRweHvn8HGIzTkaigXyZedKi8iMs3jCJrcXzXT34ZglzmX-vmsazgI4D5dsu-G7Nq2h71EC0-Vo8_ESP5j-jlKRpNgt80yVvVqK1nq");'>
+              </div>
+              <div class="absolute bottom-4 left-4 z-10">
+                <h3 class="text-2xl font-bold drop-shadow-md">Kyoto, Japan</h3>
+              </div>
+            </figure>
+
+            <!-- Content -->
+            <div class="card-body p-5 gap-5">
+              <!-- Cost & AI Reasoning -->
+              <div class="space-y-3">
+                <div class="flex justify-between items-center pb-3 border-b border-base-300">
+                  <span class="text-base-content/60 text-sm">Est. Cost per person</span>
+                  <span class="text-primary text-xl font-bold">$2,400</span>
+                </div>
+                <div class="bg-base-300/30 rounded-lg p-3 border border-base-300/50">
+                  <div class="flex gap-2 mb-1">
+                    <span class="material-symbols-outlined text-primary text-lg">psychology</span>
+                    <span class="text-xs font-bold uppercase tracking-wider">Why it fits</span>
+                  </div>
+                  <p class="text-base-content/60 text-sm">Perfect balance of the group's budget and interest in
+                    historical sites. Low rainfall in selected dates.</p>
+                </div>
+              </div>
+
+              <!-- Highlights -->
+              <div class="space-y-2">
+                <p class="text-sm font-semibold">2-Day Highlight</p>
+                <ul class="steps steps-vertical text-sm">
+                  <li class="step step-primary">
+                    <div class="text-left">
+                      <span class="font-medium">Day 1:</span>
+                      <span class="text-base-content/60">Sunrise hike at Fushimi Inari Shrine followed by downtown food
+                        tour.</span>
+                    </div>
+                  </li>
+                  <li class="step step-primary">
+                    <div class="text-left">
+                      <span class="font-medium">Day 2:</span>
+                      <span class="text-base-content/60">Private Tea Ceremony in Gion district & Kinkaku-ji
+                        visit.</span>
+                    </div>
+                  </li>
+                </ul>
+              </div>
+
+              <!-- Actions -->
+              <div class="card-actions flex-col gap-3 pt-2">
+                <!-- Voting -->
+                <div class="flex gap-3 w-full">
+                  <button class="btn btn-ghost bg-base-300 flex-1 gap-2">
+                    <span
+                      class="material-symbols-outlined text-base-content/60 group-hover:text-primary">thumb_up</span>
+                    <span class="font-bold">12</span>
+                  </button>
+                  <button class="btn btn-ghost bg-base-300 flex-1 gap-2">
+                    <span
+                      class="material-symbols-outlined text-base-content/60 group-hover:text-error">thumb_down</span>
+                    <span class="font-bold">2</span>
+                  </button>
+                </div>
+                <!-- Organizer Select -->
+                <button class="btn btn-primary w-full gap-2">
+                  <span class="material-symbols-outlined text-xl">check_circle</span>
+                  Select Final Destination
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Card 2: Reykjavik -->
+          <div
+            class="card bg-base-200 border border-base-300 hover:border-primary/50 transition-all duration-300 shadow-lg overflow-hidden group">
+            <!-- Top Badge -->
+            <div class="absolute top-4 right-4 z-10">
+              <div class="badge badge-ghost gap-1.5">
+                <span class="material-symbols-outlined text-sm">verified</span>
+                95% MATCH
+              </div>
+            </div>
+
+            <!-- Image -->
+            <figure class="relative h-64 w-full overflow-hidden">
+              <div class="absolute inset-0 bg-gradient-to-t from-base-200 to-transparent opacity-60 z-[1]"></div>
+              <div class="w-full h-full bg-center bg-cover transition-transform duration-700 group-hover:scale-105"
+                style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuDxgaNxT_IYQjwTay5rZpwhzEs0jreJJ3UXLkWyzjtgOBzcMUL29BZU9h6mx8SWuK8wvEzf07A8UIXdAD5EMHb-NrxJmEwjIk1WdA3uavM-DQv93B_cBKIgI-1DG90M8JWcCCziOwr1TCLx7hW5LoD4BP-1Abgq-ZUPuRVL94qeC9XNJGjDzNDsFsvXo_GneTwcvIggLaFZgtGi7hq6REwNcAM8R5bsLyK51DzLsXY-RY71XN4nODxgIUKl--kjbNsTBW6BsfoN3xb-");'>
+              </div>
+              <div class="absolute bottom-4 left-4 z-10">
+                <h3 class="text-2xl font-bold drop-shadow-md">Reykjavik, Iceland</h3>
+              </div>
+            </figure>
+
+            <!-- Content -->
+            <div class="card-body p-5 gap-5">
+              <div class="space-y-3">
+                <div class="flex justify-between items-center pb-3 border-b border-base-300">
+                  <span class="text-base-content/60 text-sm">Est. Cost per person</span>
+                  <span class="text-primary text-xl font-bold">$3,100</span>
+                </div>
+                <div class="bg-base-300/30 rounded-lg p-3 border border-base-300/50">
+                  <div class="flex gap-2 mb-1">
+                    <span class="material-symbols-outlined text-primary text-lg">psychology</span>
+                    <span class="text-xs font-bold uppercase tracking-wider">Why it fits</span>
+                  </div>
+                  <p class="text-base-content/60 text-sm">High match for adventure seekers. Group survey indicated
+                    strong desire for nature over cities.</p>
+                </div>
+              </div>
+
+              <div class="space-y-2">
+                <p class="text-sm font-semibold">2-Day Highlight</p>
+                <ul class="steps steps-vertical text-sm">
+                  <li class="step step-primary">
+                    <div class="text-left">
+                      <span class="font-medium">Day 1:</span>
+                      <span class="text-base-content/60">Relaxing afternoon at the Blue Lagoon geothermal spa.</span>
+                    </div>
+                  </li>
+                  <li class="step step-primary">
+                    <div class="text-left">
+                      <span class="font-medium">Day 2:</span>
+                      <span class="text-base-content/60">Super Jeep tour to hunt for Northern Lights.</span>
+                    </div>
+                  </li>
+                </ul>
+              </div>
+
+              <div class="card-actions flex-col gap-3 pt-2">
+                <div class="flex gap-3 w-full">
+                  <button class="btn btn-ghost bg-base-300 flex-1 gap-2">
+                    <span class="material-symbols-outlined">thumb_up</span>
+                    <span class="font-bold">8</span>
+                  </button>
+                  <button class="btn btn-ghost bg-base-300 flex-1 gap-2">
+                    <span class="material-symbols-outlined">thumb_down</span>
+                    <span class="font-bold">4</span>
+                  </button>
+                </div>
+                <button class="btn btn-primary w-full gap-2">
+                  <span class="material-symbols-outlined text-xl">check_circle</span>
+                  Select Final Destination
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Card 3: Barcelona -->
+          <div
+            class="card bg-base-200 border border-base-300 hover:border-primary/50 transition-all duration-300 shadow-lg overflow-hidden group">
+            <!-- Top Badge -->
+            <div class="absolute top-4 right-4 z-10">
+              <div class="badge badge-ghost gap-1.5">
+                <span class="material-symbols-outlined text-sm">verified</span>
+                92% MATCH
+              </div>
+            </div>
+
+            <!-- Image -->
+            <figure class="relative h-64 w-full overflow-hidden">
+              <div class="absolute inset-0 bg-gradient-to-t from-base-200 to-transparent opacity-60 z-[1]"></div>
+              <div class="w-full h-full bg-center bg-cover transition-transform duration-700 group-hover:scale-105"
+                style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuDEyA-Aa7ZyY2Ex1nwUab045XplGV1TYug3UYNe7ho3fu7NsuiNYzqVx5um0-kdVCYOXw_twEhU3p7O3o1dUXyFnQBERMuSRfUG9OH4INGcq30yqwm0u0S6mrZAuEbNcuxnqUhe2P8sW6QkufrADG_8PmMlVfnGTA8i5GyOCRn2TjOeeFJG1CFc4m3lY5QzgvavhpfPqnC519NQgMVaXp0A29DHHATf9BUuWygJHsP7RgDpWAsy2UJMWonLPYGNHB8EzSO_0OZZKp6x");'>
+              </div>
+              <div class="absolute bottom-4 left-4 z-10">
+                <h3 class="text-2xl font-bold drop-shadow-md">Barcelona, Spain</h3>
+              </div>
+            </figure>
+
+            <!-- Content -->
+            <div class="card-body p-5 gap-5">
+              <div class="space-y-3">
+                <div class="flex justify-between items-center pb-3 border-b border-base-300">
+                  <span class="text-base-content/60 text-sm">Est. Cost per person</span>
+                  <span class="text-primary text-xl font-bold">$2,100</span>
+                </div>
+                <div class="bg-base-300/30 rounded-lg p-3 border border-base-300/50">
+                  <div class="flex gap-2 mb-1">
+                    <span class="material-symbols-outlined text-primary text-lg">psychology</span>
+                    <span class="text-xs font-bold uppercase tracking-wider">Why it fits</span>
+                  </div>
+                  <p class="text-base-content/60 text-sm">Top choice for foodie groups. Affordable luxury accommodation
+                    available in Gothic Quarter.</p>
+                </div>
+              </div>
+
+              <div class="space-y-2">
+                <p class="text-sm font-semibold">2-Day Highlight</p>
+                <ul class="steps steps-vertical text-sm">
+                  <li class="step step-primary">
+                    <div class="text-left">
+                      <span class="font-medium">Day 1:</span>
+                      <span class="text-base-content/60">Sagrada Familia private entry & Park Güell walk.</span>
+                    </div>
+                  </li>
+                  <li class="step step-primary">
+                    <div class="text-left">
+                      <span class="font-medium">Day 2:</span>
+                      <span class="text-base-content/60">Sunset sailing cruise followed by Tapas crawl.</span>
+                    </div>
+                  </li>
+                </ul>
+              </div>
+
+              <div class="card-actions flex-col gap-3 pt-2">
+                <div class="flex gap-3 w-full">
+                  <button class="btn btn-ghost bg-base-300 flex-1 gap-2">
+                    <span class="material-symbols-outlined">thumb_up</span>
+                    <span class="font-bold">6</span>
+                  </button>
+                  <button class="btn btn-ghost bg-base-300 flex-1 gap-2">
+                    <span class="material-symbols-outlined">thumb_down</span>
+                    <span class="font-bold">1</span>
+                  </button>
+                </div>
+                <!-- Organizer Select -->
+                <button class="btn btn-primary w-full gap-2">
+                  <span class="material-symbols-outlined text-xl">check_circle</span>
+                  Select Final Destination
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Sticky Footer Action -->
+        <div class="fixed bottom-6 left-1/2 transform -translate-x-1/2 z-40 lg:left-[calc(50%+160px)]">
+          <button
+            class="btn btn-ghost bg-base-200 border border-base-300 gap-2 shadow-2xl hover:scale-105 transition-transform">
+            <span class="material-symbols-outlined text-primary">autorenew</span>
+            <span>Generate More Options</span>
+          </button>
+        </div>
+      </main>
+    </div>
+
+    <!-- Sidebar -->
+    <div class="drawer-side z-40">
+      <label for="app-drawer" aria-label="close sidebar" class="drawer-overlay"></label>
+      <aside class="bg-base-200 w-72 min-h-full border-r border-base-300 flex flex-col">
+        <!-- Logo -->
+        <div class="p-6 flex items-center gap-3">
+          <div class="bg-primary/20 p-2 rounded-lg text-primary">
+            <span class="material-symbols-outlined text-2xl">flight_takeoff</span>
+          </div>
+          <h1 class="text-xl font-bold">TripSync</h1>
+        </div>
+
+        <!-- Menu -->
+        <ul class="menu flex-1 px-4 gap-1">
+          <li>
+            <a class="bg-primary/10 text-primary font-bold">
+              <span class="material-symbols-outlined">dashboard</span>
+              Dashboard
+            </a>
+          </li>
+          <li>
+            <a class="flex items-center gap-3 active"> <!-- Set as active per context -->
+              <span class="material-symbols-outlined filled">map</span>
+              My Trips
+            </a>
+          </li>
+          <li>
+            <a class="flex items-center gap-3">
+              <span class="material-symbols-outlined">notifications</span>
+              Notifications
+              <span class="badge badge-primary badge-sm ml-auto">3</span>
+            </a>
+          </li>
+          <li>
+            <a class="flex items-center gap-3">
+              <span class="material-symbols-outlined">settings</span>
+              Settings
+            </a>
+          </li>
+        </ul>
+
+        <!-- User profile -->
+        <div class="p-4 border-t border-base-300">
+          <div class="flex items-center gap-3 p-3 rounded-xl bg-base-300">
+            <div class="avatar">
+              <div class="w-10 rounded-full">
+                <img
+                  src="https://lh3.googleusercontent.com/aida-public/AB6AXuBur6MCH6l97WdUub9rJj6HKLtL9U8pnzHroXV1z2rx-2SQi4jFqB77WEuW9wKrLIwOX6c3f7rs7qgGTkPXDcCd-wuy7Au8RCMy-dQD3na16Vv74FgVP8Taj4TU9fYYl6J8nekJQfbyh9Y3dB45g1JLfNZ6TVwUBtzOdHLdUEhApwWnRQxs-b50bVjAjiQ2AfHKdE9L4kQL97c4cJq-efU4279BgczHWPPdsc3EJ3xZPUaMzrf3XT7vW9HP-TjoVp7XitFsvGfOMPUW"
+                  alt="User" />
+              </div>
+            </div>
+            <div class="flex flex-col overflow-hidden">
+              <p class="truncate text-sm font-bold">Sarah Chen</p>
+              <p class="truncate text-xs text-base-content/60">sarah@tripsync.com</p>
+            </div>
+          </div>
+        </div>
+      </aside>
+    </div>
+  </div>
+</body>
+
+</html>

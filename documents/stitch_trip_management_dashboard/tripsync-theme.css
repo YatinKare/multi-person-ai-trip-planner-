@@ -1,0 +1,203 @@
+/* TripSync Theme - DaisyUI Custom Overrides */
+
+/* Custom color palette for TripSync emerald theme */
+:root {
+  --tripsync-primary: #13ecb6;
+  --tripsync-primary-hover: #0fd6a3;
+  --tripsync-base-100: #10221d;
+  --tripsync-base-200: #162e28;
+  --tripsync-base-300: #23483f;
+  --tripsync-secondary: #92c9bb;
+}
+
+/* DaisyUI Dark Theme Color Overrides */
+[data-theme="dark"] {
+  --p: 160 85% 50%; /* primary - #13ecb6 */
+  --pf: 160 85% 45%; /* primary focus */
+  --pc: 160 40% 10%; /* primary content (text on primary) */
+
+  --s: 160 30% 68%; /* secondary - #92c9bb */
+  --sf: 160 30% 60%;
+  --sc: 160 40% 10%;
+
+  --a: 160 85% 50%; /* accent */
+  --af: 160 85% 45%;
+  --ac: 160 40% 10%;
+
+  --n: 160 25% 15%; /* neutral */
+  --nf: 160 25% 12%;
+  --nc: 160 20% 90%;
+
+  --b1: 160 35% 10%; /* base-100 - #10221d */
+  --b2: 160 30% 13%; /* base-200 - #162e28 */
+  --b3: 160 25% 20%; /* base-300 - #23483f */
+  --bc: 0 0% 100%; /* base content */
+
+  --in: 198 93% 60%;
+  --su: 160 85% 50%;
+  --wa: 43 96% 56%;
+  --er: 0 91% 71%;
+}
+
+/* Custom scrollbar styling */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--tripsync-base-300);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--tripsync-primary);
+}
+
+/* Selection colors */
+::selection {
+  background-color: var(--tripsync-primary);
+  color: var(--tripsync-base-100);
+}
+
+/* Button glow effects */
+.btn-primary {
+  box-shadow: 0 0 15px rgba(19, 236, 182, 0.2);
+  transition: all 0.2s ease;
+}
+
+.btn-primary:hover {
+  box-shadow: 0 0 25px rgba(19, 236, 182, 0.4);
+  transform: translateY(-1px);
+}
+
+.btn-primary:active {
+  transform: scale(0.98);
+}
+
+/* Card hover transitions */
+.card {
+  transition: all 0.3s ease;
+}
+
+.card:hover {
+  border-color: rgba(19, 236, 182, 0.3);
+}
+
+/* Material icon sizing helpers */
+.material-symbols-outlined {
+  font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+}
+
+.material-symbols-outlined.filled {
+  font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+}
+
+/* Custom animations */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in-up {
+  animation: fadeInUp 0.3s ease-out;
+}
+
+/* Pattern for conflict zones */
+.pattern-diagonal-lines {
+  background-image: repeating-linear-gradient(
+    45deg,
+    transparent,
+    transparent 5px,
+    rgba(239, 68, 68, 0.1) 5px,
+    rgba(239, 68, 68, 0.1) 10px
+  );
+}
+
+/* Font family override */
+body {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+}
+
+/* Input focus states */
+.input:focus,
+.select:focus,
+.textarea:focus {
+  border-color: var(--tripsync-primary);
+  box-shadow: 0 0 0 2px rgba(19, 236, 182, 0.2);
+}
+
+/* Badge variants for trip statuses */
+.badge-voting {
+  --tw-bg-opacity: 1;
+  background-color: rgb(245 158 11 / var(--tw-bg-opacity));
+}
+
+.badge-preferences {
+  --tw-bg-opacity: 1;
+  background-color: rgb(59 130 246 / var(--tw-bg-opacity));
+}
+
+.badge-finalized {
+  --tw-bg-opacity: 1;
+  background-color: var(--tripsync-primary);
+  color: var(--tripsync-base-100);
+}
+
+.badge-draft {
+  --tw-bg-opacity: 1;
+  background-color: rgb(107 114 128 / var(--tw-bg-opacity));
+}
+
+.badge-past {
+  --tw-bg-opacity: 1;
+  background-color: rgb(75 85 99 / var(--tw-bg-opacity));
+}
+
+/* Avatar group spacing */
+.avatar-group > .avatar {
+  border: 2px solid var(--tripsync-base-200);
+}
+
+/* Steps indicator custom colors */
+.steps .step-primary + .step-primary:before,
+.steps .step-primary:after {
+  background-color: var(--tripsync-primary);
+}
+
+/* Drawer overlay backdrop */
+.drawer-side > .drawer-overlay {
+  background-color: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(4px);
+}
+
+/* Progress bar glow */
+.progress-primary::-webkit-progress-value {
+  box-shadow: 0 0 10px rgba(19, 236, 182, 0.6);
+}
+
+/* Navbar glass effect */
+.navbar-glass {
+  background-color: rgba(16, 34, 29, 0.9);
+  backdrop-filter: blur(8px);
+}
+
+/* Hide scrollbar utility */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}

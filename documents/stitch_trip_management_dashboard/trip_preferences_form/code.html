@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>TripSync - Trip Preferences</title>
+
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com" rel="preconnect" />
+    <link crossorigin href="https://fonts.gstatic.com" rel="preconnect" />
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap"
+        rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
+        rel="stylesheet" />
+
+    <!-- DaisyUI + Tailwind Browser -->
+    <link href="https://cdn.jsdelivr.net/npm/daisyui@5" rel="stylesheet" type="text/css" />
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+
+    <!-- Custom Theme -->
+    <link href="../tripsync-theme.css" rel="stylesheet" />
+</head>
+
+<body class="bg-base-100 text-white font-[Plus_Jakarta_Sans]" data-theme="dark">
+    <div class="drawer lg:drawer-open">
+        <input id="app-drawer" type="checkbox" class="drawer-toggle" />
+
+        <!-- Main content area -->
+        <div class="drawer-content flex flex-col min-h-screen">
+            <!-- Mobile navbar -->
+            <div class="navbar bg-base-200 border-b border-base-300 lg:hidden sticky top-0 z-50">
+                <div class="flex-none">
+                    <label for="app-drawer" class="btn btn-ghost btn-square">
+                        <span class="material-symbols-outlined">menu</span>
+                    </label>
+                </div>
+                <div class="flex-1">
+                    <span class="text-xl font-bold">Trip Planner</span>
+                </div>
+                <div class="flex-none">
+                    <div class="avatar">
+                        <div class="w-10 rounded-full">
+                            <img src="https://lh3.googleusercontent.com/aida-public/AB6AXuCURZxNA8kYj9m-EVBaD2_vIS6K7ydJf1le9HegJtVc18yO6g0hpvwqd43VkWRCKR66esjJuJeEb6CXpAHMTTdK3xQb5RUIUy6EiOhRsRymr3zOS5KCKvUumGrQDMEUR5nwJwfuPZBjcedlUvGcFbrP2plJQd4AU6dT_8xL0wW9deIfew2pIVj4son57otBJtndegD735IYb3myEjbOmOjjoBtE-XGsSmC3Gy9-LilW6f7r0wdMx0dmOlo6CA39yqFSvWhChd4M0ZtK"
+                                alt="User" />
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Page content -->
+            <main class="flex-1 p-4 md:p-10 lg:p-16 flex justify-center w-full">
+                <div class="flex flex-col w-full max-w-[800px] gap-12 pb-24">
+                    <!-- Header -->
+                    <div class="flex flex-col gap-4">
+                        <h1 class="text-3xl md:text-5xl font-extrabold text-white tracking-tight">Let's plan your
+                            perfect trip</h1>
+                        <p class="text-base-content/60 text-lg">Tell us what you need, and our AI will sync it with your
+                            group.</p>
+                    </div>
+
+                    <!-- Section 1: Dates -->
+                    <section class="flex flex-col gap-6 p-6 md:p-8 rounded-2xl bg-base-200 border border-base-300">
+                        <div class="flex items-center gap-3 mb-2">
+                            <div
+                                class="size-8 rounded-full bg-primary/20 flex items-center justify-center text-primary font-bold">
+                                1</div>
+                            <h2 class="text-xl font-bold text-white">When are you free?</h2>
+                        </div>
+                        <!-- Calendar Area -->
+                        <div
+                            class="flex flex-wrap justify-center gap-6 bg-base-100/50 p-4 rounded-xl border border-base-300">
+                            <!-- Month 1 -->
+                            <div class="flex min-w-[280px] flex-1 flex-col gap-2">
+                                <div class="flex items-center justify-between px-2">
+                                    <button class="btn btn-sm btn-circle btn-ghost">
+                                        <span class="material-symbols-outlined">chevron_left</span>
+                                    </button>
+                                    <p class="text-white font-bold">July 2024</p>
+                                    <div class="w-8"></div>
+                                </div>
+                                <div
+                                    class="grid grid-cols-7 text-center gap-y-1 text-xs font-bold text-base-content/60">
+                                    <span class="py-2">S</span><span class="py-2">M</span><span
+                                        class="py-2">T</span><span class="py-2">W</span><span class="py-2">T</span><span
+                                        class="py-2">F</span><span class="py-2">S</span>
+                                    <!-- Calendar Days (Simulated) -->
+                                    <span
+                                        class="h-9 flex items-center justify-center text-base-content/40 font-normal">29</span>
+                                    <span
+                                        class="h-9 flex items-center justify-center text-base-content/40 font-normal">30</span>
+                                    <span
+                                        class="h-9 flex items-center justify-center text-white hover:bg-base-300 rounded-full cursor-pointer">1</span>
+                                    <span
+                                        class="h-9 flex items-center justify-center text-white hover:bg-base-300 rounded-full cursor-pointer">2</span>
+                                    <span
+                                        class="h-9 flex items-center justify-center text-white hover:bg-base-300 rounded-full cursor-pointer">3</span>
+                                    <span
+                                        class="h-9 flex items-center justify-center text-white hover:bg-base-300 rounded-full cursor-pointer">4</span>
+                                    <!-- Selected Range Start -->
+                                    <span
+                                        class="h-9 flex items-center justify-center bg-base-300 rounded-l-full text-white cursor-pointer relative">
+                                        <span
+                                            class="absolute inset-0 m-auto size-9 bg-primary rounded-full flex items-center justify-center text-base-300 font-bold shadow-lg shadow-primary/40">5</span>
+                                    </span>
+                                    <!-- Selected Range Middle -->
+                                    <span class="h-9 flex items-center justify-center bg-base-300 text-white">6</span>
+                                    <span class="h-9 flex items-center justify-center bg-base-300 text-white">7</span>
+                                    <span class="h-9 flex items-center justify-center bg-base-300 text-white">8</span>
+                                    <span class="h-9 flex items-center justify-center bg-base-300 text-white">9</span>
+                                    <span class="h-9 flex items-center justify-center bg-base-300 text-white">10</span>
+                                    <span class="h-9 flex items-center justify-center bg-base-300 text-white">11</span>
+                                    <span class="h-9 flex items-center justify-center bg-base-300 text-white">12</span>
+                                    <!-- Selected Range End -->
+                                    <span
+                                        class="h-9 flex items-center justify-center bg-base-300 rounded-r-full text-white cursor-pointer relative">
+                                        <span
+                                            class="absolute inset-0 m-auto size-9 bg-primary rounded-full flex items-center justify-center text-base-300 font-bold shadow-lg shadow-primary/40">13</span>
+                                    </span>
+                                    <span
+                                        class="h-9 flex items-center justify-center text-white hover:bg-base-300 rounded-full cursor-pointer">14</span>
+                                    <span
+                                        class="h-9 flex items-center justify-center text-white hover:bg-base-300 rounded-full cursor-pointer">15</span>
+                                </div>
+                            </div>
+                            <!-- Month 2 (Hidden on small) -->
+                            <div class="flex min-w-[280px] flex-1 flex-col gap-2 hidden sm:flex">
+                                <div class="flex items-center justify-between px-2">
+                                    <div class="w-8"></div>
+                                    <p class="text-white font-bold">August 2024</p>
+                                    <button class="btn btn-sm btn-circle btn-ghost">
+                                        <span class="material-symbols-outlined">chevron_right</span>
+                                    </button>
+                                </div>
+                                <div
+                                    class="grid grid-cols-7 text-center gap-y-1 text-xs font-bold text-base-content/60">
+                                    <span class="py-2">S</span><span class="py-2">M</span><span
+                                        class="py-2">T</span><span class="py-2">W</span><span class="py-2">T</span><span
+                                        class="py-2">F</span><span class="py-2">S</span>
+                                    <!-- Empty Start -->
+                                    <span></span><span></span><span></span><span></span>
+                                    <!-- August Days -->
+                                    <span
+                                        class="h-9 flex items-center justify-center text-white hover:bg-base-300 rounded-full cursor-pointer">1</span>
+                                    <span
+                                        class="h-9 flex items-center justify-center text-white hover:bg-base-300 rounded-full cursor-pointer">2</span>
+                                    <!-- ... -->
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 pt-4">
+                            <label class="form-control w-full">
+                                <div class="label">
+                                    <span class="label-text font-medium text-white">Trip Duration</span>
+                                </div>
+                                <select class="select select-bordered w-full bg-base-100">
+                                    <option value="">Select duration</option>
+                                    <option value="weekend">Weekend Trip (2-3 days)</option>
+                                    <option selected="" value="week">One Week (5-7 days)</option>
+                                    <option value="two-weeks">Two Weeks (10-14 days)</option>
+                                </select>
+                            </label>
+
+                            <div
+                                class="form-control p-4 bg-base-100 border border-base-300 rounded-lg flex-row justify-between items-center">
+                                <div class="flex flex-col gap-1">
+                                    <span class="font-medium text-white text-sm">Flexible Dates?</span>
+                                    <span class="text-xs text-base-content/60">+/- 3 days from selection</span>
+                                </div>
+                                <input type="checkbox" class="toggle toggle-primary" checked="checked" />
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- Section 2: Budget -->
+                    <section class="flex flex-col gap-6 p-6 md:p-8 rounded-2xl bg-base-200 border border-base-300">
+                        <div class="flex items-center gap-3 mb-2">
+                            <div
+                                class="size-8 rounded-full bg-primary/20 flex items-center justify-center text-primary font-bold">
+                                2</div>
+                            <h2 class="text-xl font-bold text-white">What's your spending range?</h2>
+                        </div>
+                        <div class="px-2 py-6">
+                            <div class="flex justify-between mb-4">
+                                <div class="flex flex-col">
+                                    <span
+                                        class="text-base-content/60 text-xs uppercase tracking-wider font-bold">Min</span>
+                                    <span class="text-white text-xl font-bold">$800</span>
+                                </div>
+                                <div class="flex flex-col text-right">
+                                    <span
+                                        class="text-base-content/60 text-xs uppercase tracking-wider font-bold">Max</span>
+                                    <span class="text-white text-xl font-bold">$3,200+</span>
+                                </div>
+                            </div>
+                            <!-- Range Slider Logic (Reusing styles for visual match) -->
+                            <input type="range" min="0" max="100" value="25" class="range range-xs range-primary" />
+                        </div>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-2">
+                            <label
+                                class="label cursor-pointer p-4 bg-base-100 border border-base-300 rounded-lg hover:border-primary/50 transition-colors justify-start gap-3">
+                                <input type="checkbox" checked="checked"
+                                    class="checkbox checkbox-primary checkbox-sm" />
+                                <span class="label-text font-medium text-white">Include Flights</span>
+                            </label>
+                            <label
+                                class="label cursor-pointer p-4 bg-base-100 border border-base-300 rounded-lg hover:border-primary/50 transition-colors justify-start gap-3">
+                                <input type="checkbox" checked="checked"
+                                    class="checkbox checkbox-primary checkbox-sm" />
+                                <span class="label-text font-medium text-white">Include Accommodation</span>
+                            </label>
+                        </div>
+                    </section>
+
+                    <!-- Section 3: Destination -->
+                    <section class="flex flex-col gap-6 p-6 md:p-8 rounded-2xl bg-base-200 border border-base-300">
+                        <div class="flex items-center gap-3 mb-2">
+                            <div
+                                class="size-8 rounded-full bg-primary/20 flex items-center justify-center text-primary font-bold">
+                                3</div>
+                            <h2 class="text-xl font-bold text-white">What's the vibe?</h2>
+                        </div>
+                        <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                            <!-- Card 1 -->
+                            <div
+                                class="card bg-base-100 border-2 border-primary cursor-pointer hover:bg-base-300 transition-colors h-40 items-center justify-center relative">
+                                <span class="material-symbols-outlined text-3xl text-primary mb-2">beach_access</span>
+                                <span class="font-bold text-white">Relaxing</span>
+                                <div class="absolute top-2 right-2 text-primary">
+                                    <span class="material-symbols-outlined text-xl">check_circle</span>
+                                </div>
+                            </div>
+                            <!-- Card 2 -->
+                            <div
+                                class="card bg-base-100 border border-base-300 cursor-pointer hover:border-primary/50 hover:-translate-y-1 transition-all h-40 items-center justify-center group">
+                                <span
+                                    class="material-symbols-outlined text-3xl text-base-content/60 group-hover:text-base-content transition-colors mb-2">landscape</span>
+                                <span
+                                    class="font-medium text-base-content/60 group-hover:text-white transition-colors">Nature</span>
+                            </div>
+                            <!-- Card 3 -->
+                            <div
+                                class="card bg-base-100 border border-base-300 cursor-pointer hover:border-primary/50 hover:-translate-y-1 transition-all h-40 items-center justify-center group">
+                                <span
+                                    class="material-symbols-outlined text-3xl text-base-content/60 group-hover:text-base-content transition-colors mb-2">nightlife</span>
+                                <span
+                                    class="font-medium text-base-content/60 group-hover:text-white transition-colors">Party</span>
+                            </div>
+                            <!-- Card 4 -->
+                            <div
+                                class="card bg-base-100 border border-base-300 cursor-pointer hover:border-primary/50 hover:-translate-y-1 transition-all h-40 items-center justify-center group">
+                                <span
+                                    class="material-symbols-outlined text-3xl text-base-content/60 group-hover:text-base-content transition-colors mb-2">location_city</span>
+                                <span
+                                    class="font-medium text-base-content/60 group-hover:text-white transition-colors">City
+                                    Break</span>
+                            </div>
+                        </div>
+
+                        <div class="form-control">
+                            <div class="label">
+                                <span class="label-text font-medium text-white">Specific places or interests?</span>
+                            </div>
+                            <textarea class="textarea textarea-bordered h-24 bg-base-100"
+                                placeholder="e.g. Must visit the Louvre, want to try street food, avoid tourist traps..."></textarea>
+                        </div>
+                    </section>
+
+                    <!-- Section 4: Constraints -->
+                    <section class="flex flex-col gap-6 p-6 md:p-8 rounded-2xl bg-base-200 border border-base-300">
+                        <div class="flex items-center gap-3 mb-2">
+                            <div
+                                class="size-8 rounded-full bg-primary/20 flex items-center justify-center text-primary font-bold">
+                                4</div>
+                            <h2 class="text-xl font-bold text-white">Anything else?</h2>
+                        </div>
+                        <div class="flex flex-wrap gap-3">
+                            <button
+                                class="btn btn-sm btn-ghost bg-primary/10 text-primary hover:bg-primary/20 border border-primary gap-2 rounded-full">
+                                Vegetarian
+                                <span class="material-symbols-outlined text-sm">close</span>
+                            </button>
+                            <button
+                                class="btn btn-sm btn-outline border-base-300 text-base-content/60 hover:text-white hover:border-primary/50 gap-2 rounded-full">
+                                Vegan
+                                <span class="material-symbols-outlined text-sm">add</span>
+                            </button>
+                            <button
+                                class="btn btn-sm btn-outline border-base-300 text-base-content/60 hover:text-white hover:border-primary/50 gap-2 rounded-full">
+                                Wheelchair Accessible
+                                <span class="material-symbols-outlined text-sm">add</span>
+                            </button>
+                            <button
+                                class="btn btn-sm btn-outline border-base-300 text-base-content/60 hover:text-white hover:border-primary/50 gap-2 rounded-full">
+                                Pet Friendly
+                                <span class="material-symbols-outlined text-sm">add</span>
+                            </button>
+                            <button
+                                class="btn btn-sm btn-outline border-base-300 text-base-content/60 hover:text-white hover:border-primary/50 gap-2 rounded-full">
+                                Early Bird
+                                <span class="material-symbols-outlined text-sm">add</span>
+                            </button>
+                        </div>
+                    </section>
+
+                    <!-- Actions Footer (Sticky) -->
+                    <div
+                        class="fixed bottom-0 left-0 lg:left-80 right-0 p-4 bg-base-100/90 backdrop-blur-md border-t border-base-300 flex items-center justify-between z-40">
+                        <button class="btn btn-ghost font-bold text-base-content/60 hover:text-white">
+                            Back
+                        </button>
+                        <button
+                            class="btn btn-primary rounded-full px-8 text-base-300 font-bold shadow-lg shadow-primary/20 gap-2">
+                            Sync Preferences
+                            <span class="material-symbols-outlined text-lg">arrow_forward</span>
+                        </button>
+                    </div>
+                </div>
+            </main>
+        </div>
+
+        <!-- Sidebar (Stepper Variant) -->
+        <div class="drawer-side z-40">
+            <label for="app-drawer" aria-label="close sidebar" class="drawer-overlay"></label>
+            <aside class="bg-base-200 w-72 lg:w-80 min-h-full border-r border-base-300 flex flex-col p-6 lg:p-10">
+                <div class="flex flex-col gap-8">
+                    <div class="flex flex-col gap-2">
+                        <div class="flex items-center gap-2 text-primary mb-2">
+                            <span class="material-symbols-outlined">flight_takeoff</span>
+                            <span class="font-bold">TripSync</span>
+                        </div>
+                        <h1 class="text-white text-2xl font-bold leading-tight">Trip Planner</h1>
+                        <p class="text-base-content/60 text-sm font-medium">Step 1 of 4</p>
+                    </div>
+
+                    <!-- Stepper Nav -->
+                    <nav class="flex flex-col gap-2">
+                        <!-- Step 1: Active -->
+                        <div
+                            class="flex items-center gap-3 px-4 py-3 rounded-lg bg-base-300/50 border-l-4 border-primary">
+                            <span class="material-symbols-outlined text-primary">calendar_month</span>
+                            <p class="text-white text-sm font-bold leading-normal">Dates</p>
+                        </div>
+                        <!-- Step 2 -->
+                        <div
+                            class="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-base-300/20 transition-colors cursor-pointer group">
+                            <span
+                                class="material-symbols-outlined text-base-content/60 group-hover:text-white">attach_money</span>
+                            <p class="text-base-content/60 text-sm font-medium leading-normal group-hover:text-white">
+                                Budget</p>
+                        </div>
+                        <!-- Step 3 -->
+                        <div
+                            class="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-base-300/20 transition-colors cursor-pointer group">
+                            <span
+                                class="material-symbols-outlined text-base-content/60 group-hover:text-white">map</span>
+                            <p class="text-base-content/60 text-sm font-medium leading-normal group-hover:text-white">
+                                Destination</p>
+                        </div>
+                        <!-- Step 4 -->
+                        <div
+                            class="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-base-300/20 transition-colors cursor-pointer group">
+                            <span
+                                class="material-symbols-outlined text-base-content/60 group-hover:text-white">tune</span>
+                            <p class="text-base-content/60 text-sm font-medium leading-normal group-hover:text-white">
+                                Constraints</p>
+                        </div>
+                    </nav>
+
+                    <div
+                        class="mt-auto p-4 rounded-xl bg-gradient-to-br from-base-300 to-transparent border border-base-300">
+                        <div class="flex items-start gap-3">
+                            <span class="material-symbols-outlined text-primary text-xl">auto_awesome</span>
+                            <div class="flex flex-col gap-1">
+                                <p class="text-white text-xs font-bold">AI Trip Assistant</p>
+                                <p class="text-base-content/60 text-xs leading-relaxed">I'll sync everyone's preferences
+                                    to find the perfect overlap.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </aside>
+        </div>
+    </div>
+</body>
+
+</html>

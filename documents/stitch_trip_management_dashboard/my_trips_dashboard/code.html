@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+  <title>TripSync - My Trips</title>
+
+  <!-- Fonts -->
+  <link href="https://fonts.googleapis.com" rel="preconnect"/>
+  <link crossorigin href="https://fonts.gstatic.com" rel="preconnect"/>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+
+  <!-- DaisyUI + Tailwind Browser -->
+  <link href="https://cdn.jsdelivr.net/npm/daisyui@5" rel="stylesheet" type="text/css"/>
+  <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+
+  <!-- Custom Theme -->
+  <link href="../tripsync-theme.css" rel="stylesheet"/>
+</head>
+<body class="bg-base-100 text-white font-[Plus_Jakarta_Sans]" data-theme="dark">
+  <div class="drawer lg:drawer-open">
+    <input id="app-drawer" type="checkbox" class="drawer-toggle"/>
+
+    <!-- Main content area -->
+    <div class="drawer-content flex flex-col">
+      <!-- Mobile navbar -->
+      <div class="navbar bg-base-200 border-b border-base-300 lg:hidden">
+        <label for="app-drawer" class="btn btn-ghost btn-square">
+          <span class="material-symbols-outlined">menu</span>
+        </label>
+        <span class="flex-1 text-xl font-bold">TripSync</span>
+        <div class="avatar">
+          <div class="w-10 rounded-full">
+            <img src="https://lh3.googleusercontent.com/aida-public/AB6AXuC2ZofkPnUVZJrKyvebceMotNv3HC5DznqTXTW4zdP1yn0sao2x5rRxbzq26_nhq4RddVGI81MCtVDd5qdr_vaRnzF3Nmm0hwl0tezZfWTqRby6Yhfs8KvXH677dpUwwOOuVLICT8s55JIPoOzZFTC7aucRewVZ018IJGAK_GdSGsO5E-aDayxpULaBXGiqwYrZYFqSXUt0u3jrEjjHE9Z7RV0LsyhqgV5AwMBx3hvchIaQVheU_JnGuFx7EG_ANzgYkWwVjG54A-zU" alt="User"/>
+          </div>
+        </div>
+      </div>
+
+      <!-- Page content -->
+      <main class="flex-1 p-6 lg:p-10">
+        <div class="max-w-7xl mx-auto">
+          <!-- Page Heading -->
+          <div class="mb-8 flex flex-col justify-between gap-4 md:flex-row md:items-center">
+            <div>
+              <h2 class="text-3xl font-extrabold tracking-tight md:text-4xl">My Trips</h2>
+              <p class="mt-1 text-base-content/60">Manage your group adventures and itineraries.</p>
+            </div>
+            <button class="btn btn-primary gap-2">
+              <span class="material-symbols-outlined text-xl">add</span>
+              Create New Trip
+            </button>
+          </div>
+
+          <!-- Filters and Search -->
+          <div class="mb-8 flex flex-col gap-4 xl:flex-row xl:items-center xl:justify-between">
+            <!-- Search Bar -->
+            <div class="w-full max-w-md">
+              <label class="input input-bordered flex items-center gap-2 bg-base-200">
+                <span class="material-symbols-outlined text-base-content/60">search</span>
+                <input type="text" class="grow" placeholder="Search trips by name or location..."/>
+              </label>
+            </div>
+
+            <!-- Filter Chips -->
+            <div class="flex flex-wrap gap-2">
+              <button class="btn btn-sm btn-neutral">All Trips</button>
+              <button class="btn btn-sm btn-ghost bg-base-300">Collecting Preferences</button>
+              <button class="btn btn-sm btn-ghost bg-base-300">Voting</button>
+              <button class="btn btn-sm btn-ghost bg-base-300">Finalized</button>
+              <button class="btn btn-sm btn-ghost bg-base-300">Past</button>
+            </div>
+          </div>
+
+          <!-- Trips Grid -->
+          <div class="grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-3">
+            <!-- Trip Card 1: Voting -->
+            <div class="card bg-base-200 border border-base-300 shadow-md hover:shadow-xl hover:-translate-y-1 transition-all overflow-hidden group">
+              <figure class="relative aspect-video">
+                <div class="badge badge-warning absolute left-3 top-3 z-10">Voting</div>
+                <button class="btn btn-circle btn-ghost btn-sm absolute right-3 top-3 z-10 bg-black/40 backdrop-blur-md">
+                  <span class="material-symbols-outlined text-lg">more_horiz</span>
+                </button>
+                <div class="h-full w-full bg-cover bg-center transition-transform duration-700 group-hover:scale-105"
+                     style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuB_AC1xI9AkKGP5NMZ-_OQnQ5zlk0dJuK1eC9wFIH1SzosKd-DxX2kx3c8NzuvlzjsuwiJY6zKnbzjkOhbDYqsuh5mERIkFMWAFJggexJV03QV9bEtNghriFgsCDylNKKzQBPiCBuVn4elZ-nIF4UckmUfYIzwoiW96wcoY6_2HDb5PVNkGLLf7aKHGN0bxL26LBfY7zj2POmEXG8UVodGWcJrkJLsucTPGdgc0y632Di5BQwEhEj0a3doagGnNJWLKVO1NC_1Rqn_M');">
+                </div>
+              </figure>
+              <div class="card-body p-5">
+                <div class="flex items-start justify-between mb-3">
+                  <h3 class="card-title text-xl">Bali Summer Retreat</h3>
+                  <div class="flex items-center gap-1 text-xs font-medium text-primary">
+                    <span class="material-symbols-outlined text-sm">auto_awesome</span>
+                    <span>AI</span>
+                  </div>
+                </div>
+                <p class="text-sm text-base-content/60 mb-4">Updated 2h ago</p>
+                <div class="flex items-center justify-between border-t border-base-300 pt-4">
+                  <div class="avatar-group -space-x-3">
+                    <div class="avatar"><div class="w-8"><img src="https://lh3.googleusercontent.com/aida-public/AB6AXuCV2LhpUKV1I0yffbF2BNCNYkqNX_f7Ngr6dVW48B-pKN68x0Uy11BQAPBUrsxayXYOsR4NV8Keb_B3FDGRQyD87JrNkcw7dA2dORHx08r7kqguF2N4c48dCRdFScMODiu2s1lumpPEgDe-wkI_KhrRM3WII3GfjcgON61XvojiACkjvSaOasiU15PIFWSlY_3OtdMgsnt-ohIiywxkPIIWRjFoCzpaN4jG1LxemJJlBwmr3XIHqevzkLqDFVRdJgJWM_93B5pdfp3w" alt=""/></div></div>
+                    <div class="avatar"><div class="w-8"><img src="https://lh3.googleusercontent.com/aida-public/AB6AXuDxCrQFa2vJaoxyOQAQHG6OmSOe6mm1AVA1KaBB8v-NnX8KBHrMbgLrKq5Y2nnWhza_WQOJBi_bIR_OFfpTUp2HyMfrVNzycjlskgfwIiDAMe7VR_FPxBfbkuhUXGRX_t2cwunHRcLMPzWPINS3Y6RztjjR5473XWXgripvoN8uKspWlhGbw79YsU7ylQfumEI_zdzZQ52zDluKNfCzB8GFSiS3l6A0V9Hy2KjhMUKy1dAqOoqxR9LlZmfELKMgFWsgv8p3Nz69li1S" alt=""/></div></div>
+                    <div class="avatar"><div class="w-8"><img src="https://lh3.googleusercontent.com/aida-public/AB6AXuAGN_ExjBihYd5VW_DvYCuXYzLID2XXb6J0MnyK1Vc3BbR4Z-WRf7WHjQhlUmXRPO-Rm2yquSWgoQt1lR2anP-EcD0z5k1K--j0BAHiCNLVPOGex0VinjDzQClLGTB62bcyqxJNFhJFf_mxpZEydpvXSpVp0WUCEbnw0Hj631MHSBcTLHWmJ4KcIyCfFvyL5R_k8MYZgr_5lNRkh6AeugzJ7fLTr8BbpEp3siIHeEXJGCDzbn0KjeBlvO86zDfu_zVFRLmtOJoh_ovz" alt=""/></div></div>
+                    <div class="avatar placeholder"><div class="bg-base-300 text-xs w-8"><span>+2</span></div></div>
+                  </div>
+                  <button class="btn btn-ghost btn-circle btn-sm">
+                    <span class="material-symbols-outlined">arrow_forward</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Trip Card 2: Collecting Preferences -->
+            <div class="card bg-base-200 border border-base-300 shadow-md hover:shadow-xl hover:-translate-y-1 transition-all overflow-hidden group">
+              <figure class="relative aspect-video">
+                <div class="badge badge-info absolute left-3 top-3 z-10">Preferences</div>
+                <button class="btn btn-circle btn-ghost btn-sm absolute right-3 top-3 z-10 bg-black/40 backdrop-blur-md">
+                  <span class="material-symbols-outlined text-lg">more_horiz</span>
+                </button>
+                <div class="h-full w-full bg-cover bg-center transition-transform duration-700 group-hover:scale-105"
+                     style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuBxndoo9qqKJdkJG5Ca7BsmIf1CiQA9wLOyJ_SrdkhaNOQFe2eZCbfkPJEtraMam12gW0et6KKqgpUbgBMYtNvzIZVdCA4stTOXPhF6QVvTM1tg1E3J59HwpBoqyKiGsifNjcJLoY0WL_0UMfKaZpYpHqf5LS_4ik-XdDC1YwCO4cIwxxvjZWwANlF16I62BrBGFKXxYt4jK_-WOTLggQIOjQ0Oxs7Q9FftoN3vRF5uAOwLJao8rUntTCr35ClXd2ZBhJxx0CrDYhII');">
+                </div>
+              </figure>
+              <div class="card-body p-5">
+                <h3 class="card-title text-xl mb-3">Ski Trip - Aspen</h3>
+                <p class="text-sm text-base-content/60 mb-4">Updated 1d ago</p>
+                <div class="flex items-center justify-between border-t border-base-300 pt-4">
+                  <div class="avatar-group -space-x-3">
+                    <div class="avatar"><div class="w-8"><img src="https://lh3.googleusercontent.com/aida-public/AB6AXuAw61-JOCRFjSpw0sCJpCCtux2m6aBcsRr-tCvVENbbE1Atg2AxlhU4jgZVtkWEfarqA1IxH16k-I722QnchNKHNHexrrTY_ao0n1ixbDDANHXImjcHazf3KA1BRnsYIVnq5qCT8K1sgGgN_WSadUeRqMLSFj6oiiCL226AGSc08YeU8JzO0ABptRYp4UC2w9K_XP0cgS5GvW_KNyKCtQgOVXiMuZuoUfPLSZA55_Nrca0ahlxMoirphYm_6goZFMCCEBmVVamb_qYK" alt=""/></div></div>
+                    <div class="avatar"><div class="w-8"><img src="https://lh3.googleusercontent.com/aida-public/AB6AXuDLHq8y85Ppxez_GLidAwTkDVpFt9pb7mubX_6DZeQJi_i8LeWn7tRKUxkmZBnJvcwhDihGXLGDo7lhNxxU756jAEtdl2G-XgS4vKMK_TkbSJOmlLNn-Uce-gBV8bk33qppMhsqseJZCCg_k-wNoSAqEM8Y5ua6Ms17tAG25Kfr3yWxz2prM-aI2Ckp60Kjr2jPwIig0dWX7B2EDRuOSDSl0yOs6FRi94yWqd3pvj_kBxoLKPA6o-7sBN_zupWUKQX-EbSWoLLaquHp" alt=""/></div></div>
+                    <div class="avatar placeholder"><div class="bg-base-300 text-xs w-8"><span>+6</span></div></div>
+                  </div>
+                  <button class="btn btn-ghost btn-circle btn-sm">
+                    <span class="material-symbols-outlined">arrow_forward</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Trip Card 3: Finalized -->
+            <div class="card bg-base-200 border border-base-300 shadow-md hover:shadow-xl hover:-translate-y-1 transition-all overflow-hidden group">
+              <figure class="relative aspect-video">
+                <div class="badge badge-success absolute left-3 top-3 z-10">Finalized</div>
+                <button class="btn btn-circle btn-ghost btn-sm absolute right-3 top-3 z-10 bg-black/40 backdrop-blur-md">
+                  <span class="material-symbols-outlined text-lg">more_horiz</span>
+                </button>
+                <div class="h-full w-full bg-cover bg-center transition-transform duration-700 group-hover:scale-105"
+                     style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuDDjs1wH9_p0dxm5u0jkc6kX5pFmuV9LnZ5zXDe1_ybmZr_hvqupEy-XaOjwtg-PTG9CQIIc3NhWdxfVCpkc46c9vN6ig-4BcfG3CMxROCIjBZG0UNterZPKug5hgwRtCSzwsnSqPEDvpRc1aR1o3GKootHb-gxeWyrLBVBlaQnNVuiBZX-UaVc7kqDn4Mus5WXcTDJ4CaGTUUqXGcuawJI_L2LIi75ApQR3C_UERVaA-r4L3YicIwmU-4MBRB2aCKJP9y_vBz84g6C');">
+                </div>
+              </figure>
+              <div class="card-body p-5">
+                <h3 class="card-title text-xl mb-3">Tokyo Tech Tour</h3>
+                <p class="text-sm text-base-content/60 mb-4">Updated 1w ago</p>
+                <div class="flex items-center justify-between border-t border-base-300 pt-4">
+                  <div class="avatar-group -space-x-3">
+                    <div class="avatar"><div class="w-8"><img src="https://lh3.googleusercontent.com/aida-public/AB6AXuDmi8c-cK071PxzsyjhbL1O9qzvyKcGpkBkDe4w7Q6twHfaS_AoTydpgF0Gvk2TlWzy2wxIWOTnYq2ctwBXDGZIVR1ZzcEoIfkxieLhd8PLhcTvqHdUNhwGO3ctu5NgQLFp1Qd5Dkw1zYverCJDCMj9gQEGBa0Sil6REdQVTH46biv2rX5M-et3AJm5woxAOPR29pY0_nGIkCJe9PnJmoSteWdrWjE5sL8A9ObvQu0HjuLjM40KksmwkX4DEy-VbBYu5m1UdnBFq4ZH" alt=""/></div></div>
+                    <div class="avatar"><div class="w-8"><img src="https://lh3.googleusercontent.com/aida-public/AB6AXuABsJyIK9sLX5m6Fce9-w4FPbukAPP4M80Fyhwwa8-GofPqr-sZXT19nVX9FoorbrfbEppTL1Mzi9QjPL8ne4UFaSHi7O3gecCB23VcrcWODf49bC4ukX9cn3NEzb1ccN9SgWDfKFtizzO7DAVjNRSfHZRFL8GM-4nCJBGjBdo6G64QTT3ROpNfd9ztILJ9I4-kEIz1XEyXAkwpy4LLn8b4Xsarz5aT36jl4Qe_QAC62MZiAH_AcUfEOIYSVnYfabQtVmknh11HunBf" alt=""/></div></div>
+                  </div>
+                  <button class="btn btn-ghost btn-circle btn-sm">
+                    <span class="material-symbols-outlined">arrow_forward</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Trip Card 4: Draft -->
+            <div class="card bg-base-200 border border-base-300 shadow-md hover:shadow-xl hover:-translate-y-1 transition-all overflow-hidden group">
+              <figure class="relative aspect-video">
+                <div class="badge badge-neutral absolute left-3 top-3 z-10">Draft</div>
+                <button class="btn btn-circle btn-ghost btn-sm absolute right-3 top-3 z-10 bg-black/40 backdrop-blur-md">
+                  <span class="material-symbols-outlined text-lg">more_horiz</span>
+                </button>
+                <div class="flex h-full w-full items-center justify-center bg-gradient-to-br from-base-300 to-base-100">
+                  <span class="material-symbols-outlined text-6xl text-white/20">edit_note</span>
+                </div>
+              </figure>
+              <div class="card-body p-5">
+                <div class="flex items-start justify-between mb-3">
+                  <h3 class="card-title text-xl">Euro Trip 2025</h3>
+                  <div class="flex items-center gap-1 text-xs font-medium text-primary">
+                    <span class="material-symbols-outlined text-sm">auto_awesome</span>
+                    <span>AI</span>
+                  </div>
+                </div>
+                <p class="text-sm text-base-content/60 mb-4">Updated just now</p>
+                <div class="flex items-center justify-between border-t border-base-300 pt-4">
+                  <div class="avatar-group -space-x-3">
+                    <div class="avatar"><div class="w-8"><img src="https://lh3.googleusercontent.com/aida-public/AB6AXuCTVX8WJtf0amVg4aR3qC6wQllIYlHvEtFb9jmWgaYNOVY_0Y3duTfVDpjJ2Ylp6ph9Eu5OBA7vAzWJADWJxPsVC7g9fdgIBgaD71QwWYGTDzBMAHxWWaP4b2ZT-TjlVS_R3gShCQ9vZBEOewkowuu3d09IPvsHF6Uv5Er4nzEsLsvcZrSX9xZec9dbiSHkUNY9w9D3LU0g-e4CyGOoTiz7RDnXdWG4iDcaor3-5ZZkg6D5HlLCdO_gsO9q5ywa_0zqd9DY_z8LSNBv" alt=""/></div></div>
+                  </div>
+                  <button class="btn btn-ghost btn-circle btn-sm">
+                    <span class="material-symbols-outlined">arrow_forward</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Trip Card 5: Past -->
+            <div class="card bg-base-200 border border-base-300 shadow-md hover:shadow-xl hover:-translate-y-1 transition-all overflow-hidden group opacity-75">
+              <figure class="relative aspect-video">
+                <div class="badge badge-ghost absolute left-3 top-3 z-10 bg-base-content/50">Past</div>
+                <button class="btn btn-circle btn-ghost btn-sm absolute right-3 top-3 z-10 bg-black/40 backdrop-blur-md">
+                  <span class="material-symbols-outlined text-lg">more_horiz</span>
+                </button>
+                <div class="h-full w-full bg-cover bg-center grayscale transition-all duration-700 group-hover:scale-105 group-hover:grayscale-0"
+                     style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuDLbmwiRtU-0dtmIQuFZrlly0TziNflPrX-ey3HoYVyvm8elFvu9smxhMPWa79wYDx46LIr-HESGBwt-pzLkIDhdnO-uaziec1aptzw0-uOdL-9NRAznu4GQHVBUZ016aW6WTkrsXT3lFb9IbN7sJImO0ABhb6GYj_zRSP6CJ7wXxrNdoqE89H1ofAZl3hSBKCxyXVeqQkIYb-X90gDF5qrAcBnXUifCKq4JPb-rXfgMU7Visvc98lxXEEYJhChQlVEzTi4T_W3nkwI');">
+                </div>
+              </figure>
+              <div class="card-body p-5">
+                <h3 class="card-title text-xl mb-3 text-base-content/60">Paris Weekend</h3>
+                <p class="text-sm text-base-content/40 mb-4">Ended 3 months ago</p>
+                <div class="flex items-center justify-between border-t border-base-300 pt-4">
+                  <div class="avatar-group -space-x-3 opacity-60">
+                    <div class="avatar"><div class="w-8"><img src="https://lh3.googleusercontent.com/aida-public/AB6AXuCfexclBkoFxKZSkjcKYg50Qec4xE_Jm4_59RIGqH2DFtSlCfNsleorinro-LsvPmE-e_lx3MwRBgNGDLwwSt_1t2vToehStuNU9jQFx9xaAT5Q2dvcZCelsm0UUL-mMMziDlxVq8fspLUeY52c_wQQIsAjSwOt1GGbMcGX-NmI3rpocS0arj5V4zKrCEna0SwJCNuYmgugHtYTST9f5yuaqReyzGWNfy5Klrv4jR1cQItKOsHMnBuRLeN3VY-rgvuFE8YPR7bK-5ic" alt=""/></div></div>
+                    <div class="avatar"><div class="w-8"><img src="https://lh3.googleusercontent.com/aida-public/AB6AXuBMjGv83mPfAJ1ORYVdJ14z53Bx9xUkaHOpPBh0Vjufx-Ia802Hyq6_9zpQzEkJkWo4a-Jmatd456bxyIzm4AQCSVzzg4Mr5LxZ10pnIJBG038awLy3bev7CtizLHdWOX5eJ5jaGQw1Wt6lJGkeCneg_8Z24opP8zPMNTVzHlH00jkJfgasrsr5RLWfnfiSGCDJuWZh9TOYxrlRpmwqVTII9TgLcl_NNxOHuRwDpkhPDMVc64M1D0pSFctnMoTV-nAJ4tLVdvYHluxw" alt=""/></div></div>
+                  </div>
+                  <button class="btn btn-ghost btn-circle btn-sm">
+                    <span class="material-symbols-outlined">restart_alt</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Create New Card -->
+            <button class="card bg-transparent border-2 border-dashed border-base-300 hover:border-primary hover:bg-base-200/50 transition-all min-h-[300px] flex items-center justify-center group">
+              <div class="card-body items-center justify-center text-center">
+                <div class="w-16 h-16 rounded-full bg-base-300 flex items-center justify-center group-hover:bg-primary/20 group-hover:text-primary transition-colors">
+                  <span class="material-symbols-outlined text-3xl">add</span>
+                </div>
+                <h3 class="card-title text-lg mt-4 group-hover:text-primary">Plan a New Trip</h3>
+                <p class="text-sm text-base-content/60">Start from scratch or use AI</p>
+              </div>
+            </button>
+          </div>
+        </div>
+      </main>
+    </div>
+
+    <!-- Sidebar -->
+    <div class="drawer-side">
+      <label for="app-drawer" aria-label="close sidebar" class="drawer-overlay"></label>
+      <aside class="bg-base-200 w-72 min-h-full border-r border-base-300 flex flex-col">
+        <!-- Logo -->
+        <div class="p-6 flex items-center gap-3">
+          <div class="bg-primary/20 p-2 rounded-lg text-primary">
+            <span class="material-symbols-outlined text-2xl">flight_takeoff</span>
+          </div>
+          <h1 class="text-xl font-bold">TripSync</h1>
+        </div>
+
+        <!-- Menu -->
+        <ul class="menu flex-1 px-4 gap-1">
+          <li>
+            <a class="flex items-center gap-3">
+              <span class="material-symbols-outlined">dashboard</span>
+              Dashboard
+            </a>
+          </li>
+          <li>
+            <a class="active bg-primary/10 text-primary font-bold">
+              <span class="material-symbols-outlined filled">map</span>
+              My Trips
+            </a>
+          </li>
+          <li>
+            <a class="flex items-center gap-3">
+              <span class="material-symbols-outlined">notifications</span>
+              Notifications
+              <span class="badge badge-primary badge-sm ml-auto">3</span>
+            </a>
+          </li>
+          <li>
+            <a class="flex items-center gap-3">
+              <span class="material-symbols-outlined">settings</span>
+              Settings
+            </a>
+          </li>
+        </ul>
+
+        <!-- User profile -->
+        <div class="p-4 border-t border-base-300">
+          <div class="flex items-center gap-3 p-3 rounded-xl bg-base-300">
+            <div class="avatar">
+              <div class="w-10 rounded-full">
+                <img src="https://lh3.googleusercontent.com/aida-public/AB6AXuC2ZofkPnUVZJrKyvebceMotNv3HC5DznqTXTW4zdP1yn0sao2x5rRxbzq26_nhq4RddVGI81MCtVDd5qdr_vaRnzF3Nmm0hwl0tezZfWTqRby6Yhfs8KvXH677dpUwwOOuVLICT8s55JIPoOzZFTC7aucRewVZ018IJGAK_GdSGsO5E-aDayxpULaBXGiqwYrZYFqSXUt0u3jrEjjHE9Z7RV0LsyhqgV5AwMBx3hvchIaQVheU_JnGuFx7EG_ANzgYkWwVjG54A-zU" alt="User"/>
+              </div>
+            </div>
+            <div class="flex flex-col overflow-hidden">
+              <p class="truncate text-sm font-bold">Sarah Chen</p>
+              <p class="truncate text-xs text-base-content/60">sarah@tripsync.com</p>
+            </div>
+          </div>
+        </div>
+      </aside>
+    </div>
+  </div>
+</body>
+</html>

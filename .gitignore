@@ -8,3 +8,7 @@ node_modules
 !.env.example
 vite.config.js.timestamp-*
 vite.config.ts.timestamp-*
+*.cpython-313.pyc
+agent/tripsync/.adk/*
+plan_PROGRESS.md
+documents/stitch_trip_management_dashboard/*/screen.png

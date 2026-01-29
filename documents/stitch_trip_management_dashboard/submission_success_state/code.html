@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8" />
+  <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+  <title>TripSync - Submission Success</title>
+
+  <!-- Fonts -->
+  <link href="https://fonts.googleapis.com" rel="preconnect" />
+  <link crossorigin href="https://fonts.gstatic.com" rel="preconnect" />
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap"
+    rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
+    rel="stylesheet" />
+
+  <!-- DaisyUI + Tailwind Browser -->
+  <link href="https://cdn.jsdelivr.net/npm/daisyui@5" rel="stylesheet" type="text/css" />
+  <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+
+  <!-- Custom Theme -->
+  <link href="../tripsync-theme.css" rel="stylesheet" />
+</head>
+
+<body class="bg-base-100 text-white font-[Plus_Jakarta_Sans]" data-theme="dark">
+  <div class="drawer lg:drawer-open">
+    <input id="app-drawer" type="checkbox" class="drawer-toggle" />
+
+    <!-- Main content area -->
+    <div class="drawer-content flex flex-col min-h-screen">
+      <!-- Mobile navbar -->
+      <div class="navbar bg-base-200 border-b border-base-300 lg:hidden sticky top-0 z-50">
+        <div class="flex-none">
+          <label for="app-drawer" class="btn btn-ghost btn-square">
+            <span class="material-symbols-outlined">menu</span>
+          </label>
+        </div>
+        <div class="flex-1">
+          <span class="text-xl font-bold">TripSync</span>
+        </div>
+        <div class="flex-none">
+          <div class="avatar">
+            <div class="w-10 rounded-full">
+              <img
+                src="https://lh3.googleusercontent.com/aida-public/AB6AXuBvZEnD8dYZOUYkDA0H_7vWFM1-GV2-a12VxZmmNXjgaCAnxoHX57Efsif7sXv4rVWvb2zN0F_JH9W2nB789RNC9Xc37juBNJnrtGAAWcD4o0Bd4KmjkfdeUN6S_U-3F3UAXWIApr3jdCL9eT-_rPAnnhd8a6fSfjD0azbLly-5_qxp88UD1Fi2PD7TAQerr38iMMBMwyZYTStwlhuVKUVQES9_UjHmnJqAYGkOD4ZoMHb7U0L-9x9OjBnKfjaeBUjWZC8t9yhAVJR0"
+                alt="User" />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Page content -->
+      <main class="flex-1 flex justify-center py-8 px-4 sm:px-6">
+        <div class="w-full max-w-xl flex flex-col gap-6">
+          <!-- Success Card -->
+          <div class="card bg-base-200 border border-base-300 shadow-lg">
+            <div class="card-body items-center p-6 sm:p-10">
+              <!-- Hero Success Section -->
+              <div class="flex flex-col items-center gap-6 text-center w-full">
+                <div class="relative">
+                  <!-- Glow effect -->
+                  <div class="absolute inset-0 bg-primary/20 blur-xl rounded-full scale-150"></div>
+                  <div
+                    class="relative bg-base-100 rounded-full w-24 h-24 flex items-center justify-center border-4 border-base-200 shadow-xl">
+                    <span class="material-symbols-outlined text-primary text-5xl">check_circle</span>
+                  </div>
+                </div>
+
+                <div class="flex flex-col items-center gap-2 max-w-md">
+                  <h1 class="text-2xl sm:text-3xl font-bold">Preferences Saved!</h1>
+                  <p class="text-base-content/60 text-base">
+                    Thanks for telling us what you love. We've added your inputs to the group pool.
+                  </p>
+                </div>
+              </div>
+
+              <!-- Divider -->
+              <div class="divider my-8"></div>
+
+              <!-- Timeline Section -->
+              <div class="w-full text-left mb-6">
+                <h2 class="text-xl font-bold">What happens next?</h2>
+              </div>
+
+              <!-- Timeline Component -->
+              <ul class="steps steps-vertical w-full">
+                <!-- Step 1: Active -->
+                <li class="step step-primary" data-content="">
+                  <div class="flex flex-col items-start text-left py-2">
+                    <div class="flex items-center gap-2">
+                      <span class="material-symbols-outlined text-primary text-lg">hourglass_top</span>
+                      <span class="font-bold">Wait for others (2/5 responded)</span>
+                    </div>
+                    <span class="text-base-content/60 text-sm mt-1">Waiting on 3 more friends...</span>
+                  </div>
+                </li>
+
+                <!-- Step 2: Pending -->
+                <li class="step" data-content="">
+                  <div class="flex flex-col items-start text-left py-2">
+                    <div class="flex items-center gap-2">
+                      <span class="material-symbols-outlined text-base-content/40 text-lg">auto_awesome</span>
+                      <span class="text-base-content/70 font-medium">AI generates destinations</span>
+                    </div>
+                    <span class="text-base-content/40 text-sm mt-1">TripSync will generate custom itineraries</span>
+                  </div>
+                </li>
+
+                <!-- Step 3: Pending -->
+                <li class="step" data-content="">
+                  <div class="flex flex-col items-start text-left py-2">
+                    <div class="flex items-center gap-2">
+                      <span class="material-symbols-outlined text-base-content/40 text-lg">thumb_up</span>
+                      <span class="text-base-content/70 font-medium">Vote on your favorite</span>
+                    </div>
+                    <span class="text-base-content/40 text-sm mt-1">Pick the winning destination</span>
+                  </div>
+                </li>
+              </ul>
+
+              <!-- Action Buttons -->
+              <div class="w-full mt-10 flex flex-col items-center gap-4">
+                <button class="btn btn-primary w-full sm:max-w-xs text-base-300 font-bold">
+                  Go to Trip Dashboard
+                </button>
+                <a href="#" class="link link-hover text-sm text-base-content/60 hover:text-primary">
+                  Edit Preferences
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </main>
+    </div>
+
+    <!-- Sidebar -->
+    <div class="drawer-side z-40">
+      <label for="app-drawer" aria-label="close sidebar" class="drawer-overlay"></label>
+      <aside class="bg-base-200 w-72 min-h-full border-r border-base-300 flex flex-col">
+        <!-- Logo -->
+        <div class="p-6 flex items-center gap-3">
+          <div class="bg-primary/20 p-2 rounded-lg text-primary">
+            <span class="material-symbols-outlined text-2xl">flight_takeoff</span>
+          </div>
+          <h1 class="text-xl font-bold">TripSync</h1>
+        </div>
+
+        <!-- Menu -->
+        <ul class="menu flex-1 px-4 gap-1">
+          <li>
+            <a class="bg-primary/10 text-primary font-bold">
+              <span class="material-symbols-outlined">dashboard</span>
+              Dashboard
+            </a>
+          </li>
+          <li>
+            <a class="flex items-center gap-3">
+              <span class="material-symbols-outlined">map</span>
+              My Trips
+            </a>
+          </li>
+          <li>
+            <a class="flex items-center gap-3">
+              <span class="material-symbols-outlined">notifications</span>
+              Notifications
+              <span class="badge badge-primary badge-sm ml-auto">3</span>
+            </a>
+          </li>
+          <li>
+            <a class="flex items-center gap-3">
+              <span class="material-symbols-outlined">settings</span>
+              Settings
+            </a>
+          </li>
+        </ul>
+
+        <!-- User profile -->
+        <div class="p-4 border-t border-base-300">
+          <div class="flex items-center gap-3 p-3 rounded-xl bg-base-300">
+            <div class="avatar">
+              <div class="w-10 rounded-full">
+                <img
+                  src="https://lh3.googleusercontent.com/aida-public/AB6AXuBvZEnD8dYZOUYkDA0H_7vWFM1-GV2-a12VxZmmNXjgaCAnxoHX57Efsif7sXv4rVWvb2zN0F_JH9W2nB789RNC9Xc37juBNJnrtGAAWcD4o0Bd4KmjkfdeUN6S_U-3F3UAXWIApr3jdCL9eT-_rPAnnhd8a6fSfjD0azbLly-5_qxp88UD1Fi2PD7TAQerr38iMMBMwyZYTStwlhuVKUVQES9_UjHmnJqAYGkOD4ZoMHb7U0L-9x9OjBnKfjaeBUjWZC8t9yhAVJR0"
+                  alt="User" />
+              </div>
+            </div>
+            <div class="flex flex-col overflow-hidden">
+              <p class="truncate text-sm font-bold">Sarah Chen</p>
+              <p class="truncate text-xs text-base-content/60">sarah@tripsync.com</p>
+            </div>
+          </div>
+        </div>
+      </aside>
+    </div>
+  </div>
+</body>
+
+</html>
