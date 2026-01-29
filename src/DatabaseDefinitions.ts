@@ -85,7 +85,7 @@ export interface Database {
           name: string
           created_by: string
           invite_code: string
-          status: Database['public']['Enums']['trip_status']
+          status: Database["public"]["Enums"]["trip_status"]
           rough_timeframe: string | null
           created_at: string
           updated_at: string
@@ -95,7 +95,7 @@ export interface Database {
           name: string
           created_by: string
           invite_code: string
-          status?: Database['public']['Enums']['trip_status']
+          status?: Database["public"]["Enums"]["trip_status"]
           rough_timeframe?: string | null
           created_at?: string
           updated_at?: string
@@ -105,7 +105,7 @@ export interface Database {
           name?: string
           created_by?: string
           invite_code?: string
-          status?: Database['public']['Enums']['trip_status']
+          status?: Database["public"]["Enums"]["trip_status"]
           rough_timeframe?: string | null
           created_at?: string
           updated_at?: string
@@ -116,28 +116,28 @@ export interface Database {
             columns: ["created_by"]
             referencedRelation: "users"
             referencedColumns: ["id"]
-          }
+          },
         ]
       }
       trip_members: {
         Row: {
           trip_id: string
           user_id: string
-          role: Database['public']['Enums']['member_role']
+          role: Database["public"]["Enums"]["member_role"]
           joined_at: string
           nudged_at: string | null
         }
         Insert: {
           trip_id: string
           user_id: string
-          role?: Database['public']['Enums']['member_role']
+          role?: Database["public"]["Enums"]["member_role"]
           joined_at?: string
           nudged_at?: string | null
         }
         Update: {
           trip_id?: string
           user_id?: string
-          role?: Database['public']['Enums']['member_role']
+          role?: Database["public"]["Enums"]["member_role"]
           joined_at?: string
           nudged_at?: string | null
         }
@@ -153,7 +153,7 @@ export interface Database {
             columns: ["user_id"]
             referencedRelation: "users"
             referencedColumns: ["id"]
-          }
+          },
         ]
       }
       preferences: {
@@ -205,7 +205,7 @@ export interface Database {
             columns: ["user_id"]
             referencedRelation: "users"
             referencedColumns: ["id"]
-          }
+          },
         ]
       }
       recommendations: {
@@ -242,7 +242,7 @@ export interface Database {
             columns: ["generated_by"]
             referencedRelation: "users"
             referencedColumns: ["id"]
-          }
+          },
         ]
       }
       destination_votes: {
@@ -251,7 +251,7 @@ export interface Database {
           recommendation_id: string
           user_id: string
           destination_index: number
-          vote_type: Database['public']['Enums']['vote_type']
+          vote_type: Database["public"]["Enums"]["vote_type"]
           created_at: string
         }
         Insert: {
@@ -259,7 +259,7 @@ export interface Database {
           recommendation_id: string
           user_id: string
           destination_index: number
-          vote_type: Database['public']['Enums']['vote_type']
+          vote_type: Database["public"]["Enums"]["vote_type"]
           created_at?: string
         }
         Update: {
@@ -267,7 +267,7 @@ export interface Database {
           recommendation_id?: string
           user_id?: string
           destination_index?: number
-          vote_type?: Database['public']['Enums']['vote_type']
+          vote_type?: Database["public"]["Enums"]["vote_type"]
           created_at?: string
         }
         Relationships: [
@@ -282,7 +282,7 @@ export interface Database {
             columns: ["user_id"]
             referencedRelation: "users"
             referencedColumns: ["id"]
-          }
+          },
         ]
       }
       itineraries: {
@@ -328,7 +328,7 @@ export interface Database {
             columns: ["finalized_by"]
             referencedRelation: "users"
             referencedColumns: ["id"]
-          }
+          },
         ]
       }
     }
@@ -339,9 +339,14 @@ export interface Database {
       [_ in never]: never
     }
     Enums: {
-      trip_status: 'collecting' | 'recommending' | 'voting' | 'planning' | 'finalized'
-      member_role: 'organizer' | 'member'
-      vote_type: 'upvote' | 'downvote'
+      trip_status:
+        | "collecting"
+        | "recommending"
+        | "voting"
+        | "planning"
+        | "finalized"
+      member_role: "organizer" | "member"
+      vote_type: "upvote" | "downvote"
     }
     CompositeTypes: {
       [_ in never]: never
