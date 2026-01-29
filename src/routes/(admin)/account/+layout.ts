@@ -8,11 +8,9 @@ import {
   isBrowser,
 } from "@supabase/ssr"
 import { redirect } from "@sveltejs/kit"
-import type { Database } from "../../../DatabaseDefinitions.js"
-import { CreateProfileStep } from "../../../config"
 import { load_helper } from "$lib/load_helpers"
 
-export const load = async ({ fetch, data, depends, url }) => {
+export const load = async ({ fetch, data, depends }) => {
   depends("supabase:auth")
 
   const supabase = isBrowser()
@@ -45,6 +43,8 @@ export const load = async ({ fetch, data, depends, url }) => {
 
   const { data: aal } = await supabase.auth.mfa.getAuthenticatorAssuranceLevel()
 
+  /* Profile check redirection logic removed as requested */
+  /*
   const createProfilePath = "/account/create_profile"
   const signOutPath = "/account/sign_out"
   if (
@@ -56,6 +56,7 @@ export const load = async ({ fetch, data, depends, url }) => {
   ) {
     redirect(303, createProfilePath)
   }
+  */
 
   return {
     supabase,
@@ -64,23 +65,4 @@ export const load = async ({ fetch, data, depends, url }) => {
     user,
     amr: aal?.currentAuthenticationMethods,
   }
-}
-
-export const _hasFullProfile = (
-  profile: Database["public"]["Tables"]["profiles"]["Row"] | null,
-) => {
-  if (!profile) {
-    return false
-  }
-  if (!profile.full_name) {
-    return false
-  }
-  if (!profile.company_name) {
-    return false
-  }
-  if (!profile.website) {
-    return false
-  }
-
-  return true
 }
