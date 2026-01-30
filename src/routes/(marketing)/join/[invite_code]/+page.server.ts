@@ -1,13 +1,17 @@
 import type { PageServerLoad, Actions } from "./$types"
 import { redirect, fail } from "@sveltejs/kit"
 
-export const load: PageServerLoad = async ({ params, locals: { supabase, supabaseServiceRole, session } }) => {
+export const load: PageServerLoad = async ({
+  params,
+  locals: { supabaseServiceRole, session },
+}) => {
   const { invite_code } = params
 
   // Use service role to bypass RLS - allows unauthenticated users to view trip info
   const { data: trip, error: tripError } = await supabaseServiceRole
     .from("trips")
-    .select(`
+    .select(
+      `
       id,
       name,
       status,
@@ -15,7 +19,8 @@ export const load: PageServerLoad = async ({ params, locals: { supabase, supabas
       rough_timeframe,
       created_by,
       created_at
-    `)
+    `,
+    )
     .eq("invite_code", invite_code)
     .single()
 
@@ -24,7 +29,7 @@ export const load: PageServerLoad = async ({ params, locals: { supabase, supabas
     return {
       trip: null,
       error: "Invalid or expired invite link",
-      session
+      session,
     }
   }
 
@@ -38,7 +43,10 @@ export const load: PageServerLoad = async ({ params, locals: { supabase, supabas
   // If user is authenticated, check if they're already a member
   let isAlreadyMember = false
   let memberCount = 0
-  let otherMembers: Array<{ full_name: string | null; avatar_url: string | null }> = []
+  let otherMembers: Array<{
+    full_name: string | null
+    avatar_url: string | null
+  }> = []
 
   if (session) {
     const { data: membership } = await supabaseServiceRole
@@ -59,19 +67,27 @@ export const load: PageServerLoad = async ({ params, locals: { supabase, supabas
   // Load member count and some members for social proof (service role to bypass RLS)
   const { data: members } = await supabaseServiceRole
     .from("trip_members")
-    .select(`
+    .select(
+      `
       user_id,
       profiles (
         full_name,
         avatar_url
       )
-    `)
+    `,
+    )
     .eq("trip_id", trip.id)
     .limit(3)
 
   memberCount = members?.length || 0
   otherMembers = (members || [])
-    .map(m => (m.profiles as any))
+    .map(
+      (m) =>
+        m.profiles as unknown as {
+          full_name: string | null
+          avatar_url: string | null
+        },
+    )
     .filter(Boolean)
     .slice(0, 3)
 
@@ -84,18 +100,21 @@ export const load: PageServerLoad = async ({ params, locals: { supabase, supabas
       rough_timeframe: trip.rough_timeframe,
       created_by: trip.created_by,
       created_at: trip.created_at,
-      organizer: organizerProfile
+      organizer: organizerProfile,
     },
     memberCount,
     otherMembers,
     isAlreadyMember,
     session,
-    error: null
+    error: null,
   }
 }
 
 export const actions: Actions = {
-  joinTrip: async ({ params, locals: { supabase, supabaseServiceRole, session } }) => {
+  joinTrip: async ({
+    params,
+    locals: { supabase, supabaseServiceRole, session },
+  }) => {
     if (!session) {
       // Redirect to login with return URL
       const returnUrl = `/join/${params.invite_code}`
@@ -129,13 +148,11 @@ export const actions: Actions = {
     }
 
     // Add user as member (use regular client - RLS will verify auth)
-    const { error: memberError } = await supabase
-      .from("trip_members")
-      .insert({
-        trip_id: trip.id,
-        user_id: session.user.id,
-        role: "member"
-      })
+    const { error: memberError } = await supabase.from("trip_members").insert({
+      trip_id: trip.id,
+      user_id: session.user.id,
+      role: "member",
+    })
 
     if (memberError) {
       console.error("Error adding trip member:", memberError)
@@ -144,5 +161,5 @@ export const actions: Actions = {
 
     // Redirect to preference form
     throw redirect(303, `/trips/${trip.id}/preferences`)
-  }
+  },
 }

@@ -11,7 +11,9 @@
   let { data, children }: Props = $props()
 
   // Determine active menu item based on current path
-  const isTripsActive = $derived($page.url.pathname === "/trips" || $page.url.pathname.startsWith("/trips/"))
+  const isTripsActive = $derived(
+    $page.url.pathname === "/trips" || $page.url.pathname.startsWith("/trips/"),
+  )
 
   // Close drawer on mobile after navigation
   function closeDrawer(): void {
@@ -36,9 +38,14 @@
       <div class="avatar">
         <div class="w-10 rounded-full">
           {#if data.profile?.avatar_url}
-            <img src={data.profile.avatar_url} alt={data.profile.full_name || "User"} />
+            <img
+              src={data.profile.avatar_url}
+              alt={data.profile.full_name || "User"}
+            />
           {:else}
-            <div class="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center">
+            <div
+              class="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center"
+            >
               <span class="material-symbols-outlined text-primary">person</span>
             </div>
           {/if}
@@ -54,8 +61,11 @@
 
   <!-- Sidebar -->
   <div class="drawer-side z-40">
-    <label for="trips-drawer" aria-label="close sidebar" class="drawer-overlay"></label>
-    <aside class="bg-base-200 w-72 min-h-full border-r border-base-300 flex flex-col">
+    <label for="trips-drawer" aria-label="close sidebar" class="drawer-overlay"
+    ></label>
+    <aside
+      class="bg-base-200 w-72 min-h-full border-r border-base-300 flex flex-col"
+    >
       <!-- Logo -->
       <div class="p-6 flex items-center gap-3">
         <div class="bg-primary/20 p-2 rounded-lg text-primary">
@@ -79,18 +89,20 @@
         <li>
           <a
             href="/trips"
-            class={isTripsActive ? "active bg-primary/10 text-primary font-bold" : "flex items-center gap-3"}
+            class={isTripsActive
+              ? "active bg-primary/10 text-primary font-bold"
+              : "flex items-center gap-3"}
             onclick={closeDrawer}
           >
-            <span class="material-symbols-outlined {isTripsActive ? 'filled' : ''}">map</span>
+            <span
+              class="material-symbols-outlined {isTripsActive ? 'filled' : ''}"
+              >map</span
+            >
             My Trips
           </a>
         </li>
         <li>
-          <button
-            class="flex items-center gap-3"
-            onclick={closeDrawer}
-          >
+          <button class="flex items-center gap-3" onclick={closeDrawer}>
             <span class="material-symbols-outlined">notifications</span>
             Notifications
             <span class="badge badge-primary badge-sm ml-auto">3</span>
@@ -117,17 +129,28 @@
           <div class="avatar">
             <div class="w-10 rounded-full">
               {#if data.profile?.avatar_url}
-                <img src={data.profile.avatar_url} alt={data.profile.full_name || "User"} />
+                <img
+                  src={data.profile.avatar_url}
+                  alt={data.profile.full_name || "User"}
+                />
               {:else}
-                <div class="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center">
-                  <span class="material-symbols-outlined text-primary">person</span>
+                <div
+                  class="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center"
+                >
+                  <span class="material-symbols-outlined text-primary"
+                    >person</span
+                  >
                 </div>
               {/if}
             </div>
           </div>
           <div class="flex flex-col overflow-hidden">
-            <p class="truncate text-sm font-bold">{data.profile?.full_name || "User"}</p>
-            <p class="truncate text-xs text-base-content/60">{data.userEmail || ""}</p>
+            <p class="truncate text-sm font-bold">
+              {data.profile?.full_name || "User"}
+            </p>
+            <p class="truncate text-xs text-base-content/60">
+              {data.userEmail || ""}
+            </p>
           </div>
         </a>
       </div>

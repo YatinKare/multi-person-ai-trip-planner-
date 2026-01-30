@@ -1,7 +1,9 @@
 import type { PageServerLoad, Actions } from "./$types"
 import { redirect, fail } from "@sveltejs/kit"
 
-export const load: PageServerLoad = async ({ locals: { supabase, session } }) => {
+export const load: PageServerLoad = async ({
+  locals: { supabase, session },
+}) => {
   if (!session) {
     throw redirect(303, "/login")
   }
@@ -11,7 +13,8 @@ export const load: PageServerLoad = async ({ locals: { supabase, session } }) =>
   // Load trips where user is a member
   const { data: tripMemberships, error: membershipsError } = await supabase
     .from("trip_members")
-    .select(`
+    .select(
+      `
       trip_id,
       role,
       joined_at,
@@ -25,7 +28,8 @@ export const load: PageServerLoad = async ({ locals: { supabase, session } }) =>
         updated_at,
         created_by
       )
-    `)
+    `,
+    )
     .eq("user_id", userId)
     .order("joined_at", { ascending: false })
 
@@ -35,7 +39,21 @@ export const load: PageServerLoad = async ({ locals: { supabase, session } }) =>
   }
 
   // Load member counts for each trip
-  const tripIds = tripMemberships?.map(m => (m.trips as any)?.id).filter(Boolean) || []
+  interface TripData {
+    id: string
+    name: string
+    status: string
+    invite_code: string
+    rough_timeframe: string
+    created_at: string
+    updated_at: string
+    created_by: string
+  }
+
+  const tripIds =
+    tripMemberships
+      ?.map((m) => (m.trips as unknown as TripData)?.id)
+      .filter(Boolean) || []
 
   const { data: memberCounts, error: countsError } = await supabase
     .from("trip_members")
@@ -47,15 +65,18 @@ export const load: PageServerLoad = async ({ locals: { supabase, session } }) =>
   }
 
   // Aggregate member counts by trip
-  const memberCountsByTrip = (memberCounts || []).reduce((acc, { trip_id }) => {
-    acc[trip_id] = (acc[trip_id] || 0) + 1
-    return acc
-  }, {} as Record<string, number>)
+  const memberCountsByTrip = (memberCounts || []).reduce(
+    (acc, { trip_id }) => {
+      acc[trip_id] = (acc[trip_id] || 0) + 1
+      return acc
+    },
+    {} as Record<string, number>,
+  )
 
   // Transform and enrich trip data
   const trips = (tripMemberships || [])
-    .map(membership => {
-      const trip = membership.trips as any
+    .map((membership) => {
+      const trip = membership.trips as unknown as TripData
       if (!trip) return null
 
       return {
@@ -69,14 +90,14 @@ export const load: PageServerLoad = async ({ locals: { supabase, session } }) =>
         created_by: trip.created_by,
         role: membership.role,
         member_count: memberCountsByTrip[trip.id] || 1,
-        is_organizer: membership.role === "organizer"
+        is_organizer: membership.role === "organizer",
       }
     })
     .filter((trip): trip is NonNullable<typeof trip> => trip !== null)
 
   return {
     trips,
-    session
+    session,
   }
 }
 
@@ -97,9 +118,9 @@ export const actions: Actions = {
     // Use service role client for write operations since we've verified the session
     // This bypasses RLS but we control the operations and verify auth via session
 
-    // Generate a unique invite code using the database function
-    // @ts-expect-error - RPC function not in generated types
-    const { data: inviteCodeResult, error: inviteCodeError } = await supabaseServiceRole.rpc("generate_invite_code")
+    const { data: inviteCodeResult, error: inviteCodeError } =
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      await (supabaseServiceRole.rpc as any)("generate_invite_code")
 
     if (inviteCodeError || !inviteCodeResult) {
       console.error("Error generating invite code:", inviteCodeError)
@@ -113,7 +134,7 @@ export const actions: Actions = {
         rough_timeframe: roughTimeframe,
         created_by: session.user.id,
         invite_code: inviteCodeResult,
-        status: "collecting"
+        status: "collecting",
       })
       .select()
       .single()
@@ -129,7 +150,7 @@ export const actions: Actions = {
       .insert({
         trip_id: newTrip.id,
         user_id: session.user.id,
-        role: "organizer"
+        role: "organizer",
       })
 
     if (memberError) {
@@ -143,7 +164,7 @@ export const actions: Actions = {
     return {
       success: true,
       tripId: newTrip.id,
-      inviteCode: newTrip.invite_code
+      inviteCode: newTrip.invite_code,
     }
-  }
+  },
 }

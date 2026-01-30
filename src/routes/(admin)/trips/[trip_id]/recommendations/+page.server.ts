@@ -1,7 +1,10 @@
 import { error } from "@sveltejs/kit"
 import type { PageServerLoad } from "./$types"
 
-export const load: PageServerLoad = async ({ params, locals: { supabase, session } }) => {
+export const load: PageServerLoad = async ({
+  params,
+  locals: { supabase, session },
+}) => {
   if (!session) {
     throw error(401, "Unauthorized")
   }
@@ -55,7 +58,7 @@ export const load: PageServerLoad = async ({ params, locals: { supabase, session
   }
 
   // Load profiles for members
-  const memberUserIds = members?.map(m => m.user_id) || []
+  const memberUserIds = members?.map((m) => m.user_id) || []
   const { data: profiles, error: profilesError } = await supabase
     .from("profiles")
     .select("id, full_name, avatar_url")
@@ -75,26 +78,27 @@ export const load: PageServerLoad = async ({ params, locals: { supabase, session
     console.error("Error loading preferences:", prefsError)
   }
 
-  const userIdsWithPrefs = new Set(preferencesData?.map(p => p.user_id) || [])
-  const profilesMap = new Map(profiles?.map(p => [p.id, p]) || [])
+  const userIdsWithPrefs = new Set(preferencesData?.map((p) => p.user_id) || [])
+  const profilesMap = new Map(profiles?.map((p) => [p.id, p]) || [])
 
   // Combine member data with preference status
-  const membersWithStatus = members?.map(member => {
-    const profile = profilesMap.get(member.user_id)
-    return {
-      user_id: member.user_id,
-      role: member.role,
-      full_name: profile?.full_name || null,
-      avatar_url: profile?.avatar_url || null,
-      has_preferences: userIdsWithPrefs.has(member.user_id)
-    }
-  }) || []
+  const membersWithStatus =
+    members?.map((member) => {
+      const profile = profilesMap.get(member.user_id)
+      return {
+        user_id: member.user_id,
+        role: member.role,
+        full_name: profile?.full_name || null,
+        avatar_url: profile?.avatar_url || null,
+        has_preferences: userIdsWithPrefs.has(member.user_id),
+      }
+    }) || []
 
   return {
     trip,
     recommendations: recommendations || null,
     userRole: membership.role,
     members: membersWithStatus,
-    session
+    session,
   }
 }

@@ -1,7 +1,10 @@
 import { error, redirect, fail } from "@sveltejs/kit"
 import type { PageServerLoad, Actions } from "./$types"
 
-export const load: PageServerLoad = async ({ params, locals: { supabase, session } }) => {
+export const load: PageServerLoad = async ({
+  params,
+  locals: { supabase, session },
+}) => {
   if (!session) {
     throw error(401, "Unauthorized")
   }
@@ -48,12 +51,16 @@ export const load: PageServerLoad = async ({ params, locals: { supabase, session
     trip,
     existingPreferences: existingPreferences || null,
     userRole: membership.role,
-    session
+    session,
   }
 }
 
 export const actions: Actions = {
-  submitPreferences: async ({ request, params, locals: { supabase, session } }) => {
+  submitPreferences: async ({
+    request,
+    params,
+    locals: { supabase, session },
+  }) => {
     if (!session) {
       return fail(401, { message: "Unauthorized" })
     }
@@ -92,9 +99,13 @@ export const actions: Actions = {
     const specificPlaces = formData.get("specificPlaces") as string
     const placesToAvoid = formData.get("placesToAvoid") as string
 
-    const selectedDietary = JSON.parse(formData.get("selectedDietary") as string)
+    const selectedDietary = JSON.parse(
+      formData.get("selectedDietary") as string,
+    )
     const otherDietary = formData.get("otherDietary") as string
-    const selectedAccessibility = JSON.parse(formData.get("selectedAccessibility") as string)
+    const selectedAccessibility = JSON.parse(
+      formData.get("selectedAccessibility") as string,
+    )
     const otherAccessibility = formData.get("otherAccessibility") as string
     const hardNos = formData.get("hardNos") as string
 
@@ -114,7 +125,7 @@ export const actions: Actions = {
       earliestStart: earliestStartDate,
       latestEnd: latestEndDate,
       idealDuration: tripDuration,
-      flexible: flexibleDates
+      flexible: flexibleDates,
     }
 
     const budgetPrefs = {
@@ -124,14 +135,14 @@ export const actions: Actions = {
       includeAccommodation,
       includeFood,
       includeActivities,
-      flexibility: budgetFlexibility
+      flexibility: budgetFlexibility,
     }
 
     const destinationPrefs = {
       vibes: selectedVibes,
       scope: travelScope,
       specificPlaces: specificPlaces || null,
-      placesToAvoid: placesToAvoid || null
+      placesToAvoid: placesToAvoid || null,
     }
 
     const constraintsPrefs = {
@@ -139,18 +150,16 @@ export const actions: Actions = {
       otherDietary: otherDietary || null,
       accessibility: selectedAccessibility,
       otherAccessibility: otherAccessibility || null,
-      hardNos: hardNos || null
+      hardNos: hardNos || null,
     }
 
     // Check if preferences already exist
-    const { data: existingPrefs, error: checkError } = await supabase
+    const { data: existingPrefs } = await supabase
       .from("preferences")
       .select("id")
       .eq("trip_id", trip_id)
       .eq("user_id", session.user.id)
       .single()
-
-    let result
 
     if (existingPrefs) {
       // Update existing preferences
@@ -162,37 +171,39 @@ export const actions: Actions = {
           destination_prefs: destinationPrefs,
           constraints: constraintsPrefs,
           notes: additionalNotes || null,
-          updated_at: new Date().toISOString()
+          updated_at: new Date().toISOString(),
         })
         .eq("id", existingPrefs.id)
 
       if (updateError) {
         console.error("Error updating preferences:", updateError)
-        return fail(500, { message: "Failed to save preferences. Please try again." })
+        return fail(500, {
+          message: "Failed to save preferences. Please try again.",
+        })
       }
     } else {
       // Insert new preferences
-      const { error: insertError } = await supabase
-        .from("preferences")
-        .insert({
-          trip_id,
-          user_id: session.user.id,
-          dates: datesPrefs,
-          budget: budgetPrefs,
-          destination_prefs: destinationPrefs,
-          constraints: constraintsPrefs,
-          notes: additionalNotes || null,
-          submitted_at: new Date().toISOString(),
-          updated_at: new Date().toISOString()
-        })
+      const { error: insertError } = await supabase.from("preferences").insert({
+        trip_id,
+        user_id: session.user.id,
+        dates: datesPrefs,
+        budget: budgetPrefs,
+        destination_prefs: destinationPrefs,
+        constraints: constraintsPrefs,
+        notes: additionalNotes || null,
+        submitted_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+      })
 
       if (insertError) {
         console.error("Error inserting preferences:", insertError)
-        return fail(500, { message: "Failed to save preferences. Please try again." })
+        return fail(500, {
+          message: "Failed to save preferences. Please try again.",
+        })
       }
     }
 
     // Redirect back to trip dashboard
     throw redirect(303, `/trips/${trip_id}`)
-  }
+  },
 }

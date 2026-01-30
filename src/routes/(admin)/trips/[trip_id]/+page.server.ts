@@ -2,7 +2,10 @@ import { error, redirect, fail } from "@sveltejs/kit"
 import type { PageServerLoad, Actions } from "./$types"
 import { aggregatePreferences } from "$lib/server/aggregatePreferences"
 
-export const load: PageServerLoad = async ({ params, locals: { supabase, session } }) => {
+export const load: PageServerLoad = async ({
+  params,
+  locals: { supabase, session },
+}) => {
   if (!session) {
     throw error(401, "Unauthorized")
   }
@@ -44,7 +47,7 @@ export const load: PageServerLoad = async ({ params, locals: { supabase, session
   }
 
   // Load profiles for all members
-  const userIds = members?.map(m => m.user_id) || []
+  const userIds = members?.map((m) => m.user_id) || []
   const { data: profiles, error: profilesError } = await supabase
     .from("profiles")
     .select("id, full_name, avatar_url")
@@ -55,8 +58,7 @@ export const load: PageServerLoad = async ({ params, locals: { supabase, session
   }
 
   // Create a map of user_id to profile
-  const profileMap = new Map(profiles?.map(p => [p.id, p]))
-
+  const profileMap = new Map(profiles?.map((p) => [p.id, p]))
 
   // Load preferences for all members to determine response status and aggregation
   const { data: preferences, error: preferencesError } = await supabase
@@ -69,26 +71,27 @@ export const load: PageServerLoad = async ({ params, locals: { supabase, session
   }
 
   // Combine member info with response status
-  const membersWithStatus = (members || []).map(member => {
-    const hasResponded = preferences?.some(p => p.user_id === member.user_id)
+  const membersWithStatus = (members || []).map((member) => {
+    const hasResponded = preferences?.some((p) => p.user_id === member.user_id)
     const profile = profileMap.get(member.user_id)
     return {
       user_id: member.user_id,
       role: member.role,
       joined_at: member.joined_at,
       profile: profile || null,
-      has_responded: hasResponded
+      has_responded: hasResponded,
     }
   })
 
   // Count responses
-  const responseCount = membersWithStatus.filter(m => m.has_responded).length
+  const responseCount = membersWithStatus.filter((m) => m.has_responded).length
   const totalMembers = membersWithStatus.length
 
   // Aggregate preferences if any exist
-  const aggregated = preferences && preferences.length > 0
-    ? aggregatePreferences(preferences)
-    : null
+  const aggregated =
+    preferences && preferences.length > 0
+      ? aggregatePreferences(preferences)
+      : null
 
   // Check if recommendations already exist
   const { data: existingRecommendations, error: recsError } = await supabase
@@ -111,7 +114,7 @@ export const load: PageServerLoad = async ({ params, locals: { supabase, session
     totalMembers,
     userId: session.user.id,
     aggregated,
-    hasRecommendations: !!existingRecommendations
+    hasRecommendations: !!existingRecommendations,
   }
 }
 
@@ -154,7 +157,9 @@ export const actions: Actions = {
 
     // Validate confirmation text
     if (confirmation.trim() !== trip.name.trim()) {
-      return fail(400, { message: "Trip name does not match. Please type the exact trip name." })
+      return fail(400, {
+        message: "Trip name does not match. Please type the exact trip name.",
+      })
     }
 
     // Delete the trip (cascading deletes will handle related records)
@@ -193,7 +198,10 @@ export const actions: Actions = {
 
     // Prevent organizer from leaving
     if (membership.role === "organizer") {
-      return fail(403, { message: "Organizers cannot leave trips. Please delete the trip or transfer ownership." })
+      return fail(403, {
+        message:
+          "Organizers cannot leave trips. Please delete the trip or transfer ownership.",
+      })
     }
 
     // Delete user's preferences for this trip
@@ -222,5 +230,5 @@ export const actions: Actions = {
 
     // Redirect to trips list page
     throw redirect(303, "/trips")
-  }
+  },
 }

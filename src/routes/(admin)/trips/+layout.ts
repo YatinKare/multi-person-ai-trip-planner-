@@ -38,6 +38,6 @@ export const load: LayoutLoad = async ({ fetch, data, depends }) => {
     supabase,
     session: data.session,
     profile: data.profile,
-    userEmail: data.userEmail
+    userEmail: data.userEmail,
   }
 }

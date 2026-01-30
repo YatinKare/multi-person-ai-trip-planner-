@@ -2,6 +2,38 @@ import type { Database } from "../../DatabaseDefinitions"
 
 type Preference = Database["public"]["Tables"]["preferences"]["Row"]
 
+interface DatesPref {
+  earliestStart?: string
+  latestEnd?: string
+  idealDuration?: string
+  flexible?: boolean
+}
+
+interface BudgetPref {
+  min?: number
+  max?: number
+  includeFlights?: boolean
+  includeAccommodation?: boolean
+  includeFood?: boolean
+  includeActivities?: boolean
+  flexibility?: string
+}
+
+interface DestinationPref {
+  vibes?: string[]
+  scope?: string
+  specificPlaces?: string
+  placesToAvoid?: string
+}
+
+interface ConstraintsPref {
+  dietary?: string[]
+  otherDietary?: string
+  accessibility?: string[]
+  otherAccessibility?: string
+  hardNos?: string
+}
+
 export interface AggregatedPreferences {
   dates: {
     earliestCommonStart: string | null
@@ -36,7 +68,9 @@ export interface AggregatedPreferences {
   }
 }
 
-export function aggregatePreferences(preferences: Preference[]): AggregatedPreferences {
+export function aggregatePreferences(
+  preferences: Preference[],
+): AggregatedPreferences {
   // Handle empty case
   if (preferences.length === 0) {
     return {
@@ -44,46 +78,50 @@ export function aggregatePreferences(preferences: Preference[]): AggregatedPrefe
         earliestCommonStart: null,
         latestCommonEnd: null,
         commonWindow: null,
-        idealDurations: []
+        idealDurations: [],
       },
       budget: {
         minBudget: 0,
         maxBudget: 0,
         commonInclusions: [],
-        flexibilityLevels: {}
+        flexibilityLevels: {},
       },
       destination: {
         commonVibes: [],
         allVibes: [],
         popularScopes: {},
         specificPlaces: [],
-        placesToAvoid: []
+        placesToAvoid: [],
       },
       constraints: {
         dietary: [],
         accessibility: [],
-        hardNos: []
+        hardNos: [],
       },
       conflicts: {
         hasConflicts: false,
         noDateOverlap: false,
         noBudgetOverlap: false,
         noCommonVibes: false,
-        details: []
-      }
+        details: [],
+      },
     }
   }
 
   // Parse all dates
-  const allDates = preferences.map(p => {
-    const dates = p.dates as any
-    return {
-      earliestStart: dates?.earliestStart ? new Date(dates.earliestStart) : null,
-      latestEnd: dates?.latestEnd ? new Date(dates.latestEnd) : null,
-      idealDuration: dates?.idealDuration || null,
-      flexible: dates?.flexible || false
-    }
-  }).filter(d => d.earliestStart && d.latestEnd)
+  const allDates = preferences
+    .map((p) => {
+      const dates = p.dates as unknown as DatesPref
+      return {
+        earliestStart: dates?.earliestStart
+          ? new Date(dates.earliestStart)
+          : null,
+        latestEnd: dates?.latestEnd ? new Date(dates.latestEnd) : null,
+        idealDuration: dates?.idealDuration || null,
+        flexible: dates?.flexible || false,
+      }
+    })
+    .filter((d) => d.earliestStart && d.latestEnd)
 
   // Find date overlap (common window)
   let commonStart: Date | null = null
@@ -91,17 +129,25 @@ export function aggregatePreferences(preferences: Preference[]): AggregatedPrefe
 
   if (allDates.length > 0) {
     // Latest of all earliest starts
-    commonStart = new Date(Math.max(...allDates.map(d => d.earliestStart!.getTime())))
+    commonStart = new Date(
+      Math.max(...allDates.map((d) => d.earliestStart!.getTime())),
+    )
     // Earliest of all latest ends
-    commonEnd = new Date(Math.min(...allDates.map(d => d.latestEnd!.getTime())))
+    commonEnd = new Date(
+      Math.min(...allDates.map((d) => d.latestEnd!.getTime())),
+    )
   }
 
   const hasDateOverlap = commonStart && commonEnd && commonStart <= commonEnd
-  const idealDurations = [...new Set(allDates.map(d => d.idealDuration).filter(Boolean))]
+  const idealDurations = [
+    ...new Set(
+      allDates.map((d) => d.idealDuration).filter((d): d is string => !!d),
+    ),
+  ]
 
   // Parse all budgets
-  const allBudgets = preferences.map(p => {
-    const budget = p.budget as any
+  const allBudgets = preferences.map((p) => {
+    const budget = p.budget as unknown as BudgetPref
     return {
       min: budget?.min || 0,
       max: budget?.max || 0,
@@ -109,36 +155,40 @@ export function aggregatePreferences(preferences: Preference[]): AggregatedPrefe
       includeAccommodation: budget?.includeAccommodation || false,
       includeFood: budget?.includeFood || false,
       includeActivities: budget?.includeActivities || false,
-      flexibility: budget?.flexibility || "prefer_under"
+      flexibility: budget?.flexibility || "prefer_under",
     }
   })
 
   // Find budget overlap
-  const minOfMaxBudgets = Math.min(...allBudgets.map(b => b.max))
-  const maxOfMinBudgets = Math.max(...allBudgets.map(b => b.min))
+  const minOfMaxBudgets = Math.min(...allBudgets.map((b) => b.max))
+  const maxOfMinBudgets = Math.max(...allBudgets.map((b) => b.min))
   const hasBudgetOverlap = maxOfMinBudgets <= minOfMaxBudgets
 
   // Find common budget inclusions (all must include for it to be common)
   const commonInclusions = []
-  if (allBudgets.every(b => b.includeFlights)) commonInclusions.push("Flights")
-  if (allBudgets.every(b => b.includeAccommodation)) commonInclusions.push("Accommodation")
-  if (allBudgets.every(b => b.includeFood)) commonInclusions.push("Food")
-  if (allBudgets.every(b => b.includeActivities)) commonInclusions.push("Activities")
+  if (allBudgets.every((b) => b.includeFlights))
+    commonInclusions.push("Flights")
+  if (allBudgets.every((b) => b.includeAccommodation))
+    commonInclusions.push("Accommodation")
+  if (allBudgets.every((b) => b.includeFood)) commonInclusions.push("Food")
+  if (allBudgets.every((b) => b.includeActivities))
+    commonInclusions.push("Activities")
 
   // Count flexibility levels
   const flexibilityLevels: Record<string, number> = {}
-  allBudgets.forEach(b => {
-    flexibilityLevels[b.flexibility] = (flexibilityLevels[b.flexibility] || 0) + 1
+  allBudgets.forEach((b) => {
+    flexibilityLevels[b.flexibility] =
+      (flexibilityLevels[b.flexibility] || 0) + 1
   })
 
   // Parse all destination preferences
-  const allDestPrefs = preferences.map(p => {
-    const destPrefs = p.destination_prefs as any
+  const allDestPrefs = preferences.map((p) => {
+    const destPrefs = p.destination_prefs as unknown as DestinationPref
     return {
       vibes: destPrefs?.vibes || [],
       scope: destPrefs?.scope || "either",
       specificPlaces: destPrefs?.specificPlaces || "",
-      placesToAvoid: destPrefs?.placesToAvoid || ""
+      placesToAvoid: destPrefs?.placesToAvoid || "",
     }
   })
 
@@ -146,46 +196,46 @@ export function aggregatePreferences(preferences: Preference[]): AggregatedPrefe
   let commonVibes: string[] = []
   if (allDestPrefs.length > 0) {
     commonVibes = allDestPrefs[0].vibes.filter((vibe: string) =>
-      allDestPrefs.every(pref => pref.vibes.includes(vibe))
+      allDestPrefs.every((pref) => pref.vibes.includes(vibe)),
     )
   }
 
   // All vibes (union)
   const allVibesSet = new Set<string>()
-  allDestPrefs.forEach(pref => {
+  allDestPrefs.forEach((pref) => {
     pref.vibes.forEach((vibe: string) => allVibesSet.add(vibe))
   })
   const allVibes = Array.from(allVibesSet)
 
   // Count travel scope preferences
   const popularScopes: Record<string, number> = {}
-  allDestPrefs.forEach(pref => {
+  allDestPrefs.forEach((pref) => {
     popularScopes[pref.scope] = (popularScopes[pref.scope] || 0) + 1
   })
 
   // Collect specific places and places to avoid
   const specificPlaces = allDestPrefs
-    .map(pref => pref.specificPlaces)
+    .map((pref) => pref.specificPlaces)
     .filter(Boolean)
   const placesToAvoid = allDestPrefs
-    .map(pref => pref.placesToAvoid)
+    .map((pref) => pref.placesToAvoid)
     .filter(Boolean)
 
   // Parse all constraints
-  const allConstraints = preferences.map(p => {
-    const constraints = p.constraints as any
+  const allConstraints = preferences.map((p) => {
+    const constraints = p.constraints as unknown as ConstraintsPref
     return {
       dietary: constraints?.dietary || [],
       otherDietary: constraints?.otherDietary || "",
       accessibility: constraints?.accessibility || [],
       otherAccessibility: constraints?.otherAccessibility || "",
-      hardNos: constraints?.hardNos || ""
+      hardNos: constraints?.hardNos || "",
     }
   })
 
   // Collect all dietary restrictions (union)
   const dietarySet = new Set<string>()
-  allConstraints.forEach(c => {
+  allConstraints.forEach((c) => {
     c.dietary.forEach((d: string) => dietarySet.add(d))
     if (c.otherDietary) dietarySet.add(c.otherDietary)
   })
@@ -193,16 +243,14 @@ export function aggregatePreferences(preferences: Preference[]): AggregatedPrefe
 
   // Collect all accessibility needs (union)
   const accessibilitySet = new Set<string>()
-  allConstraints.forEach(c => {
+  allConstraints.forEach((c) => {
     c.accessibility.forEach((a: string) => accessibilitySet.add(a))
     if (c.otherAccessibility) accessibilitySet.add(c.otherAccessibility)
   })
   const accessibility = Array.from(accessibilitySet)
 
   // Collect all hard no's
-  const hardNos = allConstraints
-    .map(c => c.hardNos)
-    .filter(Boolean)
+  const hardNos = allConstraints.map((c) => c.hardNos).filter(Boolean)
 
   // Detect conflicts
   const conflicts = {
@@ -210,7 +258,7 @@ export function aggregatePreferences(preferences: Preference[]): AggregatedPrefe
     noDateOverlap: !hasDateOverlap && allDates.length > 0,
     noBudgetOverlap: !hasBudgetOverlap && allBudgets.length > 0,
     noCommonVibes: commonVibes.length === 0 && allVibes.length > 0,
-    details: [] as string[]
+    details: [] as string[],
   }
 
   if (conflicts.noDateOverlap) {
@@ -227,31 +275,37 @@ export function aggregatePreferences(preferences: Preference[]): AggregatedPrefe
 
   return {
     dates: {
-      earliestCommonStart: commonStart ? commonStart.toISOString().split('T')[0] : null,
-      latestCommonEnd: commonEnd ? commonEnd.toISOString().split('T')[0] : null,
-      commonWindow: hasDateOverlap && commonStart && commonEnd
-        ? { start: commonStart.toISOString().split('T')[0], end: commonEnd.toISOString().split('T')[0] }
+      earliestCommonStart: commonStart
+        ? commonStart.toISOString().split("T")[0]
         : null,
-      idealDurations
+      latestCommonEnd: commonEnd ? commonEnd.toISOString().split("T")[0] : null,
+      commonWindow:
+        hasDateOverlap && commonStart && commonEnd
+          ? {
+              start: commonStart.toISOString().split("T")[0],
+              end: commonEnd.toISOString().split("T")[0],
+            }
+          : null,
+      idealDurations,
     },
     budget: {
       minBudget: maxOfMinBudgets,
       maxBudget: minOfMaxBudgets,
       commonInclusions,
-      flexibilityLevels
+      flexibilityLevels,
     },
     destination: {
       commonVibes,
       allVibes,
       popularScopes,
       specificPlaces,
-      placesToAvoid
+      placesToAvoid,
     },
     constraints: {
       dietary,
       accessibility,
-      hardNos
+      hardNos,
     },
-    conflicts
+    conflicts,
   }
 }

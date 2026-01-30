@@ -1,7 +1,10 @@
 import type { LayoutServerLoad } from "./$types"
 import { redirect } from "@sveltejs/kit"
 
-export const load: LayoutServerLoad = async ({ locals: { supabase, session }, cookies }) => {
+export const load: LayoutServerLoad = async ({
+  locals: { supabase, session },
+  cookies,
+}) => {
   if (!session) {
     throw redirect(303, "/login")
   }
@@ -18,8 +21,8 @@ export const load: LayoutServerLoad = async ({ locals: { supabase, session }, co
     cookies: cookies.getAll(),
     profile: profile || {
       full_name: session.user.email?.split("@")[0] || "User",
-      avatar_url: null
+      avatar_url: null,
     },
-    userEmail: session.user.email
+    userEmail: session.user.email,
   }
 }

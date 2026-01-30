@@ -8,6 +8,38 @@
 
   let { data }: Props = $props()
 
+  interface DatesPref {
+    earliestStart?: string
+    latestEnd?: string
+    idealDuration?: string
+    flexible?: boolean
+  }
+
+  interface BudgetPref {
+    min?: number
+    max?: number
+    includeFlights?: boolean
+    includeAccommodation?: boolean
+    includeFood?: boolean
+    includeActivities?: boolean
+    flexibility?: string
+  }
+
+  interface DestinationPref {
+    vibes?: string[]
+    scope?: string
+    specificPlaces?: string
+    placesToAvoid?: string
+  }
+
+  interface ConstraintsPref {
+    dietary?: string[]
+    otherDietary?: string
+    accessibility?: string[]
+    otherAccessibility?: string
+    hardNos?: string
+  }
+
   // Form state
   let earliestStartDate = $state("")
   let latestEndDate = $state("")
@@ -104,7 +136,7 @@
         typeof prefs.dates === "object" &&
         !Array.isArray(prefs.dates)
       ) {
-        const dates = prefs.dates as any
+        const dates = prefs.dates as unknown as DatesPref
         earliestStartDate = dates.earliestStart || ""
         latestEndDate = dates.latestEnd || ""
         tripDuration = dates.idealDuration || ""
@@ -116,7 +148,7 @@
         typeof prefs.budget === "object" &&
         !Array.isArray(prefs.budget)
       ) {
-        const budget = prefs.budget as any
+        const budget = prefs.budget as unknown as BudgetPref
         budgetMin = budget.min || 500
         budgetMax = budget.max || 2000
         includeFlights = budget.includeFlights || false
@@ -131,7 +163,7 @@
         typeof prefs.destination_prefs === "object" &&
         !Array.isArray(prefs.destination_prefs)
       ) {
-        const destPrefs = prefs.destination_prefs as any
+        const destPrefs = prefs.destination_prefs as unknown as DestinationPref
         selectedVibes = destPrefs.vibes || []
         specificPlaces = destPrefs.specificPlaces || ""
         placesToAvoid = destPrefs.placesToAvoid || ""
@@ -143,7 +175,7 @@
         typeof prefs.constraints === "object" &&
         !Array.isArray(prefs.constraints)
       ) {
-        const constraints = prefs.constraints as any
+        const constraints = prefs.constraints as unknown as ConstraintsPref
         selectedDietary = constraints.dietary || []
         otherDietary = constraints.otherDietary || ""
         selectedAccessibility = constraints.accessibility || []
@@ -336,10 +368,11 @@
             />
           </div>
           <div>
-            <label class="label">
+            <label class="label" for="budget-max">
               <span class="label-text text-sm">Max Budget</span>
             </label>
             <input
+              id="budget-max"
               type="range"
               name="budgetMax"
               bind:value={budgetMax}
