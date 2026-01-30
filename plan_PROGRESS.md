@@ -379,7 +379,7 @@ IN_PROGRESS
 
 ### Phase 7: Destination Recommendations & Voting (P0 - Key Decision)
 
-- [x] **Task 7.1**: Convert "Destination Voting" mockup to Svelte
+- [ ] **Task 7.1**: Convert "Destination Voting" mockup to Svelte
   - Create route: `src/routes/(admin)/trips/[trip_id]/recommendations/+page.svelte`
   - Display recommendations as cards in grid layout
   - Each card shows: destination name, region, AI reasoning, cost estimate, sample highlights, tradeoffs
