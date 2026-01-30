@@ -369,7 +369,7 @@ IN_PROGRESS
   - Detect conflicts and return flags
   - Cache results (store in database or memory for performance)
 
-- [ ] **Task 6.6**: Add "Generate Recommendations" button
+- [x] **Task 6.6**: Add "Generate Recommendations" button
   - Show button only for organizers
   - Enable only when at least 1 member has submitted preferences
   - Disable if recommendations already generated (show "View Recommendations" instead)
@@ -569,16 +569,17 @@ IN_PROGRESS
 
 ## Completed This Iteration
 
-- **Tasks 6.1-6.5**: Implemented trip dashboard aggregation and conflict detection
-  - Created server-side aggregation logic in `src/lib/server/aggregatePreferences.ts`
-  - Computes date overlap, budget range, common vibes, and all constraints
-  - Detects conflicts: no date overlap, budget mismatch, no common vibes
-  - Created `AggregatedPreferences` component to display all insights
-  - Shows date window with overlap detection, budget range, vibes (common + all), and constraints
-  - Displays conflict alerts when detected with specific details
-  - Updated trip dashboard server load to call aggregation logic
-  - Integrated component into trip dashboard page
-  - All TypeScript checks pass (0 errors, 5 warnings)
+- **Task 6.6**: Implemented "Generate Recommendations" button functionality
+  - Added conditional rendering: "Generate Recommendations" if none exist, "View Recommendations" if they do
+  - Button only visible to organizers
+  - Enabled only when at least 1 member has submitted preferences
+  - Implemented `generateRecommendations()` function to call FastAPI endpoint
+  - Shows loading state with spinner during AI generation
+  - Calls `POST /api/trips/{trip_id}/recommendations` with auth token
+  - Redirects to recommendations page on success
+  - Created placeholder recommendations page at `/trips/[trip_id]/recommendations`
+  - Server load checks for existing recommendations in database
+  - All TypeScript checks pass (0 errors)
 
 ## Notes
 

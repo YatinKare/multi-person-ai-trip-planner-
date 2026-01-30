@@ -90,6 +90,19 @@ export const load: PageServerLoad = async ({ params, locals: { supabase, session
     ? aggregatePreferences(preferences)
     : null
 
+  // Check if recommendations already exist
+  const { data: existingRecommendations, error: recsError } = await supabase
+    .from("recommendations")
+    .select("id, generated_at")
+    .eq("trip_id", trip_id)
+    .order("generated_at", { ascending: false })
+    .limit(1)
+    .single()
+
+  if (recsError && recsError.code !== "PGRST116") {
+    console.error("Error loading recommendations:", recsError)
+  }
+
   return {
     trip,
     members: membersWithStatus,
@@ -98,6 +111,7 @@ export const load: PageServerLoad = async ({ params, locals: { supabase, session
     totalMembers,
     userId: session.user.id,
     aggregated,
+    hasRecommendations: !!existingRecommendations,
     session,
     supabase
   }

@@ -67,10 +67,60 @@
     }
   }
 
+  // Generate recommendations via FastAPI backend
+  async function generateRecommendations() {
+    if (!canGenerateRecommendations || generatingRecommendations) return
+
+    generatingRecommendations = true
+
+    try {
+      // Get the Supabase session token
+      const { data: { session } } = await data.supabase.auth.getSession()
+
+      if (!session) {
+        alert("Session expired. Please refresh the page.")
+        return
+      }
+
+      // Call FastAPI backend
+      const response = await fetch(`http://localhost:8000/api/trips/${data.trip.id}/recommendations`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${session.access_token}`
+        }
+      })
+
+      if (!response.ok) {
+        const error = await response.json()
+        throw new Error(error.detail || "Failed to generate recommendations")
+      }
+
+      const result = await response.json()
+
+      // Redirect to recommendations page
+      window.location.href = `/trips/${data.trip.id}/recommendations`
+    } catch (err) {
+      console.error("Error generating recommendations:", err)
+      alert(err instanceof Error ? err.message : "Failed to generate recommendations. Please try again.")
+    } finally {
+      generatingRecommendations = false
+    }
+  }
+
   let showCopySuccess = $state(false)
   let showDeleteModal = $state(false)
   let showLeaveModal = $state(false)
   let isOrganizer = $derived(data.userRole === "organizer")
+  let generatingRecommendations = $state(false)
+
+  // Can generate recommendations if:
+  // 1. User is organizer
+  // 2. At least 1 member has submitted preferences
+  // 3. Recommendations haven't been generated yet
+  let canGenerateRecommendations = $derived(
+    isOrganizer && data.responseCount > 0 && !data.hasRecommendations
+  )
 </script>
 
 <svelte:head>
@@ -101,12 +151,29 @@
     </div>
     <div class="flex flex-wrap gap-3">
       {#if isOrganizer}
-        <button
-          class="btn btn-primary flex items-center gap-2 text-base-300 font-bold hover:shadow-[0_0_20px_rgba(19,236,182,0.3)]"
-        >
-          <span class="material-symbols-outlined">auto_awesome</span>
-          Generate Recommendations
-        </button>
+        {#if data.hasRecommendations}
+          <a
+            href="/trips/{data.trip.id}/recommendations"
+            class="btn btn-primary flex items-center gap-2 text-base-300 font-bold hover:shadow-[0_0_20px_rgba(19,236,182,0.3)]"
+          >
+            <span class="material-symbols-outlined">travel_explore</span>
+            View Recommendations
+          </a>
+        {:else}
+          <button
+            class="btn btn-primary flex items-center gap-2 text-base-300 font-bold hover:shadow-[0_0_20px_rgba(19,236,182,0.3)]"
+            disabled={!canGenerateRecommendations || generatingRecommendations}
+            onclick={() => generateRecommendations()}
+          >
+            {#if generatingRecommendations}
+              <span class="loading loading-spinner loading-sm"></span>
+              Generating...
+            {:else}
+              <span class="material-symbols-outlined">auto_awesome</span>
+              Generate Recommendations
+            {/if}
+          </button>
+        {/if}
         <div class="dropdown dropdown-end">
           <button tabindex="0" class="btn btn-ghost flex items-center gap-2">
             <span class="material-symbols-outlined">more_vert</span>
