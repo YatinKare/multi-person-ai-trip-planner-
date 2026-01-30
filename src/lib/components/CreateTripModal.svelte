@@ -1,0 +1,270 @@
+<script lang="ts">
+	import { enhance } from '$app/forms';
+	import { goto } from '$app/navigation';
+	import type { SubmitFunction } from '@sveltejs/kit';
+
+	export let open = false;
+
+	let step: 'input' | 'success' = 'input';
+	let tripName = '';
+	let roughTimeframe = '';
+	let inviteCode = '';
+	let createdTripId = '';
+	let isSubmitting = false;
+
+	// Reset state when modal closes
+	$: if (!open) {
+		setTimeout(() => {
+			step = 'input';
+			tripName = '';
+			roughTimeframe = '';
+			inviteCode = '';
+			createdTripId = '';
+			isSubmitting = false;
+		}, 200);
+	}
+
+	const handleSubmit: SubmitFunction = () => {
+		isSubmitting = true;
+		return async ({ result, update }) => {
+			isSubmitting = false;
+			if (result.type === 'success' && result.data) {
+				inviteCode = result.data.inviteCode;
+				createdTripId = result.data.tripId;
+				step = 'success';
+			}
+			await update();
+		};
+	};
+
+	function closeModal() {
+		open = false;
+	}
+
+	function copyInviteLink() {
+		const link = `${window.location.origin}/join/${inviteCode}`;
+		navigator.clipboard.writeText(link);
+		// Optional: Show a toast notification here
+	}
+
+	function shareViaWhatsApp() {
+		const link = `${window.location.origin}/join/${inviteCode}`;
+		const text = `Join my trip "${tripName}"!`;
+		window.open(`https://wa.me/?text=${encodeURIComponent(text + ' ' + link)}`, '_blank');
+	}
+
+	function shareViaEmail() {
+		const link = `${window.location.origin}/join/${inviteCode}`;
+		const subject = `Join my trip: ${tripName}`;
+		const body = `I'm planning a trip and would love for you to join!\n\nClick here to join: ${link}`;
+		window.location.href = `mailto:?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+	}
+
+	function shareViaSystem() {
+		const link = `${window.location.origin}/join/${inviteCode}`;
+		if (navigator.share) {
+			navigator
+				.share({
+					title: `Join my trip: ${tripName}`,
+					text: `I'm planning a trip and would love for you to join!`,
+					url: link
+				})
+				.catch(() => {
+					// User cancelled or share failed
+				});
+		}
+	}
+
+	function goToDashboard() {
+		closeModal();
+		goto(`/trips/${createdTripId}`);
+	}
+</script>
+
+{#if open}
+	<!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
+	<div
+		class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm"
+		role="dialog"
+		aria-modal="true"
+		on:click={closeModal}
+		on:keydown={(e) => e.key === 'Escape' && closeModal()}
+	>
+		<!-- svelte-ignore a11y_no_static_element_interactions -->
+		<div
+			class="relative w-full max-w-lg mx-4 bg-base-200 rounded-2xl shadow-2xl transition-all duration-300"
+			on:click|stopPropagation
+			on:keydown|stopPropagation
+		>
+			{#if step === 'input'}
+				<!-- Step 1: Input State -->
+				<div class="p-8">
+					<button
+						type="button"
+						class="absolute top-4 right-4 btn btn-ghost btn-sm btn-circle"
+						on:click={closeModal}
+					>
+						<span class="material-symbols-outlined text-xl">close</span>
+					</button>
+
+					<h2 class="text-3xl font-bold mb-2">Where are we going?</h2>
+					<p class="text-base-content/70 mb-6">Give your trip a name to get started.</p>
+
+					<form method="POST" action="?/createTrip" use:enhance={handleSubmit}>
+						<div class="space-y-4">
+							<!-- Trip Name Input -->
+							<div class="form-control">
+								<label for="trip-name" class="label">
+									<span class="label-text font-medium">Trip Name</span>
+								</label>
+								<div class="relative">
+									<input
+										id="trip-name"
+										name="tripName"
+										type="text"
+										placeholder="e.g. Summer in Italy"
+										bind:value={tripName}
+										required
+										class="input input-bordered w-full pr-12 focus:input-primary"
+									/>
+									<span
+										class="material-symbols-outlined absolute right-4 top-1/2 -translate-y-1/2 text-primary"
+									>
+										auto_awesome
+									</span>
+								</div>
+							</div>
+
+							<!-- Rough Timeframe Input -->
+							<div class="form-control">
+								<label for="timeframe" class="label">
+									<span class="label-text font-medium">Timeframe / Vibe</span>
+								</label>
+								<input
+									id="timeframe"
+									name="roughTimeframe"
+									type="text"
+									placeholder="e.g. Late August"
+									bind:value={roughTimeframe}
+									class="input input-bordered w-full focus:input-primary"
+								/>
+							</div>
+						</div>
+
+						<button
+							type="submit"
+							disabled={isSubmitting || !tripName.trim()}
+							class="btn btn-primary w-full mt-6 text-lg font-semibold shadow-lg hover:shadow-primary/50 transition-all duration-300"
+						>
+							{#if isSubmitting}
+								<span class="loading loading-spinner"></span>
+								Creating...
+							{:else}
+								Create Trip
+							{/if}
+						</button>
+					</form>
+
+					<div class="mt-4 h-1 w-full bg-gradient-to-r from-primary/0 via-primary/50 to-primary/0 rounded-full"></div>
+				</div>
+			{:else}
+				<!-- Step 2: Success State -->
+				<div class="p-8">
+					<button
+						type="button"
+						class="absolute top-4 right-4 btn btn-ghost btn-sm btn-circle"
+						on:click={closeModal}
+					>
+						<span class="material-symbols-outlined text-xl">close</span>
+					</button>
+
+					<div class="text-center mb-6">
+						<div class="inline-block relative">
+							<span
+								class="material-symbols-outlined text-7xl text-success animate-pulse"
+								style="font-variation-settings: 'FILL' 1;"
+							>
+								check_circle
+							</span>
+							<div class="absolute inset-0 bg-success/30 blur-xl rounded-full animate-pulse"></div>
+						</div>
+						<h2 class="text-3xl font-bold mt-4">{tripName} is ready!</h2>
+						<p class="text-base-content/70 mt-2">
+							Share this link with your friends to let them join the planning.
+						</p>
+					</div>
+
+					<!-- Invite Link Section -->
+					<div class="bg-base-300 rounded-xl p-4 mb-6">
+						<div class="flex items-center gap-2">
+							<input
+								type="text"
+								readonly
+								value="{window.location.origin}/join/{inviteCode}"
+								class="input input-sm flex-1 bg-base-100 font-mono text-sm"
+							/>
+							<button
+								type="button"
+								on:click={copyInviteLink}
+								class="btn btn-primary btn-sm"
+								title="Copy invite link"
+							>
+								<span class="material-symbols-outlined text-lg">content_copy</span>
+							</button>
+						</div>
+					</div>
+
+					<!-- Social Sharing Options -->
+					<div class="divider text-sm text-base-content/50">Or share via</div>
+					<div class="grid grid-cols-3 gap-3 mb-6">
+						<button
+							type="button"
+							on:click={shareViaWhatsApp}
+							class="btn btn-outline hover:btn-success flex flex-col gap-1 h-auto py-3"
+						>
+							<span class="material-symbols-outlined text-2xl">chat</span>
+							<span class="text-xs">WhatsApp</span>
+						</button>
+						<button
+							type="button"
+							on:click={shareViaEmail}
+							class="btn btn-outline hover:btn-info flex flex-col gap-1 h-auto py-3"
+						>
+							<span class="material-symbols-outlined text-2xl">mail</span>
+							<span class="text-xs">Email</span>
+						</button>
+						<button
+							type="button"
+							on:click={shareViaSystem}
+							class="btn btn-outline hover:btn-primary flex flex-col gap-1 h-auto py-3"
+						>
+							<span class="material-symbols-outlined text-2xl">share</span>
+							<span class="text-xs">Share</span>
+						</button>
+					</div>
+
+					<!-- Navigation -->
+					<button
+						type="button"
+						on:click={goToDashboard}
+						class="btn btn-ghost w-full"
+					>
+						Go to Trip Dashboard
+					</button>
+				</div>
+			{/if}
+		</div>
+	</div>
+{/if}
+
+<style>
+	@keyframes pulse {
+		0%,
+		100% {
+			opacity: 1;
+		}
+		50% {
+			opacity: 0.5;
+		}
+	}
+</style>
