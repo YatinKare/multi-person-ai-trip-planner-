@@ -3,6 +3,7 @@
   import { writable } from "svelte/store"
   import DeleteTripModal from "$lib/components/DeleteTripModal.svelte"
   import LeaveTripModal from "$lib/components/LeaveTripModal.svelte"
+  import AggregatedPreferences from "$lib/components/AggregatedPreferences.svelte"
   import type { PageData } from "./$types"
 
   interface Props {
@@ -282,23 +283,8 @@
         <span class="badge badge-ghost text-xs">LIVE UPDATES</span>
       </div>
 
-      <!-- Placeholder for aggregated preferences -->
-      <div class="card bg-base-200 border border-base-300 shadow-sm">
-        <div class="card-body p-5 gap-4">
-          <div class="flex items-center justify-center min-h-[200px] text-center">
-            <div>
-              <span class="material-symbols-outlined text-6xl text-base-content/20">analytics</span>
-              <p class="mt-4 text-base-content/60">
-                {#if data.responseCount === 0}
-                  Waiting for responses to show insights
-                {:else}
-                  Insights will appear here once implemented
-                {/if}
-              </p>
-            </div>
-          </div>
-        </div>
-      </div>
+      <!-- Aggregated Preferences -->
+      <AggregatedPreferences aggregated={data.aggregated} />
     </div>
   </div>
 </div>

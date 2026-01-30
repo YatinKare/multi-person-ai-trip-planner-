@@ -1,5 +1,6 @@
 import { error, redirect, fail } from "@sveltejs/kit"
 import type { PageServerLoad, Actions } from "./$types"
+import { aggregatePreferences } from "$lib/server/aggregatePreferences"
 
 export const load: PageServerLoad = async ({ params, locals: { supabase, session } }) => {
   if (!session) {
@@ -57,10 +58,10 @@ export const load: PageServerLoad = async ({ params, locals: { supabase, session
   const profileMap = new Map(profiles?.map(p => [p.id, p]))
 
 
-  // Load preferences for all members to determine response status
+  // Load preferences for all members to determine response status and aggregation
   const { data: preferences, error: preferencesError } = await supabase
     .from("preferences")
-    .select("user_id, submitted_at")
+    .select("*")
     .eq("trip_id", trip_id)
 
   if (preferencesError) {
@@ -84,6 +85,11 @@ export const load: PageServerLoad = async ({ params, locals: { supabase, session
   const responseCount = membersWithStatus.filter(m => m.has_responded).length
   const totalMembers = membersWithStatus.length
 
+  // Aggregate preferences if any exist
+  const aggregated = preferences && preferences.length > 0
+    ? aggregatePreferences(preferences)
+    : null
+
   return {
     trip,
     members: membersWithStatus,
@@ -91,6 +97,7 @@ export const load: PageServerLoad = async ({ params, locals: { supabase, session
     responseCount,
     totalMembers,
     userId: session.user.id,
+    aggregated,
     session,
     supabase
   }
