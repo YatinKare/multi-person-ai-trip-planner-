@@ -1,6 +1,7 @@
 <script lang="ts">
   import { onMount, setContext } from "svelte"
   import { writable } from "svelte/store"
+  import DeleteTripModal from "$lib/components/DeleteTripModal.svelte"
   import type { PageData } from "./$types"
 
   interface Props {
@@ -65,6 +66,7 @@
   }
 
   let showCopySuccess = $state(false)
+  let showDeleteModal = $state(false)
   let isOrganizer = $derived(data.userRole === "organizer")
 </script>
 
@@ -96,16 +98,34 @@
     </div>
     <div class="flex flex-wrap gap-3">
       {#if isOrganizer}
-        <button class="btn btn-neutral flex items-center gap-2">
-          <span class="material-symbols-outlined">edit</span>
-          Edit Trip
-        </button>
         <button
           class="btn btn-primary flex items-center gap-2 text-base-300 font-bold hover:shadow-[0_0_20px_rgba(19,236,182,0.3)]"
         >
           <span class="material-symbols-outlined">auto_awesome</span>
           Generate Recommendations
         </button>
+        <div class="dropdown dropdown-end">
+          <button tabindex="0" class="btn btn-ghost flex items-center gap-2">
+            <span class="material-symbols-outlined">more_vert</span>
+          </button>
+          <ul tabindex="0" class="dropdown-content menu p-2 shadow-lg bg-base-200 rounded-box w-52 border border-base-300">
+            <li>
+              <button class="flex items-center gap-2">
+                <span class="material-symbols-outlined text-lg">edit</span>
+                Edit Trip
+              </button>
+            </li>
+            <li>
+              <button
+                class="flex items-center gap-2 text-error hover:bg-error/10"
+                onclick={() => showDeleteModal = true}
+              >
+                <span class="material-symbols-outlined text-lg">delete</span>
+                Delete Trip
+              </button>
+            </li>
+          </ul>
+        </div>
       {/if}
     </div>
   </div>
@@ -263,6 +283,9 @@
     </div>
   </div>
 </div>
+
+<!-- Delete Trip Modal -->
+<DeleteTripModal bind:open={showDeleteModal} tripName={data.trip.name} tripId={data.trip.id} />
 
 <style>
   /* Import Material Symbols font */

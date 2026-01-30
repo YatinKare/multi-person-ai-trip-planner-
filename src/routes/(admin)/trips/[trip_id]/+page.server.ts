@@ -1,5 +1,5 @@
-import { error } from "@sveltejs/kit"
-import type { PageServerLoad } from "./$types"
+import { error, redirect, fail } from "@sveltejs/kit"
+import type { PageServerLoad, Actions } from "./$types"
 
 export const load: PageServerLoad = async ({ params, locals: { supabase, session } }) => {
   if (!session) {
@@ -93,5 +93,63 @@ export const load: PageServerLoad = async ({ params, locals: { supabase, session
     userId: session.user.id,
     session,
     supabase
+  }
+}
+
+export const actions: Actions = {
+  deleteTrip: async ({ request, params, locals: { supabase, session } }) => {
+    if (!session) {
+      return fail(401, { message: "Unauthorized" })
+    }
+
+    const { trip_id } = params
+    const formData = await request.formData()
+    const confirmation = formData.get("confirmation") as string
+
+    // Verify user is the organizer
+    const { data: membership, error: membershipError } = await supabase
+      .from("trip_members")
+      .select("role")
+      .eq("trip_id", trip_id)
+      .eq("user_id", session.user.id)
+      .single()
+
+    if (membershipError || !membership) {
+      return fail(403, { message: "You are not a member of this trip" })
+    }
+
+    if (membership.role !== "organizer") {
+      return fail(403, { message: "Only organizers can delete trips" })
+    }
+
+    // Get trip name for confirmation validation
+    const { data: trip, error: tripError } = await supabase
+      .from("trips")
+      .select("name")
+      .eq("id", trip_id)
+      .single()
+
+    if (tripError || !trip) {
+      return fail(404, { message: "Trip not found" })
+    }
+
+    // Validate confirmation text
+    if (confirmation.trim() !== trip.name.trim()) {
+      return fail(400, { message: "Trip name does not match. Please type the exact trip name." })
+    }
+
+    // Delete the trip (cascading deletes will handle related records)
+    const { error: deleteError } = await supabase
+      .from("trips")
+      .delete()
+      .eq("id", trip_id)
+
+    if (deleteError) {
+      console.error("Error deleting trip:", deleteError)
+      return fail(500, { message: "Failed to delete trip. Please try again." })
+    }
+
+    // Redirect to trips list page
+    throw redirect(303, "/trips")
   }
 }
