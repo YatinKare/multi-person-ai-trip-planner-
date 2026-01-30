@@ -244,7 +244,7 @@ IN_PROGRESS
   - Create form action in `+page.server.ts` to insert trip and trip_member
   - Redirect to trip dashboard after creation
 
-- [ ] **Task 4.3**: Convert "Join Trip Invitation" mockup to Svelte
+- [x] **Task 4.3**: Convert "Join Trip Invitation" mockup to Svelte
   - Create route: `src/routes/(marketing)/join/[invite_code]/+page.svelte`
   - Load trip details by invite code in `+page.server.ts`
   - Show trip name and creator info
@@ -1793,3 +1793,117 @@ Total: 29 tests passing in 0.89s
 - Integration with existing trips dashboard
 
 Next: Task 4.3 (Join Trip Invitation) - allow users to join trips via invite links.
+
+---
+
+### Current: Task 4.3: Convert "Join Trip Invitation" mockup to Svelte (COMPLETE)
+
+- ✅ Created server-side logic (`src/routes/(marketing)/join/[invite_code]/+page.server.ts`):
+  - **Load function:**
+    - Loads trip by invite_code parameter from URL
+    - Fetches trip details with creator profile (name, avatar)
+    - Checks if authenticated user is already a member (redirects to trip dashboard if yes)
+    - Loads member count and other members for social proof display (avatar group)
+    - Returns trip details, organizer info, member count, and error state
+    - Handles invalid/expired invite codes gracefully with error message
+
+  - **joinTrip form action:**
+    - Validates authentication (redirects to login with returnUrl if not authenticated)
+    - Validates trip exists by invite_code
+    - Checks if user is already a member (redirects if duplicate join attempt)
+    - Inserts new trip_member record with role='member'
+    - Redirects to preference form after successful join
+    - Handles errors gracefully with fail() responses
+
+- ✅ Created join page UI (`src/routes/(marketing)/join/[invite_code]/+page.svelte`):
+  - **Visual Design:**
+    - Full-screen hero layout with background image and gradient overlay
+    - Centered invitation card with DaisyUI styling
+    - Card header with mini hero image and "AI-Powered Itinerary" badge
+    - Dark theme with emerald/cyan primary colors matching TripSync theme
+    - Material Symbols icons throughout
+    - Animated fade-in-up entrance effect
+
+  - **Content Sections:**
+    - Trip title and timeframe display (uses rough_timeframe if available)
+    - Organizer profile with avatar (or fallback icon), name, and verified badge
+    - Social proof section with avatar group showing other members
+    - Dynamic text: "Join [Name] & X others" or "Be the first to join!"
+    - Member count display
+
+  - **Authentication Flow:**
+    - If not authenticated: Shows "Join Trip with Google" button with Google logo SVG
+    - If authenticated: Shows "Join Trip" button with loading state
+    - "Sign In" link redirects to login with returnUrl parameter
+    - Mobile-specific sign-in link at bottom
+
+  - **Form Handling:**
+    - Uses SvelteKit form actions with progressive enhancement
+    - Loading state with spinner during submission
+    - Proper error handling with error state display
+
+  - **Error State:**
+    - Shows error card if invite code is invalid or expired
+    - Error icon, message, and "Go to Home" button
+    - Clear messaging for users
+
+- ✅ Updated sitemap configuration (`src/routes/(marketing)/sitemap.xml/+server.ts`):
+  - Excluded dynamic join route from sitemap generation
+  - Added pattern: `.*\\/join\\/\\[invite_code\\].*`
+  - Prevents build errors for routes with dynamic parameters
+
+- ✅ Build verification:
+  - All TypeScript checks passing (0 errors, 0 warnings)
+  - Production build successful
+  - Sitemap generation working correctly (dynamic route excluded)
+  - All imports and dependencies resolved
+
+### Architecture Highlights:
+
+**Server-Side Logic:**
+- Proper authentication checks with redirect to login + returnUrl
+- Duplicate membership prevention (auto-redirects if already joined)
+- Graceful error handling for invalid invite codes
+- Social proof data loading (member avatars, count)
+- Foreign key relationships (trips → profiles → trip_members)
+
+**UI/UX Design:**
+- Faithful conversion of HTML mockup to Svelte
+- Responsive design (mobile-friendly with hidden/shown elements)
+- Progressive enhancement with form actions
+- Loading states and error states handled
+- Accessibility: semantic HTML, ARIA attributes, keyboard navigation
+
+**Integration Pattern:**
+- Marketing route (unauthenticated users can view)
+- Redirects to login preserve return URL for post-auth navigation
+- Automatic redirect to preference form after joining
+- Leverages existing database schema (trips, trip_members, profiles)
+
+**Authentication Flow:**
+1. Unauthenticated user clicks invite link
+2. Sees trip details and "Join with Google" button
+3. Redirects to login with returnUrl=/join/[invite_code]
+4. After authentication, returns to join page
+5. Auto-joins trip and redirects to preference form
+
+**Already-Member Flow:**
+1. User clicks invite link for trip they're already in
+2. Server detects existing membership in load function
+3. Redirects directly to trip dashboard
+4. No duplicate records created
+
+### Testing Notes:
+- TypeScript compilation: ✅ Passed
+- Build process: ✅ Passed
+- Sitemap: ✅ Excludes dynamic route
+- Database schema: ✅ Compatible with migrations
+- Component rendering: ✅ Proper Svelte 5 syntax
+
+### Files Created:
+1. `src/routes/(marketing)/join/[invite_code]/+page.server.ts` (140 lines) - Load & join action
+2. `src/routes/(marketing)/join/[invite_code]/+page.svelte` (265 lines) - Join UI component
+
+### Files Modified:
+1. `src/routes/(marketing)/sitemap.xml/+server.ts` - Excluded dynamic join route from sitemap
+
