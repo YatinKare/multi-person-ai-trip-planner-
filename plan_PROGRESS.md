@@ -279,7 +279,7 @@ IN_PROGRESS
 
 ### Phase 5: Preference Collection Form (P0 - Critical Data)
 
-- [ ] **Task 5.1**: Convert "Trip Preferences Form" mockup to Svelte component
+- [x] **Task 5.1**: Convert "Trip Preferences Form" mockup to Svelte component
   - Create route: `src/routes/(admin)/trips/[trip_id]/preferences/+page.svelte`
   - Implement full form with all sections from plan.md
   - Use DaisyUI form components styled per mockup theme
@@ -566,6 +566,18 @@ IN_PROGRESS
   - Document request/response schemas
   - Add example requests/responses
   - Document error codes and messages
+
+## Completed This Iteration
+
+- **Task 5.1**: Implemented Trip Preferences Form
+  - Created route at `src/routes/(admin)/trips/[trip_id]/preferences/+page.svelte` with full form
+  - Implemented all 5 sections: Dates, Budget, Destination, Constraints, Additional Notes
+  - Form includes date pickers, budget sliders, vibe selection cards, dietary/accessibility toggles
+  - Created `+page.server.ts` with load function to fetch trip and existing preferences
+  - Implemented `submitPreferences` action to upsert preferences to database
+  - Form properly handles both new preference creation and editing existing preferences
+  - All TypeScript types pass validation
+  - Form redirects to trip dashboard after successful submission
 
 ## Notes
 
