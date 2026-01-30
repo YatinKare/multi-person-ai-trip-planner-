@@ -277,9 +277,9 @@ def create_recommendation_workflow() -> SequentialAgent:
     4. CandidateDestinationGeneratorAgent - generate 8-12 candidates (Task 3.3 ✓)
     5. DestinationResearchAgent - research candidates using Google Search (Task 3.3 ✓)
     6. DestinationRankerAgent - select top 3-5 with reasoning (Task 3.3 ✓)
-    7. SchemaEnforcerAgent - convert to RecommendationsPack (Task 3.5, placeholder for now)
-    8. ConstraintComplianceValidatorAgent - validate against constraints (Task 3.5, placeholder for now)
-    9. GroundingValidatorAgent - ensure factual claims are backed (Task 3.5, placeholder for now)
+    7. SchemaEnforcerAgent - convert to RecommendationsPack (Task 3.5 ✓)
+    8. ConstraintComplianceValidatorAgent - validate against constraints (Task 3.5 ✓)
+    9. GroundingValidatorAgent - ensure factual claims are backed (Task 3.5 ✓)
 
     Per plan_AGENTS.md Section 9.2.
 
@@ -322,27 +322,16 @@ Read normalized_preferences, aggregate them using the computation tools, and wri
 """,
     )
 
-    # Validation agents are placeholders for Task 3.5
-    schema_enforcer_placeholder = Agent(
-        model='gemini-2.5-flash',
-        name='schema_enforcer_placeholder',
-        description='Placeholder for SchemaEnforcerAgent (Task 3.5)',
-        instruction='Convert recommendations_draft to structured RecommendationsPack. Placeholder for Task 3.5.',
+    # Validation agents (Task 3.5)
+    from .validation_agents import (
+        create_schema_enforcer_agent_for_recommendations,
+        create_constraint_compliance_validator_agent,
+        create_grounding_validator_agent,
     )
 
-    constraint_validator_placeholder = Agent(
-        model='gemini-2.5-flash',
-        name='constraint_validator_placeholder',
-        description='Placeholder for ConstraintComplianceValidatorAgent (Task 3.5)',
-        instruction='Validate recommendations against constraints. Placeholder for Task 3.5.',
-    )
-
-    grounding_validator_placeholder = Agent(
-        model='gemini-2.5-flash',
-        name='grounding_validator_placeholder',
-        description='Placeholder for GroundingValidatorAgent (Task 3.5)',
-        instruction='Validate grounding of recommendations. Placeholder for Task 3.5.',
-    )
+    schema_enforcer = create_schema_enforcer_agent_for_recommendations()
+    constraint_validator = create_constraint_compliance_validator_agent()
+    grounding_validator = create_grounding_validator_agent()
 
     # Create the sequential workflow
     # Per plan_AGENTS.md Section 9.2, this follows the sequence diagram
@@ -354,9 +343,9 @@ Read normalized_preferences, aggregate them using the computation tools, and wri
             create_candidate_generator_agent(),          # Step 4: Generate 8-12 candidates
             create_destination_research_agent(),         # Step 5: Research using Google Search
             create_destination_ranker_agent(),           # Step 6: Rank and select top 3-5
-            schema_enforcer_placeholder,                 # Step 7: Schema enforcement (Task 3.5)
-            constraint_validator_placeholder,            # Step 8: Constraint validation (Task 3.5)
-            grounding_validator_placeholder,             # Step 9: Grounding validation (Task 3.5)
+            schema_enforcer,                             # Step 7: Schema enforcement (Task 3.5 ✓)
+            constraint_validator,                        # Step 8: Constraint validation (Task 3.5 ✓)
+            grounding_validator,                         # Step 9: Grounding validation (Task 3.5 ✓)
         ],
         name='recommendation_workflow',
         description='Orchestrates destination recommendation generation pipeline',
@@ -371,12 +360,12 @@ def create_itinerary_workflow() -> SequentialAgent:
     itinerary generation pipeline.
 
     Pipeline stages:
-    1. ItineraryDraftAgent - create day-by-day draft
-    2. CostSanityAgent - validate costs and budget
-    3. ItineraryPolishAgent - improve clarity and flow
-    4. SchemaEnforcerAgent - convert to Itinerary schema (Task 3.5)
-    5. ConstraintComplianceValidatorAgent - validate constraints (Task 3.5)
-    6. GroundingValidatorAgent - validate factual claims (Task 3.5)
+    1. ItineraryDraftAgent - create day-by-day draft (Task 3.4 ✓)
+    2. CostSanityAgent - validate costs and budget (Task 3.4 ✓)
+    3. ItineraryPolishAgent - improve clarity and flow (Task 3.4 ✓)
+    4. SchemaEnforcerAgent - convert to Itinerary schema (Task 3.5 ✓)
+    5. ConstraintComplianceValidatorAgent - validate constraints (Task 3.5 ✓)
+    6. GroundingValidatorAgent - validate factual claims (Task 3.5 ✓)
 
     Returns:
         SequentialAgent orchestrating the itinerary pipeline
@@ -392,27 +381,16 @@ def create_itinerary_workflow() -> SequentialAgent:
     cost_agent = create_cost_sanity_agent()
     polish_agent = create_itinerary_polish_agent()
 
-    # Validation agents (placeholders for Task 3.5)
-    schema_enforcer_placeholder = Agent(
-        model='gemini-2.5-flash',
-        name='schema_enforcer_placeholder',
-        description='Placeholder for SchemaEnforcerAgent (Task 3.5)',
-        instruction='Convert itinerary_polished to final Itinerary schema. Placeholder for Task 3.5.',
+    # Validation agents (Task 3.5)
+    from .validation_agents import (
+        create_schema_enforcer_agent_for_itinerary,
+        create_constraint_compliance_validator_agent,
+        create_grounding_validator_agent,
     )
 
-    constraint_validator_placeholder = Agent(
-        model='gemini-2.5-flash',
-        name='constraint_validator_placeholder',
-        description='Placeholder for ConstraintComplianceValidatorAgent (Task 3.5)',
-        instruction='Validate constraint compliance. Placeholder for Task 3.5.',
-    )
-
-    grounding_validator_placeholder = Agent(
-        model='gemini-2.5-flash',
-        name='grounding_validator_placeholder',
-        description='Placeholder for GroundingValidatorAgent (Task 3.5)',
-        instruction='Validate factual grounding. Placeholder for Task 3.5.',
-    )
+    schema_enforcer = create_schema_enforcer_agent_for_itinerary()
+    constraint_validator = create_constraint_compliance_validator_agent()
+    grounding_validator = create_grounding_validator_agent()
 
     # Sequential pipeline: draft -> cost validation -> polish -> validation (Task 3.5)
     workflow = SequentialAgent(
@@ -420,9 +398,9 @@ def create_itinerary_workflow() -> SequentialAgent:
             draft_agent,
             cost_agent,
             polish_agent,
-            schema_enforcer_placeholder,
-            constraint_validator_placeholder,
-            grounding_validator_placeholder,
+            schema_enforcer,                             # Step 4: Schema enforcement (Task 3.5 ✓)
+            constraint_validator,                        # Step 5: Constraint validation (Task 3.5 ✓)
+            grounding_validator,                         # Step 6: Grounding validation (Task 3.5 ✓)
         ],
         name='itinerary_workflow',
         description='Orchestrates itinerary generation pipeline',
