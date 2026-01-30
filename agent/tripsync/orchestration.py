@@ -374,28 +374,56 @@ def create_itinerary_workflow() -> SequentialAgent:
     1. ItineraryDraftAgent - create day-by-day draft
     2. CostSanityAgent - validate costs and budget
     3. ItineraryPolishAgent - improve clarity and flow
-    4. SchemaEnforcerAgent - convert to Itinerary schema
-    5. ConstraintComplianceValidatorAgent - validate constraints
-    6. GroundingValidatorAgent - validate factual claims
-
-    Note: Individual agents will be implemented in separate tasks.
-    This is a placeholder structure.
+    4. SchemaEnforcerAgent - convert to Itinerary schema (Task 3.5)
+    5. ConstraintComplianceValidatorAgent - validate constraints (Task 3.5)
+    6. GroundingValidatorAgent - validate factual claims (Task 3.5)
 
     Returns:
         SequentialAgent orchestrating the itinerary pipeline
     """
-    # Placeholder - agents will be created in Tasks 3.4, 3.5
-    # For now, return a sequential workflow with a placeholder
-
-    placeholder_agent = Agent(
-        model='gemini-2.5-flash',
-        name='itinerary_workflow_placeholder',
-        description='Placeholder for itinerary workflow (to be implemented in Task 3.4)',
-        instruction='This is a placeholder. The full itinerary pipeline will be implemented in Task 3.4.',
+    from .itinerary_agents import (
+        create_itinerary_draft_agent,
+        create_cost_sanity_agent,
+        create_itinerary_polish_agent,
     )
 
+    # Create itinerary generation agents
+    draft_agent = create_itinerary_draft_agent()
+    cost_agent = create_cost_sanity_agent()
+    polish_agent = create_itinerary_polish_agent()
+
+    # Validation agents (placeholders for Task 3.5)
+    schema_enforcer_placeholder = Agent(
+        model='gemini-2.5-flash',
+        name='schema_enforcer_placeholder',
+        description='Placeholder for SchemaEnforcerAgent (Task 3.5)',
+        instruction='Convert itinerary_polished to final Itinerary schema. Placeholder for Task 3.5.',
+    )
+
+    constraint_validator_placeholder = Agent(
+        model='gemini-2.5-flash',
+        name='constraint_validator_placeholder',
+        description='Placeholder for ConstraintComplianceValidatorAgent (Task 3.5)',
+        instruction='Validate constraint compliance. Placeholder for Task 3.5.',
+    )
+
+    grounding_validator_placeholder = Agent(
+        model='gemini-2.5-flash',
+        name='grounding_validator_placeholder',
+        description='Placeholder for GroundingValidatorAgent (Task 3.5)',
+        instruction='Validate factual grounding. Placeholder for Task 3.5.',
+    )
+
+    # Sequential pipeline: draft -> cost validation -> polish -> validation (Task 3.5)
     workflow = SequentialAgent(
-        sub_agents=[placeholder_agent],
+        sub_agents=[
+            draft_agent,
+            cost_agent,
+            polish_agent,
+            schema_enforcer_placeholder,
+            constraint_validator_placeholder,
+            grounding_validator_placeholder,
+        ],
         name='itinerary_workflow',
         description='Orchestrates itinerary generation pipeline',
     )

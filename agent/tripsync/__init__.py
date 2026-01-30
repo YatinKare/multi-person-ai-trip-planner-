@@ -29,6 +29,16 @@ from .recommendation_agents import (
     MoneyRange,
     Tradeoff,
 )
+from .itinerary_agents import (
+    create_itinerary_draft_agent,
+    create_cost_sanity_agent,
+    create_itinerary_polish_agent,
+    validate_itinerary_costs,
+    ItineraryActivity,
+    ItineraryDay,
+    Itinerary,
+    CostValidationResult,
+)
 from .computation_tools import (
     compute_date_overlap,
     compute_budget_range,
@@ -65,6 +75,15 @@ __all__ = [
     'RecommendationsPack',
     'MoneyRange',
     'Tradeoff',
+    # Itinerary Agents
+    'create_itinerary_draft_agent',
+    'create_cost_sanity_agent',
+    'create_itinerary_polish_agent',
+    'validate_itinerary_costs',
+    'ItineraryActivity',
+    'ItineraryDay',
+    'Itinerary',
+    'CostValidationResult',
     # Computation Tools
     'compute_date_overlap',
     'compute_budget_range',
