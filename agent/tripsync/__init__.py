@@ -18,6 +18,17 @@ from .preference_agents import (
     AggregatedGroupProfile,
     ConflictReport,
 )
+from .recommendation_agents import (
+    create_candidate_generator_agent,
+    create_destination_research_agent,
+    create_destination_ranker_agent,
+    DestinationCandidate,
+    DestinationResearchFacts,
+    DestinationOption,
+    RecommendationsPack,
+    MoneyRange,
+    Tradeoff,
+)
 from .computation_tools import (
     compute_date_overlap,
     compute_budget_range,
@@ -44,6 +55,16 @@ __all__ = [
     'NormalizedPreference',
     'AggregatedGroupProfile',
     'ConflictReport',
+    # Recommendation Agents
+    'create_candidate_generator_agent',
+    'create_destination_research_agent',
+    'create_destination_ranker_agent',
+    'DestinationCandidate',
+    'DestinationResearchFacts',
+    'DestinationOption',
+    'RecommendationsPack',
+    'MoneyRange',
+    'Tradeoff',
     # Computation Tools
     'compute_date_overlap',
     'compute_budget_range',

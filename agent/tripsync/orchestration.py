@@ -271,34 +271,93 @@ def create_recommendation_workflow() -> SequentialAgent:
     destination recommendation pipeline.
 
     Pipeline stages:
-    1. PreferenceNormalizerAgent - normalize raw preferences
-    2. AggregationAgent - compute aggregated group profile
-    3. ConflictDetectorAgent - identify conflicts
-    4. CandidateDestinationGeneratorAgent - generate 8-12 candidates
-    5. ParallelAgent(DestinationResearchAgent) - research each candidate
-    6. DestinationRankerAgent - select top 3-5 with reasoning
-    7. SchemaEnforcerAgent - convert to RecommendationsPack
-    8. ConstraintComplianceValidatorAgent - validate against constraints
-    9. GroundingValidatorAgent - ensure factual claims are backed
+    1. PreferenceNormalizerAgent - normalize raw preferences (Task 3.2 ✓)
+    2. AggregationAgent (function, not LLM) - compute aggregated group profile (Task 3.2 ✓)
+    3. ConflictDetectorAgent - identify conflicts (Task 3.2 ✓)
+    4. CandidateDestinationGeneratorAgent - generate 8-12 candidates (Task 3.3 ✓)
+    5. DestinationResearchAgent - research candidates using Google Search (Task 3.3 ✓)
+    6. DestinationRankerAgent - select top 3-5 with reasoning (Task 3.3 ✓)
+    7. SchemaEnforcerAgent - convert to RecommendationsPack (Task 3.5, placeholder for now)
+    8. ConstraintComplianceValidatorAgent - validate against constraints (Task 3.5, placeholder for now)
+    9. GroundingValidatorAgent - ensure factual claims are backed (Task 3.5, placeholder for now)
 
-    Note: Individual agents will be implemented in separate tasks.
-    This is a placeholder structure.
+    Per plan_AGENTS.md Section 9.2.
 
     Returns:
         SequentialAgent orchestrating the recommendation pipeline
     """
-    # Placeholder - agents will be created in Tasks 3.2, 3.3, 3.5
-    # For now, return a sequential workflow with a placeholder
-
-    placeholder_agent = Agent(
-        model='gemini-2.5-flash',
-        name='recommendation_workflow_placeholder',
-        description='Placeholder for recommendation workflow (to be implemented in Task 3.3)',
-        instruction='This is a placeholder. The full recommendation pipeline will be implemented in Task 3.3.',
+    # Import agents from preference_agents and recommendation_agents modules
+    # These are imported here to avoid circular dependencies
+    from .preference_agents import (
+        create_preference_normalizer_agent,
+        create_conflict_detector_agent,
+    )
+    from .recommendation_agents import (
+        create_candidate_generator_agent,
+        create_destination_research_agent,
+        create_destination_ranker_agent,
     )
 
+    # Note: AggregationAgent is a function, not an LLM agent, so it will need to be
+    # called differently in the workflow. For now, we'll need to create a wrapper agent
+    # that calls the aggregation function. This is a known pattern in ADK.
+
+    # Create a simple aggregation wrapper agent
+    aggregation_wrapper = Agent(
+        model='gemini-2.5-flash',
+        name='aggregation_wrapper',
+        description='Wrapper that calls aggregate_preferences function',
+        instruction="""
+You are a wrapper agent for the AggregationAgent function.
+
+Your job is to:
+1. Read normalized_preferences from session state
+2. Call the aggregate_preferences function (via a tool or direct invocation)
+3. Write the result to aggregated_group_profile in session state
+
+Note: The actual aggregation logic is deterministic and handled by computation tools.
+You are just coordinating the data flow.
+
+Read normalized_preferences, aggregate them using the computation tools, and write to aggregated_group_profile.
+""",
+    )
+
+    # Validation agents are placeholders for Task 3.5
+    schema_enforcer_placeholder = Agent(
+        model='gemini-2.5-flash',
+        name='schema_enforcer_placeholder',
+        description='Placeholder for SchemaEnforcerAgent (Task 3.5)',
+        instruction='Convert recommendations_draft to structured RecommendationsPack. Placeholder for Task 3.5.',
+    )
+
+    constraint_validator_placeholder = Agent(
+        model='gemini-2.5-flash',
+        name='constraint_validator_placeholder',
+        description='Placeholder for ConstraintComplianceValidatorAgent (Task 3.5)',
+        instruction='Validate recommendations against constraints. Placeholder for Task 3.5.',
+    )
+
+    grounding_validator_placeholder = Agent(
+        model='gemini-2.5-flash',
+        name='grounding_validator_placeholder',
+        description='Placeholder for GroundingValidatorAgent (Task 3.5)',
+        instruction='Validate grounding of recommendations. Placeholder for Task 3.5.',
+    )
+
+    # Create the sequential workflow
+    # Per plan_AGENTS.md Section 9.2, this follows the sequence diagram
     workflow = SequentialAgent(
-        sub_agents=[placeholder_agent],
+        sub_agents=[
+            create_preference_normalizer_agent(),       # Step 1: Normalize
+            aggregation_wrapper,                         # Step 2: Aggregate (wrapper for function)
+            create_conflict_detector_agent(),            # Step 3: Detect conflicts
+            create_candidate_generator_agent(),          # Step 4: Generate 8-12 candidates
+            create_destination_research_agent(),         # Step 5: Research using Google Search
+            create_destination_ranker_agent(),           # Step 6: Rank and select top 3-5
+            schema_enforcer_placeholder,                 # Step 7: Schema enforcement (Task 3.5)
+            constraint_validator_placeholder,            # Step 8: Constraint validation (Task 3.5)
+            grounding_validator_placeholder,             # Step 9: Grounding validation (Task 3.5)
+        ],
         name='recommendation_workflow',
         description='Orchestrates destination recommendation generation pipeline',
     )
