@@ -81,8 +81,7 @@ async def get_current_user_info(user: TokenData = Depends(get_current_user)):
     }
 
 
-# Future router includes will go here
-# Example:
-# from api.routers import recommendations, itineraries
-# app.include_router(recommendations.router, prefix="/api/trips", tags=["recommendations"])
-# app.include_router(itineraries.router, prefix="/api/trips", tags=["itineraries"])
+# Include routers
+from api.routers import ai_router
+
+app.include_router(ai_router, prefix="/api/trips")
