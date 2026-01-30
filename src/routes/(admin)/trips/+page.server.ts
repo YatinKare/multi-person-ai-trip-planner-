@@ -81,7 +81,7 @@ export const load: PageServerLoad = async ({ locals: { supabase, session } }) =>
 }
 
 export const actions: Actions = {
-  createTrip: async ({ locals: { supabase, session }, request }) => {
+  createTrip: async ({ locals: { supabaseServiceRole, session }, request }) => {
     if (!session) {
       return fail(401, { error: "Not authenticated" })
     }
@@ -94,16 +94,19 @@ export const actions: Actions = {
       return fail(400, { error: "Trip name is required" })
     }
 
+    // Use service role client for write operations since we've verified the session
+    // This bypasses RLS but we control the operations and verify auth via session
+
     // Generate a unique invite code using the database function
     // @ts-expect-error - RPC function not in generated types
-    const { data: inviteCodeResult, error: inviteCodeError } = await supabase.rpc("generate_invite_code")
+    const { data: inviteCodeResult, error: inviteCodeError } = await supabaseServiceRole.rpc("generate_invite_code")
 
     if (inviteCodeError || !inviteCodeResult) {
       console.error("Error generating invite code:", inviteCodeError)
       return fail(500, { error: "Failed to generate invite code" })
     }
 
-    const { data: newTrip, error: tripError } = await supabase
+    const { data: newTrip, error: tripError } = await supabaseServiceRole
       .from("trips")
       .insert({
         name: tripName.trim(),
@@ -121,7 +124,7 @@ export const actions: Actions = {
     }
 
     // Add creator as organizer in trip_members
-    const { error: memberError } = await supabase
+    const { error: memberError } = await supabaseServiceRole
       .from("trip_members")
       .insert({
         trip_id: newTrip.id,
@@ -132,7 +135,7 @@ export const actions: Actions = {
     if (memberError) {
       console.error("Error adding trip organizer:", memberError)
       // Clean up the trip if member insert fails
-      await supabase.from("trips").delete().eq("id", newTrip.id)
+      await supabaseServiceRole.from("trips").delete().eq("id", newTrip.id)
       return fail(500, { error: "Failed to create trip membership" })
     }
 
