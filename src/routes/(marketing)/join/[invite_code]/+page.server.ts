@@ -1,11 +1,11 @@
 import type { PageServerLoad, Actions } from "./$types"
 import { redirect, fail } from "@sveltejs/kit"
 
-export const load: PageServerLoad = async ({ params, locals: { supabase, session } }) => {
+export const load: PageServerLoad = async ({ params, locals: { supabase, supabaseServiceRole, session } }) => {
   const { invite_code } = params
 
-  // Load trip by invite code
-  const { data: trip, error: tripError } = await supabase
+  // Use service role to bypass RLS - allows unauthenticated users to view trip info
+  const { data: trip, error: tripError } = await supabaseServiceRole
     .from("trips")
     .select(`
       id,
@@ -14,12 +14,7 @@ export const load: PageServerLoad = async ({ params, locals: { supabase, session
       invite_code,
       rough_timeframe,
       created_by,
-      created_at,
-      profiles!trips_created_by_fkey (
-        id,
-        full_name,
-        avatar_url
-      )
+      created_at
     `)
     .eq("invite_code", invite_code)
     .single()
@@ -33,13 +28,20 @@ export const load: PageServerLoad = async ({ params, locals: { supabase, session
     }
   }
 
+  // Load organizer profile (service role to bypass RLS)
+  const { data: organizerProfile } = await supabaseServiceRole
+    .from("profiles")
+    .select("id, full_name, avatar_url")
+    .eq("id", trip.created_by)
+    .single()
+
   // If user is authenticated, check if they're already a member
   let isAlreadyMember = false
   let memberCount = 0
   let otherMembers: Array<{ full_name: string | null; avatar_url: string | null }> = []
 
   if (session) {
-    const { data: membership } = await supabase
+    const { data: membership } = await supabaseServiceRole
       .from("trip_members")
       .select("trip_id")
       .eq("trip_id", trip.id)
@@ -54,12 +56,12 @@ export const load: PageServerLoad = async ({ params, locals: { supabase, session
     }
   }
 
-  // Load member count and some members for social proof
-  const { data: members } = await supabase
+  // Load member count and some members for social proof (service role to bypass RLS)
+  const { data: members } = await supabaseServiceRole
     .from("trip_members")
     .select(`
       user_id,
-      profiles!trip_members_user_id_fkey (
+      profiles (
         full_name,
         avatar_url
       )
@@ -82,7 +84,7 @@ export const load: PageServerLoad = async ({ params, locals: { supabase, session
       rough_timeframe: trip.rough_timeframe,
       created_by: trip.created_by,
       created_at: trip.created_at,
-      organizer: trip.profiles as any
+      organizer: organizerProfile
     },
     memberCount,
     otherMembers,
@@ -93,7 +95,7 @@ export const load: PageServerLoad = async ({ params, locals: { supabase, session
 }
 
 export const actions: Actions = {
-  joinTrip: async ({ params, locals: { supabase, session } }) => {
+  joinTrip: async ({ params, locals: { supabase, supabaseServiceRole, session } }) => {
     if (!session) {
       // Redirect to login with return URL
       const returnUrl = `/join/${params.invite_code}`
@@ -102,8 +104,8 @@ export const actions: Actions = {
 
     const { invite_code } = params
 
-    // Load trip by invite code
-    const { data: trip, error: tripError } = await supabase
+    // Load trip by invite code (service role to bypass RLS)
+    const { data: trip, error: tripError } = await supabaseServiceRole
       .from("trips")
       .select("id, status")
       .eq("invite_code", invite_code)
@@ -114,7 +116,7 @@ export const actions: Actions = {
     }
 
     // Check if user is already a member
-    const { data: existingMembership } = await supabase
+    const { data: existingMembership } = await supabaseServiceRole
       .from("trip_members")
       .select("trip_id")
       .eq("trip_id", trip.id)
@@ -126,7 +128,7 @@ export const actions: Actions = {
       throw redirect(303, `/trips/${trip.id}`)
     }
 
-    // Add user as member
+    // Add user as member (use regular client - RLS will verify auth)
     const { error: memberError } = await supabase
       .from("trip_members")
       .insert({

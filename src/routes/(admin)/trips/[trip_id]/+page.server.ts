@@ -111,9 +111,7 @@ export const load: PageServerLoad = async ({ params, locals: { supabase, session
     totalMembers,
     userId: session.user.id,
     aggregated,
-    hasRecommendations: !!existingRecommendations,
-    session,
-    supabase
+    hasRecommendations: !!existingRecommendations
   }
 }
 

@@ -2,6 +2,7 @@
   import DeleteTripModal from "$lib/components/DeleteTripModal.svelte"
   import LeaveTripModal from "$lib/components/LeaveTripModal.svelte"
   import AggregatedPreferences from "$lib/components/AggregatedPreferences.svelte"
+  import { page } from "$app/state"
   import type { PageData } from "./$types"
 
   interface Props {
@@ -52,7 +53,7 @@
 
   // Copy invite link to clipboard
   async function copyInviteLink() {
-    const inviteUrl = `${window.location.origin}/join/${data.trip.invite_code}`
+    const inviteUrl = `${page.url.origin}/join/${data.trip.invite_code}`
     try {
       await navigator.clipboard.writeText(inviteUrl)
       showCopySuccess = true
@@ -230,7 +231,7 @@
         </div>
         <div class="w-full md:max-w-md bg-base-100/50 p-1.5 rounded-xl border border-base-300 flex items-center backdrop-blur-sm">
           <div class="flex-1 px-3 py-2 text-base-content/80 font-mono text-sm truncate select-all">
-            {window.location.origin}/join/{data.trip.invite_code}
+            {page.url.origin}/join/{data.trip.invite_code}
           </div>
           <button class="btn btn-primary btn-sm h-10 px-4 text-base-300 font-bold gap-2" onclick={copyInviteLink}>
             <span class="material-symbols-outlined text-[20px]">
