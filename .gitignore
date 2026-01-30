@@ -12,3 +12,4 @@ vite.config.ts.timestamp-*
 agent/tripsync/.adk/*
 plan_PROGRESS.md
 documents/stitch_trip_management_dashboard/*/screen.png
+run_ralph.sh
