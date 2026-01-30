@@ -151,5 +151,57 @@ export const actions: Actions = {
 
     // Redirect to trips list page
     throw redirect(303, "/trips")
+  },
+
+  leaveTrip: async ({ params, locals: { supabase, session } }) => {
+    if (!session) {
+      return fail(401, { message: "Unauthorized" })
+    }
+
+    const { trip_id } = params
+
+    // Verify user is a member of this trip
+    const { data: membership, error: membershipError } = await supabase
+      .from("trip_members")
+      .select("role")
+      .eq("trip_id", trip_id)
+      .eq("user_id", session.user.id)
+      .single()
+
+    if (membershipError || !membership) {
+      return fail(403, { message: "You are not a member of this trip" })
+    }
+
+    // Prevent organizer from leaving
+    if (membership.role === "organizer") {
+      return fail(403, { message: "Organizers cannot leave trips. Please delete the trip or transfer ownership." })
+    }
+
+    // Delete user's preferences for this trip
+    const { error: preferencesError } = await supabase
+      .from("preferences")
+      .delete()
+      .eq("trip_id", trip_id)
+      .eq("user_id", session.user.id)
+
+    if (preferencesError) {
+      console.error("Error deleting preferences:", preferencesError)
+      // Continue anyway - preferences might not exist
+    }
+
+    // Remove user from trip_members
+    const { error: leaveError } = await supabase
+      .from("trip_members")
+      .delete()
+      .eq("trip_id", trip_id)
+      .eq("user_id", session.user.id)
+
+    if (leaveError) {
+      console.error("Error leaving trip:", leaveError)
+      return fail(500, { message: "Failed to leave trip. Please try again." })
+    }
+
+    // Redirect to trips list page
+    throw redirect(303, "/trips")
   }
 }

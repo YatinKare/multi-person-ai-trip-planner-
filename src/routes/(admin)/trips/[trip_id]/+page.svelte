@@ -2,6 +2,7 @@
   import { onMount, setContext } from "svelte"
   import { writable } from "svelte/store"
   import DeleteTripModal from "$lib/components/DeleteTripModal.svelte"
+  import LeaveTripModal from "$lib/components/LeaveTripModal.svelte"
   import type { PageData } from "./$types"
 
   interface Props {
@@ -67,6 +68,7 @@
 
   let showCopySuccess = $state(false)
   let showDeleteModal = $state(false)
+  let showLeaveModal = $state(false)
   let isOrganizer = $derived(data.userRole === "organizer")
 </script>
 
@@ -122,6 +124,23 @@
               >
                 <span class="material-symbols-outlined text-lg">delete</span>
                 Delete Trip
+              </button>
+            </li>
+          </ul>
+        </div>
+      {:else}
+        <div class="dropdown dropdown-end">
+          <button tabindex="0" class="btn btn-ghost flex items-center gap-2">
+            <span class="material-symbols-outlined">more_vert</span>
+          </button>
+          <ul tabindex="0" class="dropdown-content menu p-2 shadow-lg bg-base-200 rounded-box w-52 border border-base-300">
+            <li>
+              <button
+                class="flex items-center gap-2 text-warning hover:bg-warning/10"
+                onclick={() => showLeaveModal = true}
+              >
+                <span class="material-symbols-outlined text-lg">logout</span>
+                Leave Trip
               </button>
             </li>
           </ul>
@@ -286,6 +305,9 @@
 
 <!-- Delete Trip Modal -->
 <DeleteTripModal bind:open={showDeleteModal} tripName={data.trip.name} tripId={data.trip.id} />
+
+<!-- Leave Trip Modal -->
+<LeaveTripModal bind:open={showLeaveModal} tripName={data.trip.name} tripId={data.trip.id} />
 
 <style>
   /* Import Material Symbols font */

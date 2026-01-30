@@ -269,7 +269,7 @@ IN_PROGRESS
   - Only allow if user is organizer
   - Redirect to My Trips after deletion
 
-- [ ] **Task 4.6**: Implement leave trip functionality (members only)
+- [x] **Task 4.6**: Implement leave trip functionality (members only)
   - Add "Leave Trip" button in trip menu
   - Create confirmation modal
   - Create form action to delete trip_member record
@@ -2025,4 +2025,72 @@ Implemented complete trip deletion functionality with confirmation modal and ser
 - Database RLS policies enforce organizer-only deletion
 - All related data is cleaned up via cascade deletes
 - No orphaned records will remain after deletion
+
+
+---
+
+## Completed This Iteration (Task 4.6)
+
+**Task 4.6**: Implement leave trip functionality (members only)
+
+### Implementation Summary
+
+**Created LeaveTripModal Component:**
+- Similar structure to DeleteTripModal but simplified (no name confirmation required)
+- Warning icon and alert explaining what happens when leaving:
+  - User's preferences will be deleted
+  - User will no longer see trip updates
+  - User needs new invite link to rejoin
+- Uses warning theme color (vs error for deletion)
+- Logout icon to represent leaving
+- Confirmation with Cancel/Leave Trip buttons
+- Follows DaisyUI patterns and existing modal conventions
+
+**Updated Trip Detail Page (`+page.svelte`):**
+- Added LeaveTripModal import
+- Added showLeaveModal state variable
+- Added dropdown menu for non-organizers with "Leave Trip" button
+- Organizers see their existing dropdown (Edit Trip, Delete Trip)
+- Members see new dropdown with only "Leave Trip" option
+- Modal opens when Leave Trip is clicked
+- Proper separation of organizer vs member actions
+
+**Created leaveTrip Server Action (`+page.server.ts`):**
+- Verifies user authentication (401 if not logged in)
+- Verifies user is trip member (403 if not)
+- **Prevents organizer from leaving** (403 with helpful error message)
+- Deletes user's preferences for the trip (cleanup)
+- Removes user from trip_members table
+- Handles database errors gracefully
+- Redirects to /trips after successful leave
+
+### Features Implemented:
+- ✅ Created LeaveTripModal component with clear warnings
+- ✅ Added leaveTrip server action with security validation
+- ✅ Integrated Leave Trip button in trip detail dropdown (members only)
+- ✅ Organizers prevented from leaving (must delete trip or transfer ownership)
+- ✅ User preferences automatically deleted when leaving
+- ✅ Redirect to trips list after leaving
+- ✅ Error handling for edge cases
+- ✅ TypeScript type safety throughout
+
+### Files Created/Modified:
+1. **Created**: `src/lib/components/LeaveTripModal.svelte` (138 lines) - Warning modal component for leaving trips
+2. **Modified**: `src/routes/(admin)/trips/[trip_id]/+page.server.ts` - Added leaveTrip action (49 additional lines)
+3. **Modified**: `src/routes/(admin)/trips/[trip_id]/+page.svelte` - Added member dropdown menu and leave modal integration
+
+### Testing:
+- TypeScript compilation: ✅ Passed (0 errors, 3 acceptable warnings)
+- Build: ✅ Passed successfully
+- Security: ✅ Multiple authorization checks (auth, membership, prevents organizer from leaving)
+- Cleanup: ✅ Preferences deleted when leaving
+- Database: ✅ Proper deletion of trip_member record
+
+### Security & UX Notes:
+- Members can leave freely but organizers cannot (must transfer or delete)
+- Clear warning modal prevents accidental leaving
+- Preferences are properly cleaned up to avoid orphaned data
+- Server-side validation ensures only members can leave
+- User must rejoin via invite link if they leave accidentally
+- Separation of organizer vs member actions in UI
 
