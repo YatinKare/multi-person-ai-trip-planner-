@@ -253,7 +253,7 @@ IN_PROGRESS
   - Create form action to insert trip_member record
   - Redirect to preference form after joining
 
-- [ ] **Task 4.4**: Implement trip detail view shell
+- [x] **Task 4.4**: Implement trip detail view shell
   - Create route: `src/routes/(admin)/trips/[trip_id]/+page.svelte`
   - Load trip, members, and user's role in `+page.server.ts`
   - Implement DaisyUI Drawer layout
@@ -1907,3 +1907,55 @@ Next: Task 4.3 (Join Trip Invitation) - allow users to join trips via invite lin
 ### Files Modified:
 1. `src/routes/(marketing)/sitemap.xml/+server.ts` - Excluded dynamic join route from sitemap
 
+
+
+---
+
+## Completed This Iteration (Task 4.4)
+
+**Task 4.4: Implement trip detail view shell**
+
+Created the individual trip detail page that displays trip information, member list, and placeholder for group insights.
+
+### Implementation Details:
+
+**Server-Side (`+page.server.ts`):**
+- Authentication check with 401 error if not logged in
+- Trip existence check with 404 error if not found
+- Membership verification with 403 error if user not a member
+- Loads trip details, all members, and their preferences
+- Fetches profiles separately (workaround for Supabase relation limitation)
+- Combines member data with response status (responded/pending)
+- Returns session and supabase client for proper type compatibility
+
+**Client-Side (`+page.svelte`):**
+- Breadcrumb navigation (All Trips → Trip Name)
+- Trip heading with name, status badge, and response count
+- Action buttons (Edit Trip, Generate Recommendations) - organizer only
+- Invite card with shareable link and copy-to-clipboard functionality
+- Member list table with avatars, names, response status
+- Nudge buttons for pending members (organizer only)
+- Placeholder for Group Insights (to be implemented in later tasks)
+- Responsive design following DaisyUI patterns from mockups
+- Material Symbols icons for consistent visual design
+
+### Features Implemented:
+- ✅ Route: `src/routes/(admin)/trips/[trip_id]/+page.svelte`
+- ✅ Load trip, members, and user's role in `+page.server.ts`
+- ✅ Show trip name, status badge, member count
+- ✅ Show "Copy Invite Link" button for organizers
+- ✅ Display member list with response status indicators
+- ✅ Handle 404 if trip not found or user not a member
+- ✅ Handle 403 if user tries to access trip they're not part of
+- ✅ TypeScript type safety with proper PageData types
+
+### Files Created:
+1. `src/routes/(admin)/trips/[trip_id]/+page.server.ts` (93 lines) - Server load function
+2. `src/routes/(admin)/trips/[trip_id]/+page.svelte` (270 lines) - Trip detail view component
+
+### Testing Notes:
+- TypeScript compilation: ✅ Passed (svelte-check found 0 errors)
+- Proper error handling for unauthorized access
+- Profile data properly loaded with manual fetch (avoiding Supabase relation issues)
+- Copy to clipboard functionality for invite links
+- Role-based UI rendering (organizer vs member views)
