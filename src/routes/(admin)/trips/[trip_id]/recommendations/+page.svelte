@@ -1,6 +1,4 @@
 <script lang="ts">
-  import { setContext } from "svelte"
-  import { writable } from "svelte/store"
   import type { PageData } from "./$types"
 
   interface Props {
@@ -8,9 +6,6 @@
   }
 
   let { data }: Props = $props()
-
-  const adminSectionStore = writable("trips")
-  setContext("adminSection", adminSectionStore)
 
   // Type for destination from recommendations
   interface Destination {

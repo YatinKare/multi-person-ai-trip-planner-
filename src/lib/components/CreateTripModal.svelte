@@ -3,34 +3,40 @@
 	import { goto } from '$app/navigation';
 	import type { SubmitFunction } from '@sveltejs/kit';
 
-	export let open = false;
+	interface Props {
+		open: boolean;
+	}
 
-	let step: 'input' | 'success' = 'input';
-	let tripName = '';
-	let roughTimeframe = '';
-	let inviteCode = '';
-	let createdTripId = '';
-	let isSubmitting = false;
+	let { open = $bindable(false) }: Props = $props();
+
+	let step = $state<'input' | 'success'>('input');
+	let tripName = $state('');
+	let roughTimeframe = $state('');
+	let inviteCode = $state('');
+	let createdTripId = $state('');
+	let isSubmitting = $state(false);
 
 	// Reset state when modal closes
-	$: if (!open) {
-		setTimeout(() => {
-			step = 'input';
-			tripName = '';
-			roughTimeframe = '';
-			inviteCode = '';
-			createdTripId = '';
-			isSubmitting = false;
-		}, 200);
-	}
+	$effect(() => {
+		if (!open) {
+			setTimeout(() => {
+				step = 'input';
+				tripName = '';
+				roughTimeframe = '';
+				inviteCode = '';
+				createdTripId = '';
+				isSubmitting = false;
+			}, 200);
+		}
+	});
 
 	const handleSubmit: SubmitFunction = () => {
 		isSubmitting = true;
 		return async ({ result, update }) => {
 			isSubmitting = false;
 			if (result.type === 'success' && result.data) {
-				inviteCode = result.data.inviteCode;
-				createdTripId = result.data.tripId;
+				inviteCode = result.data.inviteCode as string;
+				createdTripId = result.data.tripId as string;
 				step = 'success';
 			}
 			await update();
@@ -41,10 +47,27 @@
 		open = false;
 	}
 
+	function handleBackdropClick() {
+		closeModal();
+	}
+
+	function handleBackdropKeydown(e: KeyboardEvent) {
+		if (e.key === 'Escape') {
+			closeModal();
+		}
+	}
+
+	function handleModalClick(e: MouseEvent) {
+		e.stopPropagation();
+	}
+
+	function handleModalKeydown(e: KeyboardEvent) {
+		e.stopPropagation();
+	}
+
 	function copyInviteLink() {
 		const link = `${window.location.origin}/join/${inviteCode}`;
 		navigator.clipboard.writeText(link);
-		// Optional: Show a toast notification here
 	}
 
 	function shareViaWhatsApp() {
@@ -82,19 +105,19 @@
 </script>
 
 {#if open}
-	<!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
 	<div
 		class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm"
 		role="dialog"
 		aria-modal="true"
-		on:click={closeModal}
-		on:keydown={(e) => e.key === 'Escape' && closeModal()}
+		tabindex="-1"
+		onclick={handleBackdropClick}
+		onkeydown={handleBackdropKeydown}
 	>
 		<!-- svelte-ignore a11y_no_static_element_interactions -->
 		<div
-			class="relative w-full max-w-lg mx-4 bg-base-200 rounded-2xl shadow-2xl transition-all duration-300"
-			on:click|stopPropagation
-			on:keydown|stopPropagation
+			class="relative w-full max-w-lg mx-4 bg-base-200 rounded-2xl shadow-2xl border border-base-300 transition-all duration-300"
+			onclick={handleModalClick}
+			onkeydown={handleModalKeydown}
 		>
 			{#if step === 'input'}
 				<!-- Step 1: Input State -->
@@ -102,7 +125,7 @@
 					<button
 						type="button"
 						class="absolute top-4 right-4 btn btn-ghost btn-sm btn-circle"
-						on:click={closeModal}
+						onclick={closeModal}
 					>
 						<span class="material-symbols-outlined text-xl">close</span>
 					</button>
@@ -154,7 +177,7 @@
 						<button
 							type="submit"
 							disabled={isSubmitting || !tripName.trim()}
-							class="btn btn-primary w-full mt-6 text-lg font-semibold shadow-lg hover:shadow-primary/50 transition-all duration-300"
+							class="btn btn-primary w-full mt-6 text-lg font-semibold"
 						>
 							{#if isSubmitting}
 								<span class="loading loading-spinner"></span>
@@ -173,7 +196,7 @@
 					<button
 						type="button"
 						class="absolute top-4 right-4 btn btn-ghost btn-sm btn-circle"
-						on:click={closeModal}
+						onclick={closeModal}
 					>
 						<span class="material-symbols-outlined text-xl">close</span>
 					</button>
@@ -181,12 +204,12 @@
 					<div class="text-center mb-6">
 						<div class="inline-block relative">
 							<span
-								class="material-symbols-outlined text-7xl text-success animate-pulse"
+								class="material-symbols-outlined text-7xl text-primary"
 								style="font-variation-settings: 'FILL' 1;"
 							>
 								check_circle
 							</span>
-							<div class="absolute inset-0 bg-success/30 blur-xl rounded-full animate-pulse"></div>
+							<div class="absolute inset-0 bg-primary/30 blur-xl rounded-full animate-pulse"></div>
 						</div>
 						<h2 class="text-3xl font-bold mt-4">{tripName} is ready!</h2>
 						<p class="text-base-content/70 mt-2">
@@ -205,7 +228,7 @@
 							/>
 							<button
 								type="button"
-								on:click={copyInviteLink}
+								onclick={copyInviteLink}
 								class="btn btn-primary btn-sm"
 								title="Copy invite link"
 							>
@@ -219,7 +242,7 @@
 					<div class="grid grid-cols-3 gap-3 mb-6">
 						<button
 							type="button"
-							on:click={shareViaWhatsApp}
+							onclick={shareViaWhatsApp}
 							class="btn btn-outline hover:btn-success flex flex-col gap-1 h-auto py-3"
 						>
 							<span class="material-symbols-outlined text-2xl">chat</span>
@@ -227,7 +250,7 @@
 						</button>
 						<button
 							type="button"
-							on:click={shareViaEmail}
+							onclick={shareViaEmail}
 							class="btn btn-outline hover:btn-info flex flex-col gap-1 h-auto py-3"
 						>
 							<span class="material-symbols-outlined text-2xl">mail</span>
@@ -235,7 +258,7 @@
 						</button>
 						<button
 							type="button"
-							on:click={shareViaSystem}
+							onclick={shareViaSystem}
 							class="btn btn-outline hover:btn-primary flex flex-col gap-1 h-auto py-3"
 						>
 							<span class="material-symbols-outlined text-2xl">share</span>
@@ -246,7 +269,7 @@
 					<!-- Navigation -->
 					<button
 						type="button"
-						on:click={goToDashboard}
+						onclick={goToDashboard}
 						class="btn btn-ghost w-full"
 					>
 						Go to Trip Dashboard
@@ -256,15 +279,3 @@
 		</div>
 	</div>
 {/if}
-
-<style>
-	@keyframes pulse {
-		0%,
-		100% {
-			opacity: 1;
-		}
-		50% {
-			opacity: 0.5;
-		}
-	}
-</style>

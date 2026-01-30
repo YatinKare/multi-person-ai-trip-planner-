@@ -1,16 +1,19 @@
 @import "tailwindcss";
 
 @plugin '@tailwindcss/typography';
+
 @plugin "daisyui" {
-  /* Disable all other themes which forces the default theme created below. You can add a dark mode theme using daisyui if you like, and it will automatically use it when the user's system is in dark mode. Docs: https://daisyui.com/docs/themes/ */
+  /* Enable multiple themes */
   themes: false;
 }
 
+/* Original SaaS Starter theme for marketing/account pages */
 @plugin "daisyui/theme" {
   name: "saasstartertheme";
-  default: true; /* set as default */
-  prefersdark: false; /* set as default dark mode (prefers-color-scheme:dark) */
-  color-scheme: light; /* color of browser-provided UI */
+  default: false;
+  /* set as default */
+  prefersdark: false;
+  color-scheme: light;
 
   --color-primary: #180042;
   --color-primary-content: #fefbf6;
@@ -50,6 +53,62 @@
   --noise: 0;
 }
 
+/* TripSync Dark Emerald Theme for trips pages */
+@plugin "daisyui/theme" {
+  name: "tripsync";
+  default: true;
+  prefersdark: true;
+  color-scheme: dark;
+
+  /* Primary: Cyan/Emerald #13ecb6 */
+  --color-primary: #13ecb6;
+  --color-primary-content: #10221d;
+
+  /* Secondary: Muted teal #92c9bb */
+  --color-secondary: #92c9bb;
+  --color-secondary-content: #10221d;
+
+  /* Accent: Same as primary */
+  --color-accent: #13ecb6;
+  --color-accent-content: #10221d;
+
+  /* Neutral: Dark green */
+  --color-neutral: #23483f;
+  --color-neutral-content: #ffffff;
+
+  /* Base colors: Dark green palette */
+  --color-base-100: #10221d;
+  --color-base-200: #162e28;
+  --color-base-300: #23483f;
+  --color-base-content: #ffffff;
+
+  /* Semantic colors */
+  --color-info: #3b82f6;
+  --color-info-content: #ffffff;
+  --color-success: #13ecb6;
+  --color-success-content: #10221d;
+  --color-warning: #f59e0b;
+  --color-warning-content: #10221d;
+  --color-error: #ef4444;
+  --color-error-content: #ffffff;
+
+  /* border radius */
+  --radius-selector: 1rem;
+  --radius-field: 0.5rem;
+  --radius-box: 0.75rem;
+
+  /* base sizes */
+  --size-selector: 0.25rem;
+  --size-field: 0.25rem;
+
+  /* border size */
+  --border: 1px;
+
+  /* effects */
+  --depth: 1;
+  --noise: 0;
+}
+
 /*
   Tailwind CSS v4 Migration:
   The default border color has changed to `currentColor` in Tailwind CSS v4,
@@ -60,6 +119,7 @@
   color utility to any element that depends on these defaults.
 */
 @layer base {
+
   *,
   ::after,
   ::before,
@@ -77,12 +137,145 @@ a {
 .authBtn {
   @apply btn;
 }
+
 button[disabled].authBtn {
   font-size: 0.001px;
   filter: brightness(65%);
 }
+
 button[disabled].authBtn::before {
   font-size: 14px;
   content: "Loading...";
   color: oklch(var(--pc));
+}
+
+/* ============================================
+   TripSync Theme Global Styles
+   ============================================ */
+
+/* Global font family */
+body {
+  font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+}
+
+/* Material Symbols icon styling */
+.material-symbols-outlined {
+  font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+}
+
+.material-symbols-outlined.filled {
+  font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+}
+
+/* TripSync-specific styles (scoped to tripsync theme) */
+[data-theme="tripsync"] {
+
+  /* Custom scrollbar */
+  & ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+
+  & ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  & ::-webkit-scrollbar-thumb {
+    background: #23483f;
+    border-radius: 4px;
+  }
+
+  & ::-webkit-scrollbar-thumb:hover {
+    background: #13ecb6;
+  }
+
+  /* Selection colors */
+  & ::selection {
+    background-color: #13ecb6;
+    color: #10221d;
+  }
+
+  /* Button glow effects for primary buttons */
+  & .btn-primary {
+    box-shadow: 0 0 15px rgba(19, 236, 182, 0.2);
+    transition: all 0.2s ease;
+  }
+
+  & .btn-primary:hover {
+    box-shadow: 0 0 25px rgba(19, 236, 182, 0.4);
+    transform: translateY(-1px);
+  }
+
+  & .btn-primary:active {
+    transform: scale(0.98);
+  }
+
+  /* Card hover transitions */
+  & .card {
+    transition: all 0.3s ease;
+  }
+
+  & .card:hover {
+    border-color: rgba(19, 236, 182, 0.3);
+  }
+
+  /* Input focus states */
+  & .input:focus,
+  & .select:focus,
+  & .textarea:focus {
+    border-color: #13ecb6;
+    box-shadow: 0 0 0 2px rgba(19, 236, 182, 0.2);
+  }
+
+  /* Avatar group spacing */
+  & .avatar-group>.avatar {
+    border: 2px solid #162e28;
+  }
+
+  /* Drawer overlay backdrop */
+  & .drawer-side>.drawer-overlay {
+    background-color: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(4px);
+  }
+
+  /* Progress bar glow */
+  & .progress-primary::-webkit-progress-value {
+    box-shadow: 0 0 10px rgba(19, 236, 182, 0.6);
+  }
+}
+
+/* Pattern for conflict zones (used in dashboard) */
+.pattern-diagonal-lines {
+  background-image: repeating-linear-gradient(45deg,
+      transparent,
+      transparent 5px,
+      rgba(239, 68, 68, 0.1) 5px,
+      rgba(239, 68, 68, 0.1) 10px);
+}
+
+/* Custom animation for fade-in-up */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in-up {
+  animation: fadeInUp 0.3s ease-out;
+}
+
+/* Hide scrollbar utility */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
 }

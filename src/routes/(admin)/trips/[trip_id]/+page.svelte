@@ -1,6 +1,4 @@
 <script lang="ts">
-  import { onMount, setContext } from "svelte"
-  import { writable } from "svelte/store"
   import DeleteTripModal from "$lib/components/DeleteTripModal.svelte"
   import LeaveTripModal from "$lib/components/LeaveTripModal.svelte"
   import AggregatedPreferences from "$lib/components/AggregatedPreferences.svelte"
@@ -11,9 +9,6 @@
   }
 
   let { data }: Props = $props()
-
-  const adminSectionStore = writable("trips")
-  setContext("adminSection", adminSectionStore)
 
   // Get badge class based on trip status
   function getStatusBadgeClass(status: string): string {
@@ -361,12 +356,3 @@
 
 <!-- Leave Trip Modal -->
 <LeaveTripModal bind:open={showLeaveModal} tripName={data.trip.name} tripId={data.trip.id} />
-
-<style>
-  /* Import Material Symbols font */
-  @import url('https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200');
-
-  .material-symbols-outlined {
-    font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
-  }
-</style>

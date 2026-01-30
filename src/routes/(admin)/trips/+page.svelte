@@ -1,6 +1,4 @@
 <script lang="ts">
-  import { onMount, setContext } from "svelte"
-  import { writable } from "svelte/store"
   import CreateTripModal from "$lib/components/CreateTripModal.svelte"
   import type { PageData } from "./$types"
 
@@ -9,9 +7,6 @@
   }
 
   let { data }: Props = $props()
-
-  const adminSectionStore = writable("trips")
-  setContext("adminSection", adminSectionStore)
 
   let searchQuery = $state("")
   let selectedFilter = $state("all")
@@ -282,12 +277,3 @@
 
 <!-- Create Trip Modal -->
 <CreateTripModal bind:open={showCreateModal} />
-
-<style>
-  /* Import Material Symbols font */
-  @import url('https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200');
-
-  .material-symbols-outlined {
-    font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
-  }
-</style>

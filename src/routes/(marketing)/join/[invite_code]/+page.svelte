@@ -27,7 +27,7 @@
 </svelte:head>
 
 <!-- Main Container -->
-<div class="relative flex min-h-screen w-full flex-col overflow-hidden">
+<div class="relative flex min-h-screen w-full flex-col overflow-hidden" data-theme="tripsync">
 	<!-- Background Image with Overlay -->
 	<div class="absolute inset-0 z-0">
 		<div class="absolute inset-0 bg-gradient-to-b from-black/60 via-black/40 to-base-100/90 z-10"></div>

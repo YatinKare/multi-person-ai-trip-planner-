@@ -1,6 +1,4 @@
 <script lang="ts">
-  import { setContext } from "svelte"
-  import { writable } from "svelte/store"
   import { enhance } from "$app/forms"
   import type { PageData } from "./$types"
 
@@ -9,9 +7,6 @@
   }
 
   let { data }: Props = $props()
-
-  const adminSectionStore = writable("trips")
-  setContext("adminSection", adminSectionStore)
 
   // Form state
   let earliestStartDate = $state("")
