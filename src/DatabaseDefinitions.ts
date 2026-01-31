@@ -215,6 +215,9 @@ export interface Database {
           destinations: Json
           generated_at: string
           generated_by: string
+          selected_destination_index: number | null
+          selected_at: string | null
+          selected_by: string | null
         }
         Insert: {
           id?: string
@@ -222,6 +225,9 @@ export interface Database {
           destinations?: Json
           generated_at?: string
           generated_by: string
+          selected_destination_index?: number | null
+          selected_at?: string | null
+          selected_by?: string | null
         }
         Update: {
           id?: string
@@ -229,6 +235,9 @@ export interface Database {
           destinations?: Json
           generated_at?: string
           generated_by?: string
+          selected_destination_index?: number | null
+          selected_at?: string | null
+          selected_by?: string | null
         }
         Relationships: [
           {

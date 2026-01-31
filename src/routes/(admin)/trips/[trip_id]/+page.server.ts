@@ -96,7 +96,7 @@ export const load: PageServerLoad = async ({
   // Check if recommendations already exist
   const { data: existingRecommendations, error: recsError } = await supabase
     .from("recommendations")
-    .select("id, generated_at")
+    .select("id, generated_at, destinations, selected_destination_index")
     .eq("trip_id", trip_id)
     .order("generated_at", { ascending: false })
     .limit(1)
@@ -104,6 +104,13 @@ export const load: PageServerLoad = async ({
 
   if (recsError && recsError.code !== "PGRST116") {
     console.error("Error loading recommendations:", recsError)
+  }
+
+  // Get selected destination if one exists
+  let selectedDestination = null
+  if (existingRecommendations && existingRecommendations.selected_destination_index !== null) {
+    const destinations = existingRecommendations.destinations as any[]
+    selectedDestination = destinations[existingRecommendations.selected_destination_index]
   }
 
   return {
@@ -115,6 +122,8 @@ export const load: PageServerLoad = async ({
     userId: session.user.id,
     aggregated,
     hasRecommendations: !!existingRecommendations,
+    selectedDestination,
+    supabase,
   }
 }
 

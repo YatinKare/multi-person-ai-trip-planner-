@@ -149,6 +149,79 @@ export const load: PageServerLoad = async ({
 }
 
 export const actions: Actions = {
+  selectDestination: async ({ request, params, locals: { supabase, session } }) => {
+    if (!session) {
+      return fail(401, { message: "Unauthorized" })
+    }
+
+    const { trip_id } = params
+    const formData = await request.formData()
+    const destinationIndex = parseInt(formData.get("destinationIndex") as string)
+
+    if (isNaN(destinationIndex)) {
+      return fail(400, { message: "Invalid destination index" })
+    }
+
+    // Verify user is an organizer of this trip
+    const { data: membership } = await supabase
+      .from("trip_members")
+      .select("role")
+      .eq("trip_id", trip_id)
+      .eq("user_id", session.user.id)
+      .single()
+
+    if (!membership || membership.role !== "organizer") {
+      return fail(403, { message: "Only organizers can select destinations" })
+    }
+
+    // Get the current recommendations
+    const { data: recommendations, error: recsError } = await supabase
+      .from("recommendations")
+      .select("*")
+      .eq("trip_id", trip_id)
+      .order("generated_at", { ascending: false })
+      .limit(1)
+      .single()
+
+    if (recsError || !recommendations) {
+      return fail(404, { message: "No recommendations found" })
+    }
+
+    // Validate that the destination index is valid
+    const destinations = recommendations.destinations as any[]
+    if (destinationIndex < 0 || destinationIndex >= destinations.length) {
+      return fail(400, { message: "Invalid destination index" })
+    }
+
+    // Update the recommendations table with selected destination
+    const { error: updateRecsError } = await supabase
+      .from("recommendations")
+      .update({
+        selected_destination_index: destinationIndex,
+        selected_at: new Date().toISOString(),
+        selected_by: session.user.id,
+      })
+      .eq("id", recommendations.id)
+
+    if (updateRecsError) {
+      console.error("Error updating recommendations:", updateRecsError)
+      return fail(500, { message: "Failed to select destination" })
+    }
+
+    // Update trip status to 'planning'
+    const { error: updateTripError } = await supabase
+      .from("trips")
+      .update({ status: "planning" })
+      .eq("id", trip_id)
+
+    if (updateTripError) {
+      console.error("Error updating trip status:", updateTripError)
+      return fail(500, { message: "Failed to update trip status" })
+    }
+
+    return { success: true }
+  },
+
   vote: async ({ request, params, locals: { supabase, session } }) => {
     if (!session) {
       return fail(401, { error: "Unauthorized" })

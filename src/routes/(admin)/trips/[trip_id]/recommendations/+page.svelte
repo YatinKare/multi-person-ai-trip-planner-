@@ -1,5 +1,6 @@
 <script lang="ts">
   import type { PageData } from "./$types"
+  import DestinationSelectionModal from "$lib/components/DestinationSelectionModal.svelte"
 
   interface Props {
     data: PageData
@@ -31,6 +32,21 @@
     data.members?.filter(
       (m: { has_preferences: boolean }) => m.has_preferences,
     ) || []
+
+  // Modal state
+  let showSelectionModal = $state(false)
+  let selectedDestinationIndex = $state<number>(0)
+  let selectedDestinationName = $state<string>("")
+
+  function openSelectionModal(index: number, name: string) {
+    selectedDestinationIndex = index
+    selectedDestinationName = name
+    showSelectionModal = true
+  }
+
+  // Check if a destination has been selected (trip status is planning or beyond)
+  const isDestinationSelected = data.trip.status === "planning" || data.trip.status === "finalized"
+  const selectedIndex = data.recommendations?.selected_destination_index
 </script>
 
 <svelte:head>
@@ -79,7 +95,9 @@
 
       <!-- Voting Members -->
       <div class="flex flex-col items-end gap-2">
-        <span class="badge badge-ghost text-xs">Voting In Progress</span>
+        <span class="badge {isDestinationSelected ? 'badge-primary' : 'badge-ghost'} text-xs">
+          {isDestinationSelected ? 'Destination Selected' : 'Voting In Progress'}
+        </span>
         <div class="avatar-group -space-x-3">
           {#each respondedMembers.slice(0, 4) as member}
             <div class="avatar">
@@ -213,6 +231,7 @@
                   <input type="hidden" name="vote_type" value="upvote" />
                   <button
                     type="submit"
+                    disabled={isDestinationSelected}
                     class="btn {userVote === 'upvote'
                       ? 'btn-primary'
                       : 'btn-ghost bg-base-300'} w-full gap-2"
@@ -244,6 +263,7 @@
                   <input type="hidden" name="vote_type" value="downvote" />
                   <button
                     type="submit"
+                    disabled={isDestinationSelected}
                     class="btn {userVote === 'downvote'
                       ? 'btn-error'
                       : 'btn-ghost bg-base-300'} w-full gap-2"
@@ -263,14 +283,26 @@
                 </form>
               </div>
 
-              <!-- Organizer Select (visible only to organizers - will be implemented in Task 7.3) -->
+              <!-- Organizer Select (visible only to organizers) -->
               {#if data.userRole === "organizer"}
-                <button class="btn btn-primary w-full gap-2">
-                  <span class="material-symbols-outlined text-xl"
-                    >check_circle</span
+                {#if isDestinationSelected && selectedIndex === index}
+                  <div class="w-full p-4 bg-primary/10 border-2 border-primary rounded-lg text-center">
+                    <span class="material-symbols-outlined text-primary text-2xl" style="font-variation-settings: 'FILL' 1;">
+                      check_circle
+                    </span>
+                    <p class="text-primary font-bold mt-2">Selected Destination</p>
+                  </div>
+                {:else if !isDestinationSelected}
+                  <button
+                    class="btn btn-primary w-full gap-2"
+                    onclick={() => openSelectionModal(index, destination.name)}
                   >
-                  Select Final Destination
-                </button>
+                    <span class="material-symbols-outlined text-xl"
+                      >check_circle</span
+                    >
+                    Select Final Destination
+                  </button>
+                {/if}
               {/if}
             </div>
           </div>
@@ -287,6 +319,13 @@
     </div> -->
   {/if}
 </div>
+
+<!-- Destination Selection Modal -->
+<DestinationSelectionModal
+  bind:open={showSelectionModal}
+  destinationName={selectedDestinationName}
+  destinationIndex={selectedDestinationIndex}
+/>
 
 <style>
   @import url("https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200");

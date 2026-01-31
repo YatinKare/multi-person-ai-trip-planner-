@@ -301,6 +301,99 @@
     </div>
   {/if}
 
+  <!-- Selected Destination Card -->
+  {#if data.selectedDestination}
+    <div
+      class="relative overflow-hidden rounded-2xl bg-gradient-to-br from-primary/10 via-base-200 to-base-200 border-2 border-primary/30 mb-8"
+    >
+      <div
+        class="absolute inset-0 z-0 opacity-20 bg-[radial-gradient(circle_at_50%_120%,rgba(19,236,182,0.2),transparent_50%)]"
+      ></div>
+      <div class="relative z-10 p-6 md:p-8">
+        <div class="flex items-start justify-between gap-4 mb-4">
+          <div class="flex items-center gap-3">
+            <span
+              class="material-symbols-outlined text-4xl text-primary"
+              style="font-variation-settings: 'FILL' 1;"
+            >
+              location_on
+            </span>
+            <div>
+              <span
+                class="inline-block px-3 py-1 bg-primary/20 text-primary text-xs font-bold uppercase tracking-wider rounded-full mb-2"
+              >
+                Selected Destination
+              </span>
+              <h2 class="text-3xl font-bold text-white">
+                {data.selectedDestination.name}
+              </h2>
+              <p class="text-base-content/60 text-sm mt-1">
+                {data.selectedDestination.region}
+              </p>
+            </div>
+          </div>
+          <a
+            href="/trips/{data.trip.id}/recommendations"
+            class="btn btn-ghost btn-sm gap-2"
+          >
+            <span class="material-symbols-outlined">visibility</span>
+            View All
+          </a>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
+          <div class="bg-base-200/50 rounded-xl p-4 border border-base-300/50">
+            <div class="flex items-center gap-2 mb-3">
+              <span class="material-symbols-outlined text-primary text-lg"
+                >auto_awesome</span
+              >
+              <span class="text-sm font-bold text-base-content/80"
+                >Why This Destination</span
+              >
+            </div>
+            <p class="text-sm text-base-content/70">
+              {data.selectedDestination.reasoning}
+            </p>
+          </div>
+
+          <div class="bg-base-200/50 rounded-xl p-4 border border-base-300/50">
+            <div class="flex items-center gap-2 mb-3">
+              <span class="material-symbols-outlined text-primary text-lg"
+                >payments</span
+              >
+              <span class="text-sm font-bold text-base-content/80"
+                >Estimated Cost</span
+              >
+            </div>
+            <p class="text-2xl font-bold text-primary">
+              ${data.selectedDestination.cost_per_person.toLocaleString()}
+              <span class="text-sm text-base-content/60 font-normal"
+                >per person</span
+              >
+            </p>
+          </div>
+        </div>
+
+        {#if data.trip.status === "planning" && data.userRole === "organizer"}
+          <div class="mt-6 pt-6 border-t border-base-300/50">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-2">
+                <span class="material-symbols-outlined text-warning">info</span>
+                <span class="text-sm text-base-content/70">
+                  Ready to create your itinerary?
+                </span>
+              </div>
+              <button class="btn btn-primary gap-2">
+                <span class="material-symbols-outlined">auto_awesome</span>
+                Generate Itinerary
+              </button>
+            </div>
+          </div>
+        {/if}
+      </div>
+    </div>
+  {/if}
+
   <!-- Dashboard Grid -->
   <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 pb-12">
     <!-- Left Col: Member List -->
