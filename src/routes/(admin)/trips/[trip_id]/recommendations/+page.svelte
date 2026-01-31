@@ -55,26 +55,75 @@
 
 <div class="max-w-7xl mx-auto py-6 px-4 md:px-8 lg:px-16">
   {#if !data.recommendations || destinations.length === 0}
-    <!-- No Recommendations State -->
-    <div class="card bg-base-200 border border-base-300">
+    <!-- No Recommendations State (could be error or not generated yet) -->
+    {@const hasError = data.trip.status === 'recommending' && !data.recommendations}
+    <div class="card bg-base-200 border {hasError ? 'border-error' : 'border-base-300'}">
       <div class="card-body items-center text-center py-16">
-        <span class="material-symbols-outlined text-6xl text-primary mb-4"
-          >travel_explore</span
-        >
-        <h2 class="text-2xl font-bold text-white mb-2">
-          No Recommendations Yet
-        </h2>
-        <p class="text-base-content/60 max-w-md mb-6">
-          Recommendations haven't been generated for this trip yet. The
-          organizer can generate them from the trip dashboard.
-        </p>
-        <a href="/trips/{data.trip.id}" class="btn btn-primary">
-          <span class="material-symbols-outlined">arrow_back</span>
-          Back to Dashboard
-        </a>
+        {#if hasError}
+          <!-- Error State -->
+          <span class="material-symbols-outlined text-6xl text-error mb-4"
+            >error</span
+          >
+          <h2 class="text-2xl font-bold text-white mb-2">
+            Recommendation Generation Failed
+          </h2>
+          <div class="text-base-content/60 max-w-md mb-6">
+            <p class="mb-2">An error occurred while generating destination recommendations. This could be due to:</p>
+            <ul class="list-disc list-inside text-sm">
+              <li>Conflicting group preferences that are impossible to satisfy</li>
+              <li>Temporary AI service issues</li>
+              <li>Network connectivity problems</li>
+            </ul>
+          </div>
+          <div class="flex gap-3">
+            <a href="/trips/{data.trip.id}" class="btn btn-primary">
+              <span class="material-symbols-outlined">arrow_back</span>
+              Back to Dashboard
+            </a>
+            {#if data.userRole === 'organizer'}
+              <button
+                class="btn btn-error"
+                onclick={() => window.location.href = `/trips/${data.trip.id}#retry-recommendations`}
+              >
+                <span class="material-symbols-outlined">refresh</span>
+                Try Again
+              </button>
+            {/if}
+          </div>
+        {:else}
+          <!-- Not Generated Yet State -->
+          <span class="material-symbols-outlined text-6xl text-primary mb-4"
+            >travel_explore</span
+          >
+          <h2 class="text-2xl font-bold text-white mb-2">
+            No Recommendations Yet
+          </h2>
+          <p class="text-base-content/60 max-w-md mb-6">
+            Recommendations haven't been generated for this trip yet. The
+            organizer can generate them from the trip dashboard.
+          </p>
+          <a href="/trips/{data.trip.id}" class="btn btn-primary">
+            <span class="material-symbols-outlined">arrow_back</span>
+            Back to Dashboard
+          </a>
+        {/if}
       </div>
     </div>
   {:else}
+    <!-- Show warning if fewer than 3 destinations -->
+    {#if destinations.length < 3}
+      <div class="alert alert-warning mb-6">
+        <span class="material-symbols-outlined">warning</span>
+        <div>
+          <h3 class="font-bold">Limited Recommendations</h3>
+          <div class="text-sm">
+            Only {destinations.length} destination{destinations.length === 1 ? '' : 's'} could be generated based on your group's preferences.
+            This may indicate conflicting constraints or limited options.
+          </div>
+        </div>
+      </div>
+    {/if}
+
     <!-- Page Header -->
     <div
       class="w-full flex flex-col md:flex-row justify-between items-start md:items-center gap-6 mb-10 border-b border-base-300 pb-6"

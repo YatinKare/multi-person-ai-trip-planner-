@@ -47,8 +47,8 @@ class GenerateRecommendationsResponse(BaseModel):
     trip_id: UUID = Field(..., description="Trip ID these recommendations are for")
     destinations: List[DestinationRecommendation] = Field(
         ...,
-        description="List of 3-5 destination recommendations",
-        min_length=3,
+        description="List of 1-5 destination recommendations (ideally 3-5)",
+        min_length=1,  # Allow at least 1 recommendation rather than failing entirely
         max_length=5
     )
     generated_at: str = Field(..., description="Timestamp when recommendations were generated (ISO 8601)")

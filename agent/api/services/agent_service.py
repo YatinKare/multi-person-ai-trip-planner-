@@ -100,12 +100,26 @@ class AgentService:
             if not recommendations_final:
                 return {
                     "success": False,
-                    "error": "Recommendation generation failed to produce output"
+                    "error": "Recommendation generation failed to produce output. The AI may not have found suitable destinations based on your group's preferences."
+                }
+
+            # Validate recommendations structure
+            options = recommendations_final.get("options", [])
+            if not options or not isinstance(options, list):
+                return {
+                    "success": False,
+                    "error": "Invalid recommendation format. Please try again or adjust your preferences."
+                }
+
+            if len(options) < 1:
+                return {
+                    "success": False,
+                    "error": "No destinations could be generated. Your group's preferences may be too restrictive or conflicting. Try relaxing some constraints."
                 }
 
             # Store recommendations in database
             recommendations_payload = {
-                "options": recommendations_final.get("options", []),
+                "options": options,
                 "generated_by": user_id,
                 "group_summary": recommendations_final.get("group_summary", ""),
                 "conflicts": recommendations_final.get("conflicts", [])

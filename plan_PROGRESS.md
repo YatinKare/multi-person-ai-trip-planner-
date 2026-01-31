@@ -402,7 +402,7 @@ IN_PROGRESS
   - Show selected destination prominently on dashboard
   - Show "Generate Itinerary" button after selection
 
-- [ ] **Task 7.4**: Handle AI recommendation errors
+- [x] **Task 7.4**: Handle AI recommendation errors
   - Show error message if recommendation generation fails
   - Provide "Retry" button for organizers
   - Log errors for debugging
@@ -569,7 +569,100 @@ IN_PROGRESS
 
 ## Completed This Iteration
 
-**Summary:** Completed Task 7.1 (Convert "Destination Voting" mockup to Svelte)
+**Summary:** Completed Task 7.4 (Handle AI recommendation errors)
+
+### Task 7.4: Handle AI Recommendation Errors (COMPLETE)
+
+- ✅ Enhanced error handling UI on recommendations page (`src/routes/(admin)/trips/[trip_id]/recommendations/+page.svelte`):
+  - **Error State Detection**: Detects when trip is in 'recommending' status but has no recommendations (indicates generation failure)
+  - **Comprehensive Error Display:**
+    - Red error icon and border for failed state
+    - Clear error message: "Recommendation Generation Failed"
+    - Lists common causes: conflicting preferences, AI service issues, network problems
+    - "Try Again" button for organizers to retry generation
+    - "Back to Dashboard" link for all users
+  - **Limited Recommendations Warning:**
+    - Shows alert banner when fewer than 3 destinations are generated
+    - Informs users that limited results may indicate conflicting constraints
+    - Still displays available recommendations (graceful degradation)
+  - **Fixed HTML validation error**: Changed `<p>` containing `<ul>` to proper `<div>` structure
+
+- ✅ Improved error handling in trip dashboard (`src/routes/(admin)/trips/[trip_id]/+page.svelte`):
+  - **Enhanced `generateRecommendations()` function:**
+    - Replaced generic `alert()` with structured error state management
+    - Added retry attempt tracking
+    - Implemented 2-minute timeout for AI requests (120 seconds)
+    - Provides specific error messages based on HTTP status codes:
+      - 400: Invalid trip status or preferences
+      - 403: Permission denied
+      - 404: Trip not found
+      - 500: AI service error with detailed context
+    - Handles timeout errors with clear message
+    - Handles network errors separately
+    - Clears previous errors before new attempts
+  - **Error Banner UI:**
+    - Prominent error alert with error icon
+    - Shows detailed error message from backend or network layer
+    - Inline "Retry" button with loading state
+    - "Dismiss" button to clear error
+    - Uses DaisyUI alert-error styling
+    - Positioned prominently below header, above main content
+
+- ✅ Backend error handling improvements:
+  - **Relaxed Pydantic validation** (`agent/api/models/recommendations.py`):
+    - Changed `min_length=3` to `min_length=1` for destinations array
+    - Allows returning 1-2 recommendations rather than failing entirely
+    - Updated description to indicate "ideally 3-5" destinations
+  - **Enhanced agent service validation** (`agent/api/services/agent_service.py`):
+    - Added explicit check for empty recommendations output
+    - Validates recommendations structure before storing
+    - Provides user-friendly error messages:
+      - "No destinations could be generated. Your group's preferences may be too restrictive or conflicting."
+      - "Invalid recommendation format. Please try again or adjust your preferences."
+    - Checks for valid array structure and minimum 1 destination
+  - **JSON validation in API router** (`agent/api/routers/ai.py`):
+    - Added `ValidationError` import and try-catch for Pydantic validation
+    - Catches validation errors when building response
+    - Extracts useful error messages from Pydantic errors
+    - Returns 500 with clear message: "AI generated invalid recommendation data: [details]"
+    - Logs validation errors for debugging
+
+- ✅ Edge case handling:
+  - **< 3 destinations**: UI shows warning but displays available recommendations
+  - **0 destinations**: Backend returns error, frontend shows error state with retry
+  - **Invalid JSON from AI**: Caught by Pydantic validation, returns structured error
+  - **Network timeouts**: 2-minute timeout with clear error message
+  - **Session expiration**: Detected and handled with specific message
+  - **Malformed responses**: Try-catch for JSON parsing failures
+
+- ✅ Logging and debugging:
+  - All errors logged to console with attempt number
+  - Backend logs detailed stack traces for server errors
+  - Error messages provide context for user and debugging
+
+- ✅ Build verification:
+  - All TypeScript checks passing: 0 errors, 0 warnings
+  - Production build successful
+  - All syntax and HTML validation passing
+
+**Phase 7 Progress:** 4 of 4 tasks complete ✅
+- Task 7.1: Convert "Destination Voting" mockup to Svelte ✅
+- Task 7.2: Implement voting functionality ✅
+- Task 7.3: Implement destination selection ✅
+- Task 7.4: Handle AI recommendation errors ✅
+
+**Next Phase:** Phase 8 (Itinerary Generation & Display)
+
+### Files Modified:
+1. `src/routes/(admin)/trips/[trip_id]/recommendations/+page.svelte` - Added error states and warnings
+2. `src/routes/(admin)/trips/[trip_id]/+page.svelte` - Enhanced error handling with banner UI
+3. `agent/api/models/recommendations.py` - Relaxed min_length constraint
+4. `agent/api/services/agent_service.py` - Added validation and user-friendly errors
+5. `agent/api/routers/ai.py` - Added ValidationError handling
+
+---
+
+### Previous: Task 7.1: Convert "Destination Voting" mockup to Svelte (COMPLETE)
 
 - **Task 7.1**: Converted "Destination Voting" HTML mockup to Svelte
   - Implemented full recommendations page UI at `/trips/[trip_id]/recommendations`

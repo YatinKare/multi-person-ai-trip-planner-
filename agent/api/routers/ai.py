@@ -11,6 +11,7 @@ Per plan_PROGRESS.md Task 3.6.
 import logging
 from fastapi import APIRouter, Depends, HTTPException, status
 from uuid import UUID
+from pydantic import ValidationError
 
 from ..middleware.auth import get_current_user, TokenData
 from ..database import (
@@ -91,13 +92,29 @@ async def generate_recommendations(
 
     recommendations_data = result.get("recommendations", {})
 
-    # Build response
-    return GenerateRecommendationsResponse(
-        trip_id=request.trip_id,
-        destinations=recommendations_data.get("options", []),
-        generated_at=result.get("generated_at", ""),
-        aggregated_preferences_summary=recommendations_data.get("group_summary")
-    )
+    # Build and validate response
+    try:
+        response = GenerateRecommendationsResponse(
+            trip_id=request.trip_id,
+            destinations=recommendations_data.get("options", []),
+            generated_at=result.get("generated_at", ""),
+            aggregated_preferences_summary=recommendations_data.get("group_summary")
+        )
+        return response
+    except ValidationError as e:
+        logger.error(f"Validation error building recommendation response: {e}")
+        # Extract useful error message
+        error_details = []
+        for error in e.errors():
+            if 'destinations' in str(error.get('loc')):
+                error_details.append("Invalid recommendation format from AI")
+            else:
+                error_details.append(f"{error.get('loc')}: {error.get('msg')}")
+
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"AI generated invalid recommendation data: {'; '.join(error_details)}"
+        )
 
 
 @router.post("/itinerary/generate", response_model=GenerateItineraryResponse)

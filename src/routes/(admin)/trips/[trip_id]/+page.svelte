@@ -69,6 +69,8 @@
     if (!canGenerateRecommendations || generatingRecommendations) return
 
     generatingRecommendations = true
+    recommendationError = null // Clear previous errors
+    retryAttempt++
 
     try {
       // Get the Supabase session token
@@ -77,11 +79,14 @@
       } = await data.supabase.auth.getSession()
 
       if (!session) {
-        alert("Session expired. Please refresh the page.")
+        recommendationError = "Your session has expired. Please refresh the page and try again."
         return
       }
 
-      // Call FastAPI backend
+      // Call FastAPI backend with timeout
+      const controller = new AbortController()
+      const timeoutId = setTimeout(() => controller.abort(), 120000) // 2 minute timeout
+
       const response = await fetch(
         `http://localhost:8000/api/trips/${data.trip.id}/recommendations`,
         {
@@ -90,25 +95,55 @@
             "Content-Type": "application/json",
             Authorization: `Bearer ${session.access_token}`,
           },
+          signal: controller.signal,
         },
       )
 
+      clearTimeout(timeoutId)
+
       if (!response.ok) {
-        const error = await response.json()
-        throw new Error(error.detail || "Failed to generate recommendations")
+        const error = await response.json().catch(() => ({}))
+
+        // Provide more specific error messages based on status code
+        if (response.status === 400) {
+          throw new Error(error.detail || "Invalid trip status or preferences. Please check your group's preferences.")
+        } else if (response.status === 403) {
+          throw new Error("You don't have permission to generate recommendations for this trip.")
+        } else if (response.status === 404) {
+          throw new Error("Trip not found. Please refresh the page.")
+        } else if (response.status === 500) {
+          throw new Error(error.detail || "AI service error. This could be due to conflicting preferences or temporary service issues.")
+        } else {
+          throw new Error(error.detail || "Failed to generate recommendations. Please try again.")
+        }
       }
 
-      await response.json()
+      const result = await response.json()
 
-      // Redirect to recommendations page
+      // Check if we got valid recommendations
+      if (!result.destinations || result.destinations.length === 0) {
+        throw new Error("No destinations could be generated. Your group's preferences may be too restrictive or conflicting.")
+      }
+
+      // Success - redirect to recommendations page
       window.location.href = `/trips/${data.trip.id}/recommendations`
     } catch (err) {
       console.error("Error generating recommendations:", err)
-      alert(
-        err instanceof Error
-          ? err.message
-          : "Failed to generate recommendations. Please try again.",
-      )
+
+      if (err instanceof Error) {
+        if (err.name === 'AbortError') {
+          recommendationError = "Request timed out. The AI is taking longer than expected. Please try again."
+        } else if (err.message.includes('fetch')) {
+          recommendationError = "Network error. Please check your connection and try again."
+        } else {
+          recommendationError = err.message
+        }
+      } else {
+        recommendationError = "An unexpected error occurred. Please try again."
+      }
+
+      // Log detailed error for debugging
+      console.error("Generation attempt:", retryAttempt, "Error:", err)
     } finally {
       generatingRecommendations = false
     }
@@ -119,6 +154,8 @@
   let showLeaveModal = $state(false)
   let isOrganizer = $derived(data.userRole === "organizer")
   let generatingRecommendations = $state(false)
+  let recommendationError = $state<string | null>(null)
+  let retryAttempt = $state(0)
 
   // Can generate recommendations if:
   // 1. User is organizer
@@ -127,6 +164,11 @@
   let canGenerateRecommendations = $derived(
     isOrganizer && data.responseCount > 0 && !data.hasRecommendations,
   )
+
+  // Clear error when user dismisses
+  function dismissError() {
+    recommendationError = null
+  }
 </script>
 
 <svelte:head>
@@ -251,6 +293,39 @@
       {/if}
     </div>
   </div>
+
+  <!-- Error Banner -->
+  {#if recommendationError}
+    <div role="alert" class="alert alert-error mb-8 shadow-lg">
+      <span class="material-symbols-outlined text-2xl">error</span>
+      <div class="flex-1">
+        <h3 class="font-bold">Failed to Generate Recommendations</h3>
+        <div class="text-sm mt-1">{recommendationError}</div>
+      </div>
+      <div class="flex gap-2">
+        <button
+          class="btn btn-sm btn-ghost"
+          onclick={dismissError}
+        >
+          Dismiss
+        </button>
+        {#if isOrganizer && canGenerateRecommendations}
+          <button
+            class="btn btn-sm btn-primary"
+            onclick={() => generateRecommendations()}
+            disabled={generatingRecommendations}
+          >
+            {#if generatingRecommendations}
+              <span class="loading loading-spinner loading-xs"></span>
+            {:else}
+              <span class="material-symbols-outlined text-sm">refresh</span>
+            {/if}
+            Retry
+          </button>
+        {/if}
+      </div>
+    </div>
+  {/if}
 
   <!-- Invite Action Card -->
   {#if isOrganizer}
