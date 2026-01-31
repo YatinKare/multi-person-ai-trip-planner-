@@ -47,6 +47,16 @@ export const load: PageServerLoad = async ({
     console.error("Error loading recommendations:", recsError)
   }
 
+  // Update trip status to 'voting' if recommendations exist and status is 'recommending'
+  if (recommendations && trip.status === "recommending") {
+    await supabase
+      .from("trips")
+      .update({ status: "voting" })
+      .eq("id", trip_id)
+    // Update local trip object to reflect new status
+    trip.status = "voting"
+  }
+
   // Load trip members
   const { data: members, error: membersError } = await supabase
     .from("trip_members")
@@ -172,6 +182,21 @@ export const actions: Actions = {
 
     if (!membership || membership.role !== "organizer") {
       return fail(403, { message: "Only organizers can select destinations" })
+    }
+
+    // Check trip status - can only select destination in 'voting' status
+    const { data: trip, error: tripError } = await supabase
+      .from("trips")
+      .select("status")
+      .eq("id", trip_id)
+      .single()
+
+    if (tripError || !trip) {
+      return fail(404, { message: "Trip not found" })
+    }
+
+    if (trip.status !== "voting") {
+      return fail(400, { message: `Cannot select destination when trip is in '${trip.status}' status. Trip must be in 'voting' status.` })
     }
 
     // Get the current recommendations

@@ -236,6 +236,34 @@ export const actions: Actions = {
       return fail(403, { error: "Only the organizer can finalize the itinerary" })
     }
 
+    // Check trip status - can only finalize from 'planning' status
+    const { data: trip, error: tripStatusError } = await supabase
+      .from("trips")
+      .select("status")
+      .eq("id", trip_id)
+      .single()
+
+    if (tripStatusError || !trip) {
+      return fail(404, { error: "Trip not found" })
+    }
+
+    if (trip.status !== "planning") {
+      return fail(400, { error: `Cannot finalize trip in '${trip.status}' status. A destination must be selected first (trip must be in 'planning' status).` })
+    }
+
+    // Verify a destination has been selected by checking recommendations
+    const { data: recommendations, error: recsError } = await supabase
+      .from("recommendations")
+      .select("selected_destination_index")
+      .eq("trip_id", trip_id)
+      .order("generated_at", { ascending: false })
+      .limit(1)
+      .single()
+
+    if (recsError || !recommendations || recommendations.selected_destination_index === null) {
+      return fail(400, { error: "Cannot finalize itinerary without selecting a destination first" })
+    }
+
     // Update itinerary to set finalized_at and finalized_by
     const { error: itineraryError } = await supabase
       .from("itineraries")

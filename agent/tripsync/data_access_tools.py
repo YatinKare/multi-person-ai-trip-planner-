@@ -166,6 +166,11 @@ def store_recommendations(trip_id: str, payload: Dict[str, Any]) -> Dict[str, An
         if not result.data:
             return {"success": False, "error": "Failed to insert recommendations"}
 
+        # Update trip status to 'recommending' (if it was 'collecting')
+        trip_result = client.table("trips").select("status").eq("id", trip_id).execute()
+        if trip_result.data and trip_result.data[0].get("status") == "collecting":
+            client.table("trips").update({"status": "recommending"}).eq("id", trip_id).execute()
+
         return {
             "success": True,
             "recommendation_id": result.data[0].get("id"),
