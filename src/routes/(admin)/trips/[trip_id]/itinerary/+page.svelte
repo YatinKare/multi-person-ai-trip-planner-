@@ -1,33 +1,13 @@
 <script lang="ts">
   import type { PageData } from "./$types"
+  import type { Activity, DayItinerary } from "$lib/types"
+  import ActivityCard from "$lib/components/ActivityCard.svelte"
 
   interface Props {
     data: PageData
   }
 
   let { data }: Props = $props()
-
-  // Type for activity in the itinerary
-  interface Activity {
-    name: string
-    description: string
-    time_slot: string
-    estimated_cost: number
-    location: string
-    location_url?: string
-    duration_hours: number
-    tips?: string
-    category?: string
-  }
-
-  // Type for day itinerary
-  interface DayItinerary {
-    day_number: number
-    date?: string
-    title?: string
-    activities: Activity[]
-    total_cost: number
-  }
 
   // Parse days from JSONB
   const days: DayItinerary[] =
@@ -206,68 +186,7 @@
                     {getTimeSlotLabel("morning")}
                   </h3>
                   {#each morning as activity}
-                    <div class="card bg-base-300 border border-base-content/10">
-                      <div class="card-body p-4">
-                        <div class="flex justify-between items-start gap-4">
-                          <div class="flex-1">
-                            <h4 class="font-bold text-white">
-                              {activity.name}
-                            </h4>
-                            <p class="text-sm text-base-content/70 mt-1">
-                              {activity.description}
-                            </p>
-                            <div class="flex items-center gap-4 mt-3 text-sm">
-                              <span class="flex items-center gap-1">
-                                <span
-                                  class="material-symbols-outlined text-xs text-primary"
-                                  >location_on</span
-                                >
-                                {#if activity.location_url}
-                                  <a
-                                    href={activity.location_url}
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    class="link link-primary"
-                                  >
-                                    {activity.location}
-                                  </a>
-                                {:else}
-                                  <span>{activity.location}</span>
-                                {/if}
-                              </span>
-                              <span class="flex items-center gap-1">
-                                <span
-                                  class="material-symbols-outlined text-xs text-base-content/60"
-                                  >schedule</span
-                                >
-                                {activity.duration_hours}h
-                              </span>
-                              {#if activity.category}
-                                <span
-                                  class="badge badge-xs badge-outline capitalize"
-                                >
-                                  {activity.category}
-                                </span>
-                              {/if}
-                            </div>
-                            {#if activity.tips}
-                              <div
-                                class="alert alert-info bg-info/10 border-info/20 mt-3 py-2"
-                              >
-                                <span
-                                  class="material-symbols-outlined text-sm"
-                                  >lightbulb</span
-                                >
-                                <span class="text-xs">{activity.tips}</span>
-                              </div>
-                            {/if}
-                          </div>
-                          <div class="badge badge-primary badge-lg">
-                            {formatCost(activity.estimated_cost)}
-                          </div>
-                        </div>
-                      </div>
-                    </div>
+                    <ActivityCard {activity} />
                   {/each}
                 </div>
               </div>
@@ -293,68 +212,7 @@
                     {getTimeSlotLabel("afternoon")}
                   </h3>
                   {#each afternoon as activity}
-                    <div class="card bg-base-300 border border-base-content/10">
-                      <div class="card-body p-4">
-                        <div class="flex justify-between items-start gap-4">
-                          <div class="flex-1">
-                            <h4 class="font-bold text-white">
-                              {activity.name}
-                            </h4>
-                            <p class="text-sm text-base-content/70 mt-1">
-                              {activity.description}
-                            </p>
-                            <div class="flex items-center gap-4 mt-3 text-sm">
-                              <span class="flex items-center gap-1">
-                                <span
-                                  class="material-symbols-outlined text-xs text-primary"
-                                  >location_on</span
-                                >
-                                {#if activity.location_url}
-                                  <a
-                                    href={activity.location_url}
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    class="link link-primary"
-                                  >
-                                    {activity.location}
-                                  </a>
-                                {:else}
-                                  <span>{activity.location}</span>
-                                {/if}
-                              </span>
-                              <span class="flex items-center gap-1">
-                                <span
-                                  class="material-symbols-outlined text-xs text-base-content/60"
-                                  >schedule</span
-                                >
-                                {activity.duration_hours}h
-                              </span>
-                              {#if activity.category}
-                                <span
-                                  class="badge badge-xs badge-outline capitalize"
-                                >
-                                  {activity.category}
-                                </span>
-                              {/if}
-                            </div>
-                            {#if activity.tips}
-                              <div
-                                class="alert alert-info bg-info/10 border-info/20 mt-3 py-2"
-                              >
-                                <span
-                                  class="material-symbols-outlined text-sm"
-                                  >lightbulb</span
-                                >
-                                <span class="text-xs">{activity.tips}</span>
-                              </div>
-                            {/if}
-                          </div>
-                          <div class="badge badge-primary badge-lg">
-                            {formatCost(activity.estimated_cost)}
-                          </div>
-                        </div>
-                      </div>
-                    </div>
+                    <ActivityCard {activity} />
                   {/each}
                 </div>
               </div>
@@ -379,68 +237,7 @@
                     {getTimeSlotLabel("evening")}
                   </h3>
                   {#each evening as activity}
-                    <div class="card bg-base-300 border border-base-content/10">
-                      <div class="card-body p-4">
-                        <div class="flex justify-between items-start gap-4">
-                          <div class="flex-1">
-                            <h4 class="font-bold text-white">
-                              {activity.name}
-                            </h4>
-                            <p class="text-sm text-base-content/70 mt-1">
-                              {activity.description}
-                            </p>
-                            <div class="flex items-center gap-4 mt-3 text-sm">
-                              <span class="flex items-center gap-1">
-                                <span
-                                  class="material-symbols-outlined text-xs text-primary"
-                                  >location_on</span
-                                >
-                                {#if activity.location_url}
-                                  <a
-                                    href={activity.location_url}
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    class="link link-primary"
-                                  >
-                                    {activity.location}
-                                  </a>
-                                {:else}
-                                  <span>{activity.location}</span>
-                                {/if}
-                              </span>
-                              <span class="flex items-center gap-1">
-                                <span
-                                  class="material-symbols-outlined text-xs text-base-content/60"
-                                  >schedule</span
-                                >
-                                {activity.duration_hours}h
-                              </span>
-                              {#if activity.category}
-                                <span
-                                  class="badge badge-xs badge-outline capitalize"
-                                >
-                                  {activity.category}
-                                </span>
-                              {/if}
-                            </div>
-                            {#if activity.tips}
-                              <div
-                                class="alert alert-info bg-info/10 border-info/20 mt-3 py-2"
-                              >
-                                <span
-                                  class="material-symbols-outlined text-sm"
-                                  >lightbulb</span
-                                >
-                                <span class="text-xs">{activity.tips}</span>
-                              </div>
-                            {/if}
-                          </div>
-                          <div class="badge badge-primary badge-lg">
-                            {formatCost(activity.estimated_cost)}
-                          </div>
-                        </div>
-                      </div>
-                    </div>
+                    <ActivityCard {activity} />
                   {/each}
                 </div>
               </div>

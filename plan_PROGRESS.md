@@ -428,7 +428,7 @@ IN_PROGRESS
   - Show total estimated cost at bottom
   - Load itinerary from database in `+page.server.ts`
 
-- [ ] **Task 8.3**: Implement itinerary activity cards
+- [x] **Task 8.3**: Implement itinerary activity cards
   - Create component: `src/lib/components/ActivityCard.svelte`
   - Display activity details with icons
   - Show cost in primary color
@@ -569,9 +569,70 @@ IN_PROGRESS
 
 ## Completed This Iteration
 
-**Summary:** Completed Task 7.4 (Handle AI recommendation errors)
+**Summary:** Completed Task 8.3 (Implement itinerary activity cards)
 
-### Task 7.4: Handle AI Recommendation Errors (COMPLETE)
+### Task 8.3: Implement Itinerary Activity Cards (COMPLETE)
+
+- ✅ Created reusable `ActivityCard.svelte` component (`src/lib/components/ActivityCard.svelte`):
+  - **Activity Details Display:**
+    - Activity name as bold heading
+    - Description text with proper styling
+    - All information displayed with Material Symbols icons
+  - **Cost Display:**
+    - Badge in primary color (DaisyUI badge-primary badge-lg)
+    - Formatted as USD currency with proper thousand separators
+  - **Location Display:**
+    - Location icon (material-symbols-outlined location_on)
+    - Clickable link when location_url is provided (opens in new tab)
+    - Plain text fallback when no URL available
+  - **Duration & Category:**
+    - Duration displayed with schedule icon (e.g., "3h")
+    - Optional category badge (capitalized)
+  - **Tips Section:**
+    - Optional tips displayed in info alert with lightbulb icon
+    - Styled with DaisyUI alert-info component
+  - **Mobile-Friendly Layout:**
+    - Flexbox layout with flex-wrap for responsive behavior
+    - Cards stack properly on small screens
+    - Cost badge remains visible and aligned
+
+- ✅ Created shared types file (`src/lib/types.ts`):
+  - `Activity` interface with all required fields
+  - `DayItinerary` interface for day structure
+  - Proper TypeScript typing for type safety
+
+- ✅ Refactored itinerary page (`src/routes/(admin)/trips/[trip_id]/itinerary/+page.svelte`):
+  - Replaced inline activity card markup with ActivityCard component
+  - Updated imports to use shared types from `$lib/types`
+  - Removed duplicate Activity and DayItinerary interface definitions
+  - Applied component to all three time slots (morning, afternoon, evening)
+  - Maintained existing timeline structure with time slot headers and icons
+  - Preserved all existing functionality and styling
+
+- ✅ Build verification:
+  - TypeScript checks pass: 0 errors, 0 warnings
+  - Production build succeeds
+  - Component properly integrated with DaisyUI timeline layout
+
+**Phase 8 Progress:** 3 of 7 tasks complete ✅
+- Task 8.1: Implement itinerary generation trigger ✅
+- Task 8.2: Convert "Finalized Trip Itinerary" mockup to Svelte ✅
+- Task 8.3: Implement itinerary activity cards ✅
+- Task 8.4: Implement activity feedback system (P1 - Next)
+- Task 8.5: Implement activity suggestions (P1)
+- Task 8.6: Implement itinerary regeneration (P1)
+- Task 8.7: Implement itinerary finalization
+
+**Next Task:** Task 8.4 (Implement activity feedback system - P1 Should Have)
+
+### Files Modified:
+1. **Created:** `src/lib/components/ActivityCard.svelte` - Reusable activity card component
+2. **Created:** `src/lib/types.ts` - Shared TypeScript types for Activity and DayItinerary
+3. **Modified:** `src/routes/(admin)/trips/[trip_id]/itinerary/+page.svelte` - Refactored to use ActivityCard component
+
+---
+
+### Previous: Task 7.4: Handle AI Recommendation Errors (COMPLETE)
 
 - ✅ Enhanced error handling UI on recommendations page (`src/routes/(admin)/trips/[trip_id]/recommendations/+page.svelte`):
   - **Error State Detection**: Detects when trip is in 'recommending' status but has no recommendations (indicates generation failure)
