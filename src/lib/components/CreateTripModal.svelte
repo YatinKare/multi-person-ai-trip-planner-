@@ -224,7 +224,9 @@
                 class="absolute inset-0 bg-primary/30 blur-xl rounded-full animate-pulse"
               ></div>
             </div>
-            <h2 class="text-3xl font-bold mt-4">{confirmedTripName} is ready!</h2>
+            <h2 class="text-3xl font-bold mt-4">
+              {confirmedTripName} is ready!
+            </h2>
             <p class="text-base-content/70 mt-2">
               Share this link with your friends to let them join the planning.
             </p>
