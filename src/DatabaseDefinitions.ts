@@ -304,6 +304,7 @@ export interface Database {
           generated_at: string
           finalized_at: string | null
           finalized_by: string | null
+          regeneration_count: number
         }
         Insert: {
           id?: string
@@ -314,6 +315,7 @@ export interface Database {
           generated_at?: string
           finalized_at?: string | null
           finalized_by?: string | null
+          regeneration_count?: number
         }
         Update: {
           id?: string
@@ -324,6 +326,7 @@ export interface Database {
           generated_at?: string
           finalized_at?: string | null
           finalized_by?: string | null
+          regeneration_count?: number
         }
         Relationships: [
           {

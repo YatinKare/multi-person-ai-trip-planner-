@@ -427,4 +427,115 @@ export const actions: Actions = {
 
     return { success: true, action: "rejectSuggestion" }
   },
+
+  regenerate: async ({ request, params, locals: { supabase, session }, fetch }) => {
+    if (!session) {
+      return fail(401, { error: "Unauthorized", action: "regenerate" })
+    }
+
+    const { trip_id } = params
+    const formData = await request.formData()
+    const feedback = formData.get("feedback") as string
+    const regenerationCount = parseInt(formData.get("regeneration_count") as string) || 0
+
+    // Validate feedback
+    if (!feedback || feedback.trim().length < 10) {
+      return fail(400, { error: "Feedback must be at least 10 characters", action: "regenerate" })
+    }
+
+    if (feedback.length > 1000) {
+      return fail(400, { error: "Feedback must be 1000 characters or less", action: "regenerate" })
+    }
+
+    // Check max regenerations
+    const maxRegenerations = 5
+    if (regenerationCount >= maxRegenerations) {
+      return fail(400, { error: "Maximum regenerations reached (5)", action: "regenerate" })
+    }
+
+    // Check if user is the organizer
+    const { data: membership, error: membershipError } = await supabase
+      .from("trip_members")
+      .select("role")
+      .eq("trip_id", trip_id)
+      .eq("user_id", session.user.id)
+      .single()
+
+    if (membershipError || !membership) {
+      return fail(403, { error: "You are not a member of this trip", action: "regenerate" })
+    }
+
+    if (membership.role !== "organizer") {
+      return fail(403, { error: "Only the organizer can regenerate the itinerary", action: "regenerate" })
+    }
+
+    // Check trip status
+    const { data: trip, error: tripError } = await supabase
+      .from("trips")
+      .select("status")
+      .eq("id", trip_id)
+      .single()
+
+    if (tripError || !trip) {
+      return fail(404, { error: "Trip not found", action: "regenerate" })
+    }
+
+    if (trip.status !== "planning") {
+      return fail(400, { error: "Can only regenerate itinerary in 'planning' status", action: "regenerate" })
+    }
+
+    try {
+      // Call FastAPI backend to regenerate itinerary
+      const response = await fetch("http://localhost:8000/api/ai/itinerary/regenerate", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${session.access_token}`,
+        },
+        body: JSON.stringify({
+          trip_id: trip_id,
+          feedback: feedback.trim(),
+          regeneration_count: regenerationCount,
+        }),
+      })
+
+      if (!response.ok) {
+        const error = await response.json().catch(() => ({}))
+        console.error("Error from API:", error)
+        return fail(response.status, {
+          error: error.detail || "Failed to regenerate itinerary. Please try again.",
+          action: "regenerate",
+        })
+      }
+
+      const result = await response.json()
+
+      // Update the itinerary in the database with the new data
+      const { error: updateError } = await supabase
+        .from("itineraries")
+        .update({
+          days: result.days,
+          total_cost: result.total_cost,
+          generated_at: result.generated_at,
+          regeneration_count: regenerationCount + 1,
+        })
+        .eq("trip_id", trip_id)
+
+      if (updateError) {
+        console.error("Error updating itinerary:", updateError)
+        return fail(500, {
+          error: "Failed to save regenerated itinerary. Please try again.",
+          action: "regenerate",
+        })
+      }
+
+      return { success: true, action: "regenerate" }
+    } catch (err) {
+      console.error("Error regenerating itinerary:", err)
+      return fail(500, {
+        error: err instanceof Error ? err.message : "Failed to regenerate itinerary. Please try again.",
+        action: "regenerate",
+      })
+    }
+  },
 }

@@ -132,6 +132,24 @@
   function closeSuggestModal() {
     showSuggestModal = false
   }
+
+  // Regeneration modal state
+  let showRegenerateModal = $state(false)
+  let regenerationFeedback = $state("")
+  let isRegenerating = $state(false)
+
+  function openRegenerateModal() {
+    showRegenerateModal = true
+  }
+
+  function closeRegenerateModal() {
+    showRegenerateModal = false
+    regenerationFeedback = ""
+  }
+
+  // Get regeneration count from itinerary
+  const regenerationCount = (data.itinerary as any)?.regeneration_count || 0
+  const maxRegenerations = 5
 </script>
 
 <svelte:head>
@@ -197,6 +215,15 @@
       {/if}
       {#if isOrganizer && !isFinalized}
         <button
+          class="btn btn-accent flex items-center gap-2 font-bold"
+          onclick={openRegenerateModal}
+          disabled={regenerationCount >= maxRegenerations}
+          title={regenerationCount >= maxRegenerations ? "Maximum regenerations reached" : "Regenerate itinerary with feedback"}
+        >
+          <span class="material-symbols-outlined">refresh</span>
+          Regenerate
+        </button>
+        <button
           class="btn btn-success flex items-center gap-2 font-bold"
           onclick={openFinalizeModal}
         >
@@ -213,6 +240,23 @@
       <span class="material-symbols-outlined text-primary">info</span>
       <div class="flex-1">
         <p class="text-base-content/90">{summary}</p>
+      </div>
+    </div>
+  {/if}
+
+  <!-- Regeneration info (if applicable) -->
+  {#if regenerationCount > 0}
+    <div class="alert bg-accent/10 border-accent/20 mb-8">
+      <span class="material-symbols-outlined text-accent">refresh</span>
+      <div class="flex-1">
+        <p class="text-base-content/90">
+          This itinerary has been regenerated {regenerationCount} {regenerationCount === 1 ? "time" : "times"} based on your feedback.
+          {#if regenerationCount >= maxRegenerations}
+            <span class="font-bold text-warning">Maximum regenerations reached.</span>
+          {:else}
+            You can regenerate {maxRegenerations - regenerationCount} more {maxRegenerations - regenerationCount === 1 ? "time" : "times"}.
+          {/if}
+        </p>
       </div>
     </div>
   {/if}
@@ -679,3 +723,127 @@
   onClose={closeSuggestModal}
   actionData={form}
 />
+
+<!-- Regenerate Itinerary Modal -->
+{#if showRegenerateModal}
+  <div class="modal modal-open">
+    <div class="modal-box max-w-2xl">
+      <h3 class="font-bold text-2xl mb-4 flex items-center gap-2">
+        <span class="material-symbols-outlined text-accent">refresh</span>
+        Regenerate Itinerary
+      </h3>
+
+      <div class="space-y-4">
+        <p class="text-base-content/80">
+          Provide feedback on what you'd like to change about the current itinerary. The AI will use your feedback to generate an improved version.
+        </p>
+
+        <div class="alert bg-base-300">
+          <span class="material-symbols-outlined text-info">lightbulb</span>
+          <div class="flex-1 text-sm">
+            <p class="font-semibold mb-1">Feedback examples:</p>
+            <ul class="list-disc list-inside space-y-1 text-base-content/70">
+              <li>"Add more outdoor activities"</li>
+              <li>"Replace expensive restaurants with more budget-friendly options"</li>
+              <li>"Include more cultural experiences and museums"</li>
+              <li>"Reduce the pace - add more relaxation time"</li>
+            </ul>
+          </div>
+        </div>
+
+        {#if regenerationCount >= maxRegenerations - 1 && regenerationCount < maxRegenerations}
+          <div class="alert alert-warning">
+            <span class="material-symbols-outlined">warning</span>
+            <span>This is your last regeneration. Make sure your feedback is clear!</span>
+          </div>
+        {/if}
+
+        {#if form && "error" in form && form.action === "regenerate"}
+          <div class="alert alert-error">
+            <span class="material-symbols-outlined">error</span>
+            <span>{form.error}</span>
+          </div>
+        {/if}
+
+        {#if form && "success" in form && form.action === "regenerate"}
+          <div class="alert alert-success">
+            <span class="material-symbols-outlined">check_circle</span>
+            <span>Itinerary regenerated successfully!</span>
+          </div>
+        {/if}
+      </div>
+
+      <form
+        method="POST"
+        action="?/regenerate"
+        use:enhance={() => {
+          isRegenerating = true
+          return async ({ update }) => {
+            await update()
+            isRegenerating = false
+            if (form && "success" in form && form.action === "regenerate") {
+              // Close modal and reload page after successful regeneration
+              setTimeout(() => {
+                closeRegenerateModal()
+                window.location.reload()
+              }, 1500)
+            }
+          }
+        }}
+      >
+        <input type="hidden" name="regeneration_count" value={regenerationCount} />
+
+        <div class="form-control mt-4">
+          <label class="label" for="feedback">
+            <span class="label-text font-semibold">Your Feedback <span class="text-error">*</span></span>
+            <span class="label-text-alt">{regenerationFeedback.length}/1000</span>
+          </label>
+          <textarea
+            id="feedback"
+            name="feedback"
+            class="textarea textarea-bordered h-32"
+            placeholder="Describe what you'd like to change about the itinerary..."
+            bind:value={regenerationFeedback}
+            maxlength="1000"
+            required
+          ></textarea>
+          <label class="label">
+            <span class="label-text-alt text-base-content/60">
+              Be specific about what you want changed (min 10 characters)
+            </span>
+          </label>
+        </div>
+
+        <div class="modal-action">
+          <button
+            type="button"
+            class="btn btn-ghost"
+            onclick={closeRegenerateModal}
+            disabled={isRegenerating}
+          >
+            Cancel
+          </button>
+          <button
+            type="submit"
+            class="btn btn-accent gap-2"
+            disabled={isRegenerating || regenerationFeedback.length < 10}
+          >
+            {#if isRegenerating}
+              <span class="loading loading-spinner loading-sm"></span>
+              Regenerating...
+            {:else}
+              <span class="material-symbols-outlined">refresh</span>
+              Regenerate Itinerary
+            {/if}
+          </button>
+        </div>
+      </form>
+    </div>
+    <button
+      type="button"
+      class="modal-backdrop"
+      onclick={closeRegenerateModal}
+      aria-label="Close modal"
+    ></button>
+  </div>
+{/if}
