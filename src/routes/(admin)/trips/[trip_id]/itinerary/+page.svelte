@@ -69,6 +69,57 @@
   function closeFinalizeModal() {
     showFinalizeModal = false
   }
+
+  // Feedback modal state
+  let showFeedbackModal = $state(false)
+  let feedbackActivity = $state<{
+    dayIndex: number
+    activityIndex: number
+    activityName: string
+  } | null>(null)
+  let feedbackReason = $state("")
+
+  function openFeedbackModal(
+    dayIndex: number,
+    activityIndex: number,
+    activityName: string
+  ) {
+    feedbackActivity = { dayIndex, activityIndex, activityName }
+
+    // Check if user already has feedback for this activity
+    const existingFeedback = data.userFeedback.find(
+      (f) =>
+        f.day_index === dayIndex &&
+        f.activity_index === activityIndex
+    )
+
+    feedbackReason = existingFeedback?.reason || ""
+    showFeedbackModal = true
+  }
+
+  function closeFeedbackModal() {
+    showFeedbackModal = false
+    feedbackActivity = null
+    feedbackReason = ""
+  }
+
+  // Check if user has already submitted feedback for an activity
+  function hasUserFeedback(dayIndex: number, activityIndex: number): boolean {
+    return data.userFeedback.some(
+      (f) =>
+        f.day_index === dayIndex &&
+        f.activity_index === activityIndex
+    )
+  }
+
+  // Get feedback count for an activity (for organizers)
+  function getFeedbackCount(dayIndex: number, activityIndex: number): number {
+    return data.feedback.filter(
+      (f) =>
+        f.day_index === dayIndex &&
+        f.activity_index === activityIndex
+    ).length
+  }
 </script>
 
 <svelte:head>
@@ -190,8 +241,17 @@
                   <h3 class="text-lg font-bold text-warning">
                     {getTimeSlotLabel("morning")}
                   </h3>
-                  {#each morning as activity}
-                    <ActivityCard {activity} />
+                  {#each morning as activity, activityIndex}
+                    <ActivityCard
+                      {activity}
+                      dayIndex={day.day_number - 1}
+                      {activityIndex}
+                      {isFinalized}
+                      onFeedback={openFeedbackModal}
+                      feedbackCount={isOrganizer
+                        ? getFeedbackCount(day.day_number - 1, activityIndex)
+                        : undefined}
+                    />
                   {/each}
                 </div>
               </div>
@@ -216,8 +276,18 @@
                   <h3 class="text-lg font-bold text-primary">
                     {getTimeSlotLabel("afternoon")}
                   </h3>
-                  {#each afternoon as activity}
-                    <ActivityCard {activity} />
+                  {#each afternoon as activity, activityIndex}
+                    {@const actualIndex = morning.length + activityIndex}
+                    <ActivityCard
+                      {activity}
+                      dayIndex={day.day_number - 1}
+                      activityIndex={actualIndex}
+                      {isFinalized}
+                      onFeedback={openFeedbackModal}
+                      feedbackCount={isOrganizer
+                        ? getFeedbackCount(day.day_number - 1, actualIndex)
+                        : undefined}
+                    />
                   {/each}
                 </div>
               </div>
@@ -241,8 +311,18 @@
                   <h3 class="text-lg font-bold text-secondary">
                     {getTimeSlotLabel("evening")}
                   </h3>
-                  {#each evening as activity}
-                    <ActivityCard {activity} />
+                  {#each evening as activity, activityIndex}
+                    {@const actualIndex = morning.length + afternoon.length + activityIndex}
+                    <ActivityCard
+                      {activity}
+                      dayIndex={day.day_number - 1}
+                      activityIndex={actualIndex}
+                      {isFinalized}
+                      onFeedback={openFeedbackModal}
+                      feedbackCount={isOrganizer
+                        ? getFeedbackCount(day.day_number - 1, actualIndex)
+                        : undefined}
+                    />
                   {/each}
                 </div>
               </div>
@@ -304,7 +384,7 @@
           >
         </div>
 
-        {#if form?.error}
+        {#if form && "error" in form}
           <div class="alert alert-error">
             <span class="material-symbols-outlined">error</span>
             <span>{form.error}</span>
@@ -320,7 +400,7 @@
           return async ({ update }) => {
             await update()
             isSubmitting = false
-            if (!form?.error) {
+            if (!form || !("error" in form)) {
               closeFinalizeModal()
               // Reload page to show finalized state
               window.location.reload()
@@ -357,6 +437,125 @@
       type="button"
       class="modal-backdrop"
       onclick={closeFinalizeModal}
+      aria-label="Close modal"
+    ></button>
+  </div>
+{/if}
+
+<!-- Feedback Modal -->
+{#if showFeedbackModal && feedbackActivity}
+  <div class="modal modal-open">
+    <div class="modal-box max-w-lg">
+      <h3 class="font-bold text-2xl mb-4 flex items-center gap-2">
+        <span class="material-symbols-outlined text-error">thumb_down</span>
+        Activity Feedback
+      </h3>
+
+      <div class="space-y-4">
+        <p class="text-base-content/80">
+          Tell us what you don't like about this activity:
+        </p>
+        <div class="alert bg-base-300">
+          <span class="material-symbols-outlined text-primary">info</span>
+          <span class="font-bold">{feedbackActivity.activityName}</span>
+        </div>
+
+        {#if form && "error" in form && form.action === "submitFeedback"}
+          <div class="alert alert-error">
+            <span class="material-symbols-outlined">error</span>
+            <span>{form.error}</span>
+          </div>
+        {/if}
+
+        {#if form && "success" in form && form.action === "submitFeedback"}
+          <div class="alert alert-success">
+            <span class="material-symbols-outlined">check_circle</span>
+            <span>Feedback submitted successfully!</span>
+          </div>
+        {/if}
+      </div>
+
+      <form
+        method="POST"
+        action="?/submitFeedback"
+        use:enhance={() => {
+          isSubmitting = true
+          return async ({ update }) => {
+            await update()
+            isSubmitting = false
+            if (form && "success" in form && form.action === "submitFeedback") {
+              // Close modal after successful submission
+              setTimeout(() => {
+                closeFeedbackModal()
+                window.location.reload()
+              }, 1000)
+            }
+          }
+        }}
+      >
+        <input
+          type="hidden"
+          name="itinerary_id"
+          value={data.itinerary.id}
+        />
+        <input
+          type="hidden"
+          name="day_index"
+          value={feedbackActivity.dayIndex}
+        />
+        <input
+          type="hidden"
+          name="activity_index"
+          value={feedbackActivity.activityIndex}
+        />
+        <input
+          type="hidden"
+          name="activity_name"
+          value={feedbackActivity.activityName}
+        />
+
+        <div class="form-control mt-4">
+          <label class="label" for="reason">
+            <span class="label-text">Reason (Optional)</span>
+          </label>
+          <textarea
+            id="reason"
+            name="reason"
+            class="textarea textarea-bordered h-24"
+            placeholder="e.g., Too expensive, not interested in this type of activity, accessibility concerns..."
+            bind:value={feedbackReason}
+          ></textarea>
+        </div>
+
+        <div class="modal-action">
+          <button
+            type="button"
+            class="btn btn-ghost"
+            onclick={closeFeedbackModal}
+            disabled={isSubmitting}
+          >
+            Cancel
+          </button>
+          <button
+            type="submit"
+            class="btn btn-error gap-2"
+            disabled={isSubmitting}
+          >
+            {#if isSubmitting}
+              <span class="loading loading-spinner loading-sm"></span>
+              Submitting...
+            {:else}
+              <span class="material-symbols-outlined">thumb_down</span>
+              Submit Feedback
+            {/if}
+          </button>
+        </div>
+      </form>
+    </div>
+    <button
+      type="button"
+      class="modal-backdrop"
+      onclick={closeFeedbackModal}
       aria-label="Close modal"
     ></button>
   </div>

@@ -3,6 +3,11 @@
 
   // Props
   export let activity: Activity;
+  export let dayIndex: number | undefined = undefined;
+  export let activityIndex: number | undefined = undefined;
+  export let isFinalized: boolean = false;
+  export let onFeedback: ((dayIndex: number, activityIndex: number, activityName: string) => void) | undefined = undefined;
+  export let feedbackCount: number | undefined = undefined;
 
   // Format cost as USD
   function formatCost(amount: number | undefined): string {
@@ -14,6 +19,16 @@
       maximumFractionDigits: 0
     }).format(amount);
   }
+
+  // Handle feedback button click
+  function handleFeedbackClick() {
+    if (onFeedback && dayIndex !== undefined && activityIndex !== undefined) {
+      onFeedback(dayIndex, activityIndex, activity.name);
+    }
+  }
+
+  // Show feedback button if not finalized and callback is provided
+  const showFeedbackButton = !isFinalized && onFeedback !== undefined && dayIndex !== undefined && activityIndex !== undefined;
 </script>
 
 <div class="card bg-base-300 border border-base-content/10">
@@ -79,9 +94,33 @@
         {/if}
       </div>
 
-      <!-- Cost Badge -->
-      <div class="badge badge-primary badge-lg flex-shrink-0">
-        {formatCost(activity.estimated_cost)}
+      <!-- Right Side: Cost Badge and Feedback Button -->
+      <div class="flex flex-col items-end gap-2 flex-shrink-0">
+        <!-- Cost Badge -->
+        <div class="badge badge-primary badge-lg">
+          {formatCost(activity.estimated_cost)}
+        </div>
+
+        <!-- Feedback Button (show if not finalized and callback provided) -->
+        {#if showFeedbackButton}
+          <button
+            type="button"
+            class="btn btn-sm btn-ghost gap-1 text-error hover:bg-error/10"
+            onclick={handleFeedbackClick}
+            title="Report issue with this activity"
+          >
+            <span class="material-symbols-outlined text-base">thumb_down</span>
+            <span class="text-xs">Feedback</span>
+          </button>
+        {/if}
+
+        <!-- Feedback Count (show for organizers) -->
+        {#if feedbackCount !== undefined && feedbackCount > 0}
+          <div class="badge badge-error badge-sm gap-1">
+            <span class="material-symbols-outlined text-xs">flag</span>
+            {feedbackCount}
+          </div>
+        {/if}
       </div>
     </div>
   </div>

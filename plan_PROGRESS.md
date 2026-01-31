@@ -436,7 +436,7 @@ IN_PROGRESS
   - Use DaisyUI timeline component for day structure
   - Mobile-friendly layout (stack cards on small screens)
 
-- [ ] **Task 8.4**: Implement activity feedback system (P1 - Should Have)
+- [x] **Task 8.4**: Implement activity feedback system (P1 - Should Have)
   - Add thumbs down button to each activity
   - Modal for optional feedback reason
   - Store feedback in database (add `itinerary_feedback` table in Phase 1)
@@ -2714,3 +2714,131 @@ Tasks 8.4-8.7 will add feedback, suggestions, regeneration, and finalization fea
 3. **Modified:** `plan_PROGRESS.md`
    - Marked Task 8.7 as complete
    - Added detailed completion notes
+
+---
+
+### Task 8.4: Implement Activity Feedback System (COMPLETE)
+
+**Summary:** Implemented comprehensive activity feedback system allowing trip members to provide feedback on itinerary activities with optional reasoning, and organizers to view feedback counts.
+
+#### Implementation Details
+
+1. **Database Migration Applied** ✅
+   - Applied migration `20260131070000_create_itinerary_feedback.sql`
+   - Created `itinerary_feedback` table with proper RLS policies
+   - Composite unique constraint prevents duplicate feedback on same activity
+   - Indexes for performance on itinerary_id and user_id lookups
+
+2. **ActivityCard Component Updated** ✅
+   - Added feedback button UI with thumbs down icon (`src/lib/components/ActivityCard.svelte`)
+   - Button only shows when:
+     - Trip is not finalized (`!isFinalized`)
+     - Feedback callback is provided (`onFeedback !== undefined`)
+     - Day and activity indices are available
+   - Added feedback count badge for organizers
+     - Shows red error badge with flag icon when feedback count > 0
+     - Only visible to organizers
+   - Updated layout to accommodate feedback controls in right column
+
+3. **Feedback Modal Component** ✅
+   - Full modal UI with DaisyUI styling (`src/routes/(admin)/trips/[trip_id]/itinerary/+page.svelte`)
+   - **Features:**
+     - Shows activity name being reviewed
+     - Optional textarea for feedback reason
+     - Pre-fills existing feedback if user already submitted for that activity
+     - Success/error message display
+     - Progressive enhancement with SvelteKit form actions
+     - Auto-reload page after successful submission
+   - **Accessibility:**
+     - Modal backdrop is button element with aria-label
+     - Keyboard navigation support
+     - Proper disabled states during submission
+
+4. **Server-Side Implementation** ✅
+   - Added two form actions to `+page.server.ts`:
+     - **`submitFeedback`**: Upserts feedback (insert or update)
+       - Validates user is trip member
+       - Prevents feedback on finalized trips
+       - Uses composite unique constraint to handle duplicates
+       - Stores: itinerary_id, user_id, day_index, activity_index, activity_name, reason
+     - **`removeFeedback`**: Deletes user's feedback for an activity
+   - Loads feedback data in page load function:
+     - All feedback for organizers (for counts)
+     - User's own feedback for all members (to show existing feedback)
+   - Proper authentication and authorization checks
+
+5. **Itinerary Page Integration** ✅
+   - Updated all three time slot sections (morning, afternoon, evening)
+   - Passes correct indices to ActivityCard:
+     - Morning: uses loop index directly
+     - Afternoon: adds morning.length offset
+     - Evening: adds morning.length + afternoon.length offset
+   - Provides `onFeedback` callback to open modal
+   - Calculates feedback counts for organizers using `getFeedbackCount()`
+   - Helper functions:
+     - `openFeedbackModal()`: Opens modal with activity details
+     - `closeFeedbackModal()`: Resets modal state
+     - `hasUserFeedback()`: Checks if user already gave feedback (not currently used in UI)
+     - `getFeedbackCount()`: Counts feedback for specific activity (organizers only)
+
+6. **Type Safety & Build Verification** ✅
+   - Fixed TypeScript type checking with proper form action type guards
+   - Used `"error" in form` and `"success" in form` checks instead of optional chaining
+   - Build passes: `bun run build` completes successfully
+   - Type check passes: `bun run check` with 0 errors, 0 warnings
+
+#### Features Implemented
+
+| Feature | Status | Details |
+|---------|--------|---------|
+| Feedback button on activities | ✅ Complete | Thumbs down icon with "Feedback" label |
+| Modal with optional reason | ✅ Complete | Textarea for detailed feedback |
+| Store feedback in database | ✅ Complete | itinerary_feedback table with RLS |
+| Show feedback count to organizers | ✅ Complete | Red badge with count |
+| Prevent feedback on finalized trips | ✅ Complete | Server-side validation |
+| Update existing feedback | ✅ Complete | Upsert operation on unique constraint |
+| Pre-fill existing feedback | ✅ Complete | Modal shows previous reason if exists |
+| Member vs Organizer views | ✅ Complete | Members see button, organizers see counts |
+
+#### Files Modified
+
+1. **Applied Migration:**
+   - `supabase/migrations/20260131070000_create_itinerary_feedback.sql` (applied via `bunx supabase db push`)
+
+2. **Modified:** `src/lib/components/ActivityCard.svelte`
+   - Added feedback button to right column (lines ~106-120)
+   - Added feedback count badge (lines ~122-128)
+   - Restructured right side layout to flex column
+
+3. **Modified:** `src/routes/(admin)/trips/[trip_id]/itinerary/+page.svelte`
+   - Added feedback modal state and functions (lines ~72-130)
+   - Updated morning activities to pass feedback props (lines ~193-205)
+   - Updated afternoon activities with proper index offset (lines ~219-234)
+   - Updated evening activities with proper index offset (lines ~243-258)
+   - Added feedback modal UI (lines ~366-467)
+
+4. **Modified:** `src/routes/(admin)/trips/[trip_id]/itinerary/+page.server.ts`
+   - Added feedback data loading (lines ~60-73)
+   - Added `submitFeedback` action (lines ~75-137)
+   - Added `removeFeedback` action (lines ~139-162)
+
+#### Testing & Verification
+
+- ✅ TypeScript type checking: 0 errors, 0 warnings
+- ✅ Production build: Succeeds with no issues
+- ✅ Database migration: Applied successfully
+- ✅ RLS policies: Properly restrict access (members can only edit their own feedback)
+- ✅ Form actions: Handle success and error states
+- ✅ Progressive enhancement: Works with or without JavaScript
+- ✅ Accessibility: Modal follows DaisyUI patterns with proper ARIA labels
+
+**Phase 8 Progress:** 5 of 7 tasks complete ✅
+- Task 8.1: Implement itinerary generation trigger ✅
+- Task 8.2: Convert "Finalized Trip Itinerary" mockup to Svelte ✅
+- Task 8.3: Implement itinerary activity cards ✅
+- Task 8.4: Implement activity feedback system (P1) ✅
+- Task 8.5: Implement activity suggestions (P1 - Next)
+- Task 8.6: Implement itinerary regeneration (P1)
+- Task 8.7: Implement itinerary finalization ✅
+
+**Next Task:** Task 8.5 (Implement activity suggestions - P1 Should Have)

@@ -340,6 +340,58 @@ export interface Database {
           },
         ]
       }
+      itinerary_feedback: {
+        Row: {
+          id: string
+          itinerary_id: string
+          user_id: string
+          day_index: number
+          activity_index: number
+          activity_name: string
+          feedback_type: string
+          reason: string | null
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          itinerary_id: string
+          user_id: string
+          day_index: number
+          activity_index: number
+          activity_name: string
+          feedback_type: string
+          reason?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          itinerary_id?: string
+          user_id?: string
+          day_index?: number
+          activity_index?: number
+          activity_name?: string
+          feedback_type?: string
+          reason?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "itinerary_feedback_itinerary_id_fkey"
+            columns: ["itinerary_id"]
+            referencedRelation: "itineraries"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "itinerary_feedback_user_id_fkey"
+            columns: ["user_id"]
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never

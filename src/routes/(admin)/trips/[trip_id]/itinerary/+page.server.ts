@@ -61,16 +61,133 @@ export const load: PageServerLoad = async ({
     console.error("Error loading members:", membersError)
   }
 
+  // Load feedback for this itinerary
+  const { data: feedback, error: feedbackError } = await supabase
+    .from("itinerary_feedback")
+    .select("*")
+    .eq("itinerary_id", itinerary.id)
+
+  if (feedbackError) {
+    console.error("Error loading feedback:", feedbackError)
+  }
+
+  // Load user's own feedback
+  const { data: userFeedback, error: userFeedbackError } = await supabase
+    .from("itinerary_feedback")
+    .select("*")
+    .eq("itinerary_id", itinerary.id)
+    .eq("user_id", session.user.id)
+
+  if (userFeedbackError) {
+    console.error("Error loading user feedback:", userFeedbackError)
+  }
+
   return {
     trip,
     itinerary,
     userRole: membership.role,
     members: members || [],
     userId: session.user.id,
+    feedback: feedback || [],
+    userFeedback: userFeedback || [],
   }
 }
 
 export const actions: Actions = {
+  submitFeedback: async ({ request, params, locals: { supabase, session } }) => {
+    if (!session) {
+      return fail(401, { error: "Unauthorized" })
+    }
+
+    const { trip_id } = params
+    const formData = await request.formData()
+    const itineraryId = formData.get("itinerary_id") as string
+    const dayIndex = parseInt(formData.get("day_index") as string)
+    const activityIndex = parseInt(formData.get("activity_index") as string)
+    const activityName = formData.get("activity_name") as string
+    const reason = formData.get("reason") as string | null
+
+    // Check if user is a member of this trip
+    const { data: membership, error: membershipError } = await supabase
+      .from("trip_members")
+      .select("role")
+      .eq("trip_id", trip_id)
+      .eq("user_id", session.user.id)
+      .single()
+
+    if (membershipError || !membership) {
+      return fail(403, { error: "You are not a member of this trip" })
+    }
+
+    // Check if trip is finalized (no feedback allowed after finalization)
+    const { data: trip, error: tripError } = await supabase
+      .from("trips")
+      .select("status")
+      .eq("id", trip_id)
+      .single()
+
+    if (tripError || !trip) {
+      return fail(404, { error: "Trip not found" })
+    }
+
+    if (trip.status === "finalized") {
+      return fail(403, { error: "Cannot submit feedback on finalized itineraries" })
+    }
+
+    // Upsert feedback (insert or update if already exists)
+    const { error: feedbackError } = await supabase
+      .from("itinerary_feedback")
+      .upsert(
+        {
+          itinerary_id: itineraryId,
+          user_id: session.user.id,
+          day_index: dayIndex,
+          activity_index: activityIndex,
+          activity_name: activityName,
+          feedback_type: "dislike",
+          reason: reason || null,
+        },
+        {
+          onConflict: "itinerary_id,user_id,day_index,activity_index",
+        }
+      )
+
+    if (feedbackError) {
+      console.error("Error submitting feedback:", feedbackError)
+      return fail(500, { error: "Failed to submit feedback. Please try again." })
+    }
+
+    return { success: true, action: "submitFeedback" }
+  },
+
+  removeFeedback: async ({ request, params, locals: { supabase, session } }) => {
+    if (!session) {
+      return fail(401, { error: "Unauthorized" })
+    }
+
+    const { trip_id } = params
+    const formData = await request.formData()
+    const itineraryId = formData.get("itinerary_id") as string
+    const dayIndex = parseInt(formData.get("day_index") as string)
+    const activityIndex = parseInt(formData.get("activity_index") as string)
+
+    // Delete the feedback
+    const { error: deleteError } = await supabase
+      .from("itinerary_feedback")
+      .delete()
+      .eq("itinerary_id", itineraryId)
+      .eq("user_id", session.user.id)
+      .eq("day_index", dayIndex)
+      .eq("activity_index", activityIndex)
+
+    if (deleteError) {
+      console.error("Error removing feedback:", deleteError)
+      return fail(500, { error: "Failed to remove feedback. Please try again." })
+    }
+
+    return { success: true, action: "removeFeedback" }
+  },
+
   finalize: async ({ params, locals: { supabase, session } }) => {
     if (!session) {
       return fail(401, { error: "Unauthorized" })
