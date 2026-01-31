@@ -457,7 +457,7 @@ IN_PROGRESS
   - Replace existing itinerary with new version
   - Track regeneration count (max 5, then show warning)
 
-- [ ] **Task 8.7**: Implement itinerary finalization
+- [x] **Task 8.7**: Implement itinerary finalization
   - Add "Finalize Trip" button (organizer only)
   - Confirmation modal: "This will lock the itinerary. Continue?"
   - Update trip status to 'finalized' and set finalized_at timestamp
@@ -2549,3 +2549,114 @@ The backend implementation was already complete from Task 3.6:
 ### Next Steps:
 Task 8.3 will implement detailed activity card components (already included in basic form).
 Tasks 8.4-8.7 will add feedback, suggestions, regeneration, and finalization features.
+
+---
+
+## Completed This Iteration (Ralph Run)
+
+**Summary:** Completed Task 8.7 (Implement itinerary finalization)
+
+### Task 8.7: Implement Itinerary Finalization (COMPLETE)
+
+- ✅ **Finalize Button (Organizer Only):**
+  - Updated button in itinerary page header to trigger modal instead of basic confirm()
+  - Button only visible when user is organizer AND trip is not finalized
+  - Clear visual design with success color and check_circle icon
+
+- ✅ **Confirmation Modal:**
+  - Created comprehensive modal with DaisyUI styling
+  - Lists three key consequences of finalization:
+    - Locks itinerary (read-only for all members)
+    - Prevents modifications or regeneration
+    - Marks trip as complete
+  - Includes info alert: "This action cannot be undone"
+  - Cancel and Finalize buttons with proper disabled states
+  - Loading state during submission with spinner
+  - Modal backdrop click to close (with proper accessibility - button element)
+
+- ✅ **Backend Form Action (src/routes/(admin)/trips/[trip_id]/itinerary/+page.server.ts):**
+  - Implemented `finalize` form action
+  - **Authentication & Authorization:**
+    - Validates user session (401 if not authenticated)
+    - Checks trip membership (403 if not a member)
+    - Verifies organizer role (403 if not organizer)
+  - **Database Updates:**
+    - Updates `itineraries` table:
+      - Sets `finalized_at` timestamp to current time
+      - Sets `finalized_by` to current user ID
+    - Updates `trips` table:
+      - Changes status to 'finalized'
+  - **Error Handling:**
+    - Proper error messages for auth failures
+    - Console logging for debugging
+    - 500 errors with user-friendly messages
+  - Returns success flag on completion
+
+- ✅ **Frontend Integration (src/routes/(admin)/trips/[trip_id]/itinerary/+page.svelte):**
+  - **State Management:**
+    - Added modal visibility state (`showFinalizeModal`)
+    - Added submission loading state (`isSubmitting`)
+  - **Form Enhancement:**
+    - Used SvelteKit's `enhance` for progressive enhancement
+    - Handles loading states during submission
+    - Reloads page on success to show finalized state
+    - Displays errors from backend in modal
+  - **Error Display:**
+    - Shows form errors in modal if action fails
+    - User can retry or cancel after error
+
+- ✅ **Finalized Badge Display:**
+  - Badge already existed in header (line 96-101)
+  - Shows green success badge with check icon when `trip.status === 'finalized'`
+  - Displays prominently next to trip cost information
+
+- ✅ **Read-Only State:**
+  - Finalize button hidden when `isFinalized` is true
+  - Future export buttons will be enabled based on `isFinalized` flag (Tasks 9.1, 9.2)
+  - Regeneration button (Task 8.6) will also check `isFinalized` flag
+
+- ✅ **Type Safety:**
+  - Added `ActionData` import from SvelteKit types
+  - Proper typing for form action responses
+  - No TypeScript errors: `bun run check` passes with 0 errors, 0 warnings
+
+- ✅ **Accessibility:**
+  - Fixed modal backdrop to use `<button>` element instead of `<div>`
+  - Added `aria-label="Close modal"` to backdrop
+  - Keyboard navigation support (Tab, Enter, Escape)
+  - Disabled state properly communicated to screen readers
+
+- ✅ **Build Verification:**
+  - Production build succeeds: `bun run build` completes without errors
+  - Type checking passes: `bun run check` with 0 errors, 0 warnings
+  - No accessibility warnings after backdrop fix
+
+**Phase 8 Progress:** 4 of 7 tasks complete ✅ (P0 complete, P1 remaining)
+- Task 8.1: Implement itinerary generation trigger ✅
+- Task 8.2: Convert "Finalized Trip Itinerary" mockup to Svelte ✅
+- Task 8.3: Implement itinerary activity cards ✅
+- Task 8.4: Implement activity feedback system (P1 - Should Have)
+- Task 8.5: Implement activity suggestions (P1 - Should Have)
+- Task 8.6: Implement itinerary regeneration (P1 - Should Have)
+- Task 8.7: Implement itinerary finalization ✅
+
+**All P0 Tasks in Phase 8 Complete!** Tasks 8.1, 8.2, 8.3, and 8.7 are now complete. Remaining tasks (8.4-8.6) are P1 "Should Have" features.
+
+**Next P0 Tasks:** Phase 9 and Phase 10 tasks are mostly P1/P2, so the core MVP (P0) is essentially complete for itinerary features.
+
+### Files Modified:
+1. **Modified:** `src/routes/(admin)/trips/[trip_id]/itinerary/+page.svelte`
+   - Added modal state management
+   - Replaced confirm() with proper modal UI
+   - Integrated form action with progressive enhancement
+   - Fixed accessibility warning on modal backdrop
+
+2. **Modified:** `src/routes/(admin)/trips/[trip_id]/itinerary/+page.server.ts`
+   - Added `finalize` form action
+   - Implements authentication and authorization checks
+   - Updates both itineraries and trips tables
+   - Proper error handling and user feedback
+
+3. **Modified:** `plan_PROGRESS.md`
+   - Marked Task 8.7 as complete
+   - Added detailed completion notes

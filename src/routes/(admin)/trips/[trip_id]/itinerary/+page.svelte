@@ -1,13 +1,15 @@
 <script lang="ts">
-  import type { PageData } from "./$types"
+  import type { PageData, ActionData } from "./$types"
   import type { Activity, DayItinerary } from "$lib/types"
   import ActivityCard from "$lib/components/ActivityCard.svelte"
+  import { enhance } from "$app/forms"
 
   interface Props {
     data: PageData
+    form: ActionData
   }
 
-  let { data }: Props = $props()
+  let { data, form }: Props = $props()
 
   // Parse days from JSONB
   const days: DayItinerary[] =
@@ -55,6 +57,18 @@
   // Check if user is organizer
   const isOrganizer = data.userRole === "organizer"
   const isFinalized = data.trip.status === "finalized"
+
+  // Finalization modal state
+  let showFinalizeModal = $state(false)
+  let isSubmitting = $state(false)
+
+  function openFinalizeModal() {
+    showFinalizeModal = true
+  }
+
+  function closeFinalizeModal() {
+    showFinalizeModal = false
+  }
 </script>
 
 <svelte:head>
@@ -112,16 +126,7 @@
       {#if isOrganizer && !isFinalized}
         <button
           class="btn btn-success flex items-center gap-2 font-bold"
-          onclick={() => {
-            if (
-              confirm(
-                "Finalize this itinerary? This will lock it and make it read-only for all members.",
-              )
-            ) {
-              // TODO: Implement finalization
-              alert("Finalization feature coming soon!")
-            }
-          }}
+          onclick={openFinalizeModal}
         >
           <span class="material-symbols-outlined">check_circle</span>
           Finalize Itinerary
@@ -272,3 +277,87 @@
     </div>
   </div>
 </div>
+
+<!-- Finalize Modal -->
+{#if showFinalizeModal}
+  <div class="modal modal-open">
+    <div class="modal-box max-w-lg">
+      <h3 class="font-bold text-2xl mb-4 flex items-center gap-2">
+        <span class="material-symbols-outlined text-warning">warning</span>
+        Finalize Itinerary?
+      </h3>
+
+      <div class="space-y-4">
+        <p class="text-base-content/80">
+          Finalizing this itinerary will:
+        </p>
+        <ul class="list-disc list-inside space-y-2 text-base-content/70 pl-2">
+          <li>Lock the itinerary, making it read-only for all members</li>
+          <li>Prevent any further modifications or regeneration</li>
+          <li>Mark the trip as complete</li>
+        </ul>
+        <div class="alert alert-info">
+          <span class="material-symbols-outlined">info</span>
+          <span
+            >This action cannot be undone. Make sure everyone is happy with the
+            itinerary before finalizing.</span
+          >
+        </div>
+
+        {#if form?.error}
+          <div class="alert alert-error">
+            <span class="material-symbols-outlined">error</span>
+            <span>{form.error}</span>
+          </div>
+        {/if}
+      </div>
+
+      <form
+        method="POST"
+        action="?/finalize"
+        use:enhance={() => {
+          isSubmitting = true
+          return async ({ update }) => {
+            await update()
+            isSubmitting = false
+            if (!form?.error) {
+              closeFinalizeModal()
+              // Reload page to show finalized state
+              window.location.reload()
+            }
+          }
+        }}
+      >
+        <div class="modal-action">
+          <button
+            type="button"
+            class="btn btn-ghost"
+            onclick={closeFinalizeModal}
+            disabled={isSubmitting}
+          >
+            Cancel
+          </button>
+          <button
+            type="submit"
+            class="btn btn-success gap-2"
+            disabled={isSubmitting}
+          >
+            {#if isSubmitting}
+              <span class="loading loading-spinner loading-sm"></span>
+              Finalizing...
+            {:else}
+              <span class="material-symbols-outlined">check_circle</span>
+              Finalize Itinerary
+            {/if}
+          </button>
+        </div>
+      </form>
+    </div>
+    <button
+      type="button"
+      class="modal-backdrop"
+      onclick={closeFinalizeModal}
+      aria-label="Close modal"
+    ></button>
+  </div>
+{/if}

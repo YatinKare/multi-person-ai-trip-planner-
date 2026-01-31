@@ -1,5 +1,5 @@
-import { error } from "@sveltejs/kit"
-import type { PageServerLoad } from "./$types"
+import { error, fail, redirect } from "@sveltejs/kit"
+import type { PageServerLoad, Actions } from "./$types"
 
 export const load: PageServerLoad = async ({
   params,
@@ -68,4 +68,61 @@ export const load: PageServerLoad = async ({
     members: members || [],
     userId: session.user.id,
   }
+}
+
+export const actions: Actions = {
+  finalize: async ({ params, locals: { supabase, session } }) => {
+    if (!session) {
+      return fail(401, { error: "Unauthorized" })
+    }
+
+    const { trip_id } = params
+
+    // Check if user is the organizer
+    const { data: membership, error: membershipError } = await supabase
+      .from("trip_members")
+      .select("role")
+      .eq("trip_id", trip_id)
+      .eq("user_id", session.user.id)
+      .single()
+
+    if (membershipError || !membership) {
+      return fail(403, { error: "You are not a member of this trip" })
+    }
+
+    if (membership.role !== "organizer") {
+      return fail(403, { error: "Only the organizer can finalize the itinerary" })
+    }
+
+    // Update itinerary to set finalized_at and finalized_by
+    const { error: itineraryError } = await supabase
+      .from("itineraries")
+      .update({
+        finalized_at: new Date().toISOString(),
+        finalized_by: session.user.id,
+      })
+      .eq("trip_id", trip_id)
+
+    if (itineraryError) {
+      console.error("Error finalizing itinerary:", itineraryError)
+      return fail(500, {
+        error: "Failed to finalize itinerary. Please try again.",
+      })
+    }
+
+    // Update trip status to 'finalized'
+    const { error: tripError } = await supabase
+      .from("trips")
+      .update({ status: "finalized" })
+      .eq("id", trip_id)
+
+    if (tripError) {
+      console.error("Error updating trip status:", tripError)
+      return fail(500, {
+        error: "Failed to update trip status. Please try again.",
+      })
+    }
+
+    return { success: true }
+  },
 }
