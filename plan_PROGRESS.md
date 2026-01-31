@@ -475,7 +475,7 @@ IN_PROGRESS
   - Return PDF as download
   - Handle errors (show error message if generation fails)
 
-- [ ] **Task 9.2**: Implement calendar export (.ics)
+- [x] **Task 9.2**: Implement calendar export (.ics)
   - Add "Export to Calendar" button on finalized itinerary page
   - Create server-side .ics generation endpoint: `src/routes/(admin)/trips/[trip_id]/export/calendar/+server.ts`
   - Generate .ics file with each activity as separate event
@@ -569,9 +569,96 @@ IN_PROGRESS
 
 ## Completed This Iteration
 
-**Summary:** Completed Task 9.1 (Implement PDF export - P1)
+**Summary:** Completed Task 9.2 (Implement calendar export (.ics) - P1)
 
-### Task 9.1: Implement PDF Export (COMPLETE)
+### Task 9.2: Implement Calendar Export (.ics) (COMPLETE)
+
+Implemented comprehensive calendar export functionality allowing all members to download an .ics file of finalized trip itineraries for import into Google Calendar, Apple Calendar, Outlook, and other calendar applications.
+
+#### Implementation Details:
+
+**1. Calendar Generation Library**
+- ✅ Selected `ics` library (version 3.8.1) for .ics file generation
+- ✅ Installed via bun package manager
+- ✅ Industry-standard iCalendar format support
+- ✅ Compatible with all major calendar applications
+
+**2. Server-Side Calendar Endpoint**
+- ✅ Created GET endpoint at `src/routes/(admin)/trips/[trip_id]/export/calendar/+server.ts`
+- ✅ Validates user authentication and trip membership
+- ✅ Only allows export for finalized trips (status check)
+- ✅ Loads trip details, itinerary, and preferences from database
+- ✅ Extracts start date from preferences to calculate actual event dates
+- ✅ Returns .ics file as downloadable file with proper Content-Type headers
+- ✅ Filename sanitized from trip name
+
+**3. Event Generation & Formatting**
+- ✅ Each activity converted to a separate calendar event
+- ✅ Time slot mapping: Morning (9:00-12:00), Afternoon (13:00-17:00), Evening (18:00-22:00)
+- ✅ Activity duration used if available, otherwise defaults to time slot duration
+- ✅ Event title: Activity name
+- ✅ Event description includes: activity description, estimated cost, and tips
+- ✅ Event location: Activity location or destination name
+- ✅ Event status set to "CONFIRMED"
+- ✅ Categories include trip name and destination for organization
+- ✅ Organizer set as "TripSync <noreply@tripsync.com>"
+
+**4. Date Calculation Logic**
+- ✅ Automatically calculates actual dates from trip start date in preferences
+- ✅ Falls back to current date if no preferences available
+- ✅ Properly handles multi-day itineraries with correct date increments
+- ✅ Converts time slots to specific hours for calendar apps
+
+**5. Export Button UI**
+- ✅ Added "Export to Calendar" button to itinerary page header
+- ✅ Button only visible when trip status is 'finalized'
+- ✅ Uses Material Symbols icon (event)
+- ✅ Secondary button styling to differentiate from PDF export
+- ✅ Opens .ics file download dialog
+- ✅ Positioned next to PDF export button for consistency
+
+**6. Security & Validation**
+- ✅ JWT authentication required for all requests
+- ✅ RLS policies ensure users can only export trips they're members of
+- ✅ Status validation prevents export of non-finalized trips (returns 400 error)
+- ✅ Error handling for missing itineraries (404)
+- ✅ Proper error messages for unauthorized access (401, 403)
+- ✅ Error handling for .ics generation failures (500)
+
+#### Files Created/Modified:
+
+1. **src/routes/(admin)/trips/[trip_id]/export/calendar/+server.ts** (NEW)
+   - Complete .ics generation endpoint
+   - Authentication and authorization checks
+   - Event creation with ics library
+   - Date calculation logic
+   - Proper response headers for download
+
+2. **src/routes/(admin)/trips/[trip_id]/itinerary/+page.svelte** (MODIFIED)
+   - Added Export to Calendar button in header section (line 243-249)
+   - Conditional rendering based on finalization status
+   - Link to calendar export endpoint
+   - Positioned next to PDF export button
+
+3. **package.json** (MODIFIED)
+   - Added ics@3.8.1 to dependencies
+
+#### Validation Results:
+- ✅ TypeScript check: 0 errors, 8 warnings (a11y only - pre-existing)
+- ✅ Build validation: Success
+- ✅ All requirements from plan.md Task 9.2 satisfied
+
+#### Features Implemented:
+- ✅ .ics file generation with each activity as separate event
+- ✅ Activity details included (name, time slot, location, description, cost, tips)
+- ✅ Time slots converted to specific time ranges
+- ✅ Compatible with Google Calendar, Apple Calendar, and Outlook
+- ✅ Automatic date calculation from trip preferences
+- ✅ Proper calendar event metadata (status, categories, organizer)
+
+---
+
+### Previous: Task 9.1: Implement PDF Export (COMPLETE)
 
 Implemented comprehensive PDF export functionality allowing all members to download a formatted PDF version of finalized trip itineraries.
 

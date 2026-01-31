@@ -240,6 +240,14 @@
           <span class="material-symbols-outlined">picture_as_pdf</span>
           Export to PDF
         </a>
+        <a
+          href="/trips/{data.trip.id}/export/calendar"
+          class="btn btn-secondary flex items-center gap-2 font-bold"
+          download
+        >
+          <span class="material-symbols-outlined">event</span>
+          Export to Calendar
+        </a>
       {/if}
     </div>
   </div>
