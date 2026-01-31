@@ -125,7 +125,6 @@ export const load: PageServerLoad = async ({
     aggregated,
     hasRecommendations: !!existingRecommendations,
     selectedDestination,
-    supabase,
   }
 }
 
