@@ -3,6 +3,7 @@
   import LeaveTripModal from "$lib/components/LeaveTripModal.svelte"
   import AggregatedPreferences from "$lib/components/AggregatedPreferences.svelte"
   import { page } from "$app/state"
+  import { goto } from "$app/navigation"
   import type { PageData } from "./$types"
 
   interface Props {
@@ -190,6 +191,13 @@
             {/if}
           </button>
         {/if}
+        <button
+          onclick={() => goto(`/trips/${data.trip.id}/preferences`)}
+          class="btn btn-neutral flex items-center gap-2 font-bold"
+        >
+          <span class="material-symbols-outlined">tune</span>
+          My Preferences
+        </button>
         <div class="dropdown dropdown-end">
           <button tabindex="0" class="btn btn-ghost flex items-center gap-2">
             <span class="material-symbols-outlined">more_vert</span>
@@ -215,6 +223,13 @@
           </ul>
         </div>
       {:else}
+        <button
+          onclick={() => goto(`/trips/${data.trip.id}/preferences`)}
+          class="btn btn-primary flex items-center gap-2 text-base-300 font-bold hover:shadow-[0_0_20px_rgba(19,236,182,0.3)]"
+        >
+          <span class="material-symbols-outlined">tune</span>
+          My Preferences
+        </button>
         <div class="dropdown dropdown-end">
           <button tabindex="0" class="btn btn-ghost flex items-center gap-2">
             <span class="material-symbols-outlined">more_vert</span>

@@ -11,6 +11,7 @@
 
   let step = $state<"input" | "success">("input")
   let tripName = $state("")
+  let confirmedTripName = $state("")
   let roughTimeframe = $state("")
   let inviteCode = $state("")
   let createdTripId = $state("")
@@ -22,6 +23,7 @@
       setTimeout(() => {
         step = "input"
         tripName = ""
+        confirmedTripName = ""
         roughTimeframe = ""
         inviteCode = ""
         createdTripId = ""
@@ -37,6 +39,7 @@
       if (result.type === "success" && result.data) {
         inviteCode = result.data.inviteCode as string
         createdTripId = result.data.tripId as string
+        confirmedTripName = tripName
         step = "success"
       }
       await update()
@@ -64,7 +67,7 @@
 
   function shareViaWhatsApp() {
     const link = `${window.location.origin}/join/${inviteCode}`
-    const text = `Join my trip "${tripName}"!`
+    const text = `Join my trip "${confirmedTripName}"!`
     window.open(
       `https://wa.me/?text=${encodeURIComponent(text + " " + link)}`,
       "_blank",
@@ -73,7 +76,7 @@
 
   function shareViaEmail() {
     const link = `${window.location.origin}/join/${inviteCode}`
-    const subject = `Join my trip: ${tripName}`
+    const subject = `Join my trip: ${confirmedTripName}`
     const body = `I'm planning a trip and would love for you to join!\n\nClick here to join: ${link}`
     window.location.href = `mailto:?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`
   }
@@ -83,7 +86,7 @@
     if (navigator.share) {
       navigator
         .share({
-          title: `Join my trip: ${tripName}`,
+          title: `Join my trip: ${confirmedTripName}`,
           text: `I'm planning a trip and would love for you to join!`,
           url: link,
         })
@@ -221,7 +224,7 @@
                 class="absolute inset-0 bg-primary/30 blur-xl rounded-full animate-pulse"
               ></div>
             </div>
-            <h2 class="text-3xl font-bold mt-4">{tripName} is ready!</h2>
+            <h2 class="text-3xl font-bold mt-4">{confirmedTripName} is ready!</h2>
             <p class="text-base-content/70 mt-2">
               Share this link with your friends to let them join the planning.
             </p>

@@ -188,6 +188,7 @@
   })
 
   let submitting = $state(false)
+  let errorMessage = $state("")
 </script>
 
 <svelte:head>
@@ -220,10 +221,36 @@
     </p>
   </div>
 
+  {#if errorMessage}
+    <div role="alert" class="alert alert-warning mb-8 shadow-lg">
+      <span class="material-symbols-outlined">warning</span>
+      <span>{errorMessage}</span>
+    </div>
+  {/if}
+
   <form
     method="POST"
     action="?/submitPreferences"
-    use:enhance={() => {
+    use:enhance={({ cancel }) => {
+      errorMessage = ""
+
+      // Validate Vibes
+      if (selectedVibes.length === 0) {
+        errorMessage = "Please select at least one vibe for your trip."
+        cancel()
+        // Scroll to top or show toast
+        window.scrollTo({ top: 0, behavior: "smooth" })
+        return
+      }
+
+      // Validate Budget
+      if (budgetMax < budgetMin) {
+        errorMessage = "Max budget cannot be less than min budget."
+        cancel()
+        window.scrollTo({ top: 0, behavior: "smooth" })
+        return
+      }
+
       submitting = true
       return async ({ update }) => {
         await update()
@@ -507,7 +534,7 @@
       </div>
 
       <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-        {#each vibes as vibe}
+        {#each vibes as vibe (vibe.id)}
           <button
             type="button"
             onclick={() => toggleVibe(vibe.id)}
@@ -641,7 +668,7 @@
           >
         </div>
         <div class="flex flex-wrap gap-3">
-          {#each dietaryOptions as option}
+          {#each dietaryOptions as option (option)}
             <button
               type="button"
               onclick={() => toggleDietary(option)}
@@ -683,7 +710,7 @@
           >
         </div>
         <div class="flex flex-wrap gap-3">
-          {#each accessibilityOptions as option}
+          {#each accessibilityOptions as option (option)}
             <button
               type="button"
               onclick={() => toggleAccessibility(option)}
