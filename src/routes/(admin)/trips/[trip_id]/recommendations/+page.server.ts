@@ -1,5 +1,5 @@
-import { error } from "@sveltejs/kit"
-import type { PageServerLoad } from "./$types"
+import { error, fail } from "@sveltejs/kit"
+import type { PageServerLoad, Actions } from "./$types"
 
 export const load: PageServerLoad = async ({
   params,
@@ -94,11 +94,142 @@ export const load: PageServerLoad = async ({
       }
     }) || []
 
+  // Load votes for this recommendation (if recommendations exist)
+  let votes: any[] = []
+  let userVotes: Record<number, string> = {}
+
+  if (recommendations) {
+    const { data: votesData, error: votesError } = await supabase
+      .from("destination_votes")
+      .select("*")
+      .eq("recommendation_id", recommendations.id)
+
+    if (votesError) {
+      console.error("Error loading votes:", votesError)
+    } else {
+      votes = votesData || []
+      // Create a map of destination_index -> vote_type for current user
+      userVotes = votes
+        .filter((v) => v.user_id === session.user.id)
+        .reduce(
+          (acc, v) => {
+            acc[v.destination_index] = v.vote_type
+            return acc
+          },
+          {} as Record<number, string>,
+        )
+    }
+  }
+
+  // Calculate vote counts per destination
+  const voteCounts: Record<
+    number,
+    { upvotes: number; downvotes: number }
+  > = {}
+  votes.forEach((vote) => {
+    if (!voteCounts[vote.destination_index]) {
+      voteCounts[vote.destination_index] = { upvotes: 0, downvotes: 0 }
+    }
+    if (vote.vote_type === "upvote") {
+      voteCounts[vote.destination_index].upvotes++
+    } else if (vote.vote_type === "downvote") {
+      voteCounts[vote.destination_index].downvotes++
+    }
+  })
+
   return {
     trip,
     recommendations: recommendations || null,
     userRole: membership.role,
     members: membersWithStatus,
+    voteCounts,
+    userVotes,
     session,
   }
+}
+
+export const actions: Actions = {
+  vote: async ({ request, params, locals: { supabase, session } }) => {
+    if (!session) {
+      return fail(401, { error: "Unauthorized" })
+    }
+
+    const { trip_id } = params
+    const formData = await request.formData()
+    const destinationIndex = parseInt(formData.get("destination_index") as string)
+    const voteType = formData.get("vote_type") as "upvote" | "downvote"
+    const recommendationId = formData.get("recommendation_id") as string
+
+    if (!recommendationId || isNaN(destinationIndex) || !voteType) {
+      return fail(400, { error: "Invalid vote data" })
+    }
+
+    // Verify user is a member of this trip
+    const { data: membership } = await supabase
+      .from("trip_members")
+      .select("role")
+      .eq("trip_id", trip_id)
+      .eq("user_id", session.user.id)
+      .single()
+
+    if (!membership) {
+      return fail(403, { error: "Not a member of this trip" })
+    }
+
+    // Check if user already has a vote for this destination
+    const { data: existingVote } = await supabase
+      .from("destination_votes")
+      .select("*")
+      .eq("recommendation_id", recommendationId)
+      .eq("user_id", session.user.id)
+      .eq("destination_index", destinationIndex)
+      .maybeSingle()
+
+    if (existingVote) {
+      // If same vote type, remove the vote (toggle off)
+      if (existingVote.vote_type === voteType) {
+        const { error: deleteError } = await supabase
+          .from("destination_votes")
+          .delete()
+          .eq("id", existingVote.id)
+
+        if (deleteError) {
+          console.error("Error removing vote:", deleteError)
+          return fail(500, { error: "Failed to remove vote" })
+        }
+
+        return { success: true, action: "removed" }
+      } else {
+        // Different vote type, update the vote
+        const { error: updateError } = await supabase
+          .from("destination_votes")
+          .update({ vote_type: voteType })
+          .eq("id", existingVote.id)
+
+        if (updateError) {
+          console.error("Error updating vote:", updateError)
+          return fail(500, { error: "Failed to update vote" })
+        }
+
+        return { success: true, action: "updated" }
+      }
+    } else {
+      // No existing vote, insert new one
+      const { error: insertError } = await supabase
+        .from("destination_votes")
+        .insert({
+          recommendation_id: recommendationId,
+          user_id: session.user.id,
+          destination_index: destinationIndex,
+          vote_type: voteType,
+        })
+
+      if (insertError) {
+        console.error("Error inserting vote:", insertError)
+        return fail(500, { error: "Failed to add vote" })
+      }
+
+      return { success: true, action: "added" }
+    }
+  },
 }

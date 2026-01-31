@@ -109,7 +109,10 @@
     <div
       class="w-full grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 lg:gap-8 mb-20"
     >
-      {#each destinations as destination}
+      {#each destinations as destination, index}
+        {@const upvotes = data.voteCounts[index]?.upvotes || 0}
+        {@const downvotes = data.voteCounts[index]?.downvotes || 0}
+        {@const userVote = data.userVotes[index]}
         <div
           class="card bg-base-200 border border-base-300 hover:border-primary/50 transition-all duration-300 shadow-lg overflow-hidden group"
         >
@@ -194,20 +197,70 @@
 
             <!-- Actions -->
             <div class="card-actions flex-col gap-3 pt-2">
-              <!-- Voting (placeholder - will be implemented in Task 7.2) -->
+              <!-- Voting -->
               <div class="flex gap-3 w-full">
-                <button class="btn btn-ghost bg-base-300 flex-1 gap-2">
-                  <span class="material-symbols-outlined text-base-content/60"
-                    >thumb_up</span
+                <form method="POST" action="?/vote" class="flex-1">
+                  <input
+                    type="hidden"
+                    name="recommendation_id"
+                    value={data.recommendations.id}
+                  />
+                  <input
+                    type="hidden"
+                    name="destination_index"
+                    value={index}
+                  />
+                  <input type="hidden" name="vote_type" value="upvote" />
+                  <button
+                    type="submit"
+                    class="btn {userVote === 'upvote'
+                      ? 'btn-primary'
+                      : 'btn-ghost bg-base-300'} w-full gap-2"
                   >
-                  <span class="font-bold">0</span>
-                </button>
-                <button class="btn btn-ghost bg-base-300 flex-1 gap-2">
-                  <span class="material-symbols-outlined text-base-content/60"
-                    >thumb_down</span
+                    <span
+                      class="material-symbols-outlined {userVote === 'upvote'
+                        ? ''
+                        : 'text-base-content/60'}"
+                      style={userVote === "upvote"
+                        ? "font-variation-settings: 'FILL' 1"
+                        : ""}
+                    >
+                      thumb_up
+                    </span>
+                    <span class="font-bold">{upvotes}</span>
+                  </button>
+                </form>
+                <form method="POST" action="?/vote" class="flex-1">
+                  <input
+                    type="hidden"
+                    name="recommendation_id"
+                    value={data.recommendations.id}
+                  />
+                  <input
+                    type="hidden"
+                    name="destination_index"
+                    value={index}
+                  />
+                  <input type="hidden" name="vote_type" value="downvote" />
+                  <button
+                    type="submit"
+                    class="btn {userVote === 'downvote'
+                      ? 'btn-error'
+                      : 'btn-ghost bg-base-300'} w-full gap-2"
                   >
-                  <span class="font-bold">0</span>
-                </button>
+                    <span
+                      class="material-symbols-outlined {userVote === 'downvote'
+                        ? ''
+                        : 'text-base-content/60'}"
+                      style={userVote === "downvote"
+                        ? "font-variation-settings: 'FILL' 1"
+                        : ""}
+                    >
+                      thumb_down
+                    </span>
+                    <span class="font-bold">{downvotes}</span>
+                  </button>
+                </form>
               </div>
 
               <!-- Organizer Select (visible only to organizers - will be implemented in Task 7.3) -->
