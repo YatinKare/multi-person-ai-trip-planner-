@@ -2,6 +2,7 @@
   import type { PageData, ActionData } from "./$types"
   import type { Activity, DayItinerary } from "$lib/types"
   import ActivityCard from "$lib/components/ActivityCard.svelte"
+  import SuggestActivityModal from "$lib/components/SuggestActivityModal.svelte"
   import { enhance } from "$app/forms"
 
   interface Props {
@@ -120,6 +121,17 @@
         f.activity_index === activityIndex
     ).length
   }
+
+  // Suggest Activity modal state
+  let showSuggestModal = $state(false)
+
+  function openSuggestModal() {
+    showSuggestModal = true
+  }
+
+  function closeSuggestModal() {
+    showSuggestModal = false
+  }
 </script>
 
 <svelte:head>
@@ -174,6 +186,15 @@
         <span class="material-symbols-outlined">arrow_back</span>
         Back to Dashboard
       </a>
+      {#if !isFinalized}
+        <button
+          class="btn btn-primary flex items-center gap-2 font-bold"
+          onclick={openSuggestModal}
+        >
+          <span class="material-symbols-outlined">add_circle</span>
+          Suggest Activity
+        </button>
+      {/if}
       {#if isOrganizer && !isFinalized}
         <button
           class="btn btn-success flex items-center gap-2 font-bold"
@@ -194,6 +215,95 @@
         <p class="text-base-content/90">{summary}</p>
       </div>
     </div>
+  {/if}
+
+  <!-- Activity Suggestions (Organizer View) -->
+  {#if isOrganizer && data.suggestions.length > 0}
+    {@const pendingSuggestions = data.suggestions.filter((s) => s.status === "pending")}
+    {#if pendingSuggestions.length > 0}
+      <div class="card bg-base-200 border border-primary mb-8">
+        <div class="card-body">
+          <h3 class="text-xl font-bold text-white flex items-center gap-2 mb-4">
+            <span class="material-symbols-outlined text-primary">notifications_active</span>
+            Activity Suggestions ({pendingSuggestions.length} pending)
+          </h3>
+          <p class="text-base-content/70 mb-4">
+            Members have suggested the following activities. Review and accept or reject them.
+          </p>
+          <div class="space-y-3">
+            {#each pendingSuggestions as suggestion}
+              <div class="card bg-base-300 border border-base-content/10">
+                <div class="card-body p-4">
+                  <div class="flex flex-col md:flex-row md:items-start justify-between gap-4">
+                    <div class="flex-1">
+                      <div class="flex items-center gap-2 mb-2">
+                        <span class="badge badge-primary">
+                          Day {suggestion.day_index + 1} - {suggestion.time_slot.charAt(0).toUpperCase() + suggestion.time_slot.slice(1)}
+                        </span>
+                        <span class="text-sm text-base-content/60">
+                          by {suggestion.user_name}
+                        </span>
+                      </div>
+                      <h4 class="font-bold text-lg text-white mb-2">
+                        {suggestion.activity_name}
+                      </h4>
+                      {#if suggestion.activity_description}
+                        <p class="text-base-content/80 text-sm mb-2">
+                          {suggestion.activity_description}
+                        </p>
+                      {/if}
+                      <div class="flex flex-wrap gap-3 text-sm">
+                        {#if suggestion.location}
+                          <span class="flex items-center gap-1 text-base-content/70">
+                            <span class="material-symbols-outlined text-xs">location_on</span>
+                            {suggestion.location}
+                          </span>
+                        {/if}
+                        {#if suggestion.estimated_cost !== null}
+                          <span class="flex items-center gap-1 text-base-content/70">
+                            <span class="material-symbols-outlined text-xs">payments</span>
+                            ${suggestion.estimated_cost}
+                          </span>
+                        {/if}
+                      </div>
+                      {#if suggestion.reason}
+                        <div class="mt-3 p-2 bg-base-200 rounded text-sm text-base-content/70">
+                          <span class="font-semibold">Why: </span>{suggestion.reason}
+                        </div>
+                      {/if}
+                    </div>
+                    <div class="flex gap-2">
+                      <form method="POST" action="?/acceptSuggestion" use:enhance>
+                        <input type="hidden" name="suggestionId" value={suggestion.id} />
+                        <button
+                          type="submit"
+                          class="btn btn-success btn-sm gap-1"
+                          title="Accept suggestion"
+                        >
+                          <span class="material-symbols-outlined text-sm">check</span>
+                          Accept
+                        </button>
+                      </form>
+                      <form method="POST" action="?/rejectSuggestion" use:enhance>
+                        <input type="hidden" name="suggestionId" value={suggestion.id} />
+                        <button
+                          type="submit"
+                          class="btn btn-error btn-sm gap-1"
+                          title="Reject suggestion"
+                        >
+                          <span class="material-symbols-outlined text-sm">close</span>
+                          Reject
+                        </button>
+                      </form>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            {/each}
+          </div>
+        </div>
+      </div>
+    {/if}
   {/if}
 
   <!-- Day-by-Day Itinerary -->
@@ -560,3 +670,12 @@
     ></button>
   </div>
 {/if}
+
+<!-- Suggest Activity Modal -->
+<SuggestActivityModal
+  show={showSuggestModal}
+  tripId={data.trip.id}
+  totalDays={tripLengthDays}
+  onClose={closeSuggestModal}
+  actionData={form}
+/>

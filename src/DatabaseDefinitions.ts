@@ -392,6 +392,79 @@ export interface Database {
           },
         ]
       }
+      activity_suggestions: {
+        Row: {
+          id: string
+          trip_id: string
+          user_id: string
+          day_index: number
+          time_slot: string
+          activity_name: string
+          activity_description: string | null
+          estimated_cost: number | null
+          location: string | null
+          reason: string | null
+          status: string
+          reviewed_by: string | null
+          reviewed_at: string | null
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          trip_id: string
+          user_id: string
+          day_index: number
+          time_slot: string
+          activity_name: string
+          activity_description?: string | null
+          estimated_cost?: number | null
+          location?: string | null
+          reason?: string | null
+          status?: string
+          reviewed_by?: string | null
+          reviewed_at?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          trip_id?: string
+          user_id?: string
+          day_index?: number
+          time_slot?: string
+          activity_name?: string
+          activity_description?: string | null
+          estimated_cost?: number | null
+          location?: string | null
+          reason?: string | null
+          status?: string
+          reviewed_by?: string | null
+          reviewed_at?: string | null
+          created_at?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "activity_suggestions_trip_id_fkey"
+            columns: ["trip_id"]
+            referencedRelation: "trips"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "activity_suggestions_user_id_fkey"
+            columns: ["user_id"]
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "activity_suggestions_reviewed_by_fkey"
+            columns: ["reviewed_by"]
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never

@@ -82,6 +82,30 @@ export const load: PageServerLoad = async ({
     console.error("Error loading user feedback:", userFeedbackError)
   }
 
+  // Load activity suggestions for this trip
+  const { data: suggestions, error: suggestionsError } = await supabase
+    .from("activity_suggestions")
+    .select("*")
+    .eq("trip_id", trip_id)
+    .order("created_at", { ascending: false })
+
+  if (suggestionsError) {
+    console.error("Error loading suggestions:", suggestionsError)
+  }
+
+  // Load user profiles for suggestions
+  const suggestionUserIds = suggestions?.map(s => s.user_id) || []
+  const { data: suggestionProfiles } = await supabase
+    .from("profiles")
+    .select("id, full_name")
+    .in("id", suggestionUserIds)
+
+  // Attach profiles to suggestions
+  const suggestionsWithProfiles = suggestions?.map(s => ({
+    ...s,
+    user_name: suggestionProfiles?.find(p => p.id === s.user_id)?.full_name || "Unknown"
+  })) || []
+
   return {
     trip,
     itinerary,
@@ -90,6 +114,7 @@ export const load: PageServerLoad = async ({
     userId: session.user.id,
     feedback: feedback || [],
     userFeedback: userFeedback || [],
+    suggestions: suggestionsWithProfiles,
   }
 }
 
@@ -241,5 +266,165 @@ export const actions: Actions = {
     }
 
     return { success: true }
+  },
+
+  suggestActivity: async ({ request, params, locals: { supabase, session } }) => {
+    if (!session) {
+      return fail(401, { error: "Unauthorized", action: "suggestActivity" })
+    }
+
+    const { trip_id } = params
+    const formData = await request.formData()
+    const dayIndex = parseInt(formData.get("dayIndex") as string)
+    const timeSlot = formData.get("timeSlot") as string
+    const activityName = formData.get("activityName") as string
+    const activityDescription = formData.get("activityDescription") as string | null
+    const estimatedCostStr = formData.get("estimatedCost") as string
+    const estimatedCost = estimatedCostStr ? parseFloat(estimatedCostStr) : null
+    const location = formData.get("location") as string | null
+    const reason = formData.get("reason") as string | null
+
+    // Validate required fields
+    if (!activityName || !timeSlot || dayIndex < 0) {
+      return fail(400, { error: "Missing required fields", action: "suggestActivity" })
+    }
+
+    // Check if user is a member of this trip
+    const { data: membership, error: membershipError } = await supabase
+      .from("trip_members")
+      .select("role")
+      .eq("trip_id", trip_id)
+      .eq("user_id", session.user.id)
+      .single()
+
+    if (membershipError || !membership) {
+      return fail(403, { error: "You are not a member of this trip", action: "suggestActivity" })
+    }
+
+    // Check if trip is finalized (no suggestions allowed after finalization)
+    const { data: trip, error: tripError } = await supabase
+      .from("trips")
+      .select("status")
+      .eq("id", trip_id)
+      .single()
+
+    if (tripError || !trip) {
+      return fail(404, { error: "Trip not found", action: "suggestActivity" })
+    }
+
+    if (trip.status === "finalized") {
+      return fail(403, { error: "Cannot suggest activities on finalized trips", action: "suggestActivity" })
+    }
+
+    // Insert the suggestion
+    const { error: suggestionError } = await supabase
+      .from("activity_suggestions")
+      .insert({
+        trip_id: trip_id,
+        user_id: session.user.id,
+        day_index: dayIndex,
+        time_slot: timeSlot,
+        activity_name: activityName,
+        activity_description: activityDescription || null,
+        estimated_cost: estimatedCost,
+        location: location || null,
+        reason: reason || null,
+        status: "pending",
+      })
+
+    if (suggestionError) {
+      console.error("Error submitting suggestion:", suggestionError)
+      return fail(500, { error: "Failed to submit suggestion. Please try again.", action: "suggestActivity" })
+    }
+
+    return { success: true, action: "suggestActivity" }
+  },
+
+  acceptSuggestion: async ({ request, params, locals: { supabase, session } }) => {
+    if (!session) {
+      return fail(401, { error: "Unauthorized", action: "acceptSuggestion" })
+    }
+
+    const { trip_id } = params
+    const formData = await request.formData()
+    const suggestionId = formData.get("suggestionId") as string
+
+    // Check if user is the organizer
+    const { data: membership, error: membershipError } = await supabase
+      .from("trip_members")
+      .select("role")
+      .eq("trip_id", trip_id)
+      .eq("user_id", session.user.id)
+      .single()
+
+    if (membershipError || !membership) {
+      return fail(403, { error: "You are not a member of this trip", action: "acceptSuggestion" })
+    }
+
+    if (membership.role !== "organizer") {
+      return fail(403, { error: "Only the organizer can review suggestions", action: "acceptSuggestion" })
+    }
+
+    // Update suggestion status
+    const { error: updateError } = await supabase
+      .from("activity_suggestions")
+      .update({
+        status: "accepted",
+        reviewed_by: session.user.id,
+        reviewed_at: new Date().toISOString(),
+      })
+      .eq("id", suggestionId)
+      .eq("trip_id", trip_id)
+
+    if (updateError) {
+      console.error("Error accepting suggestion:", updateError)
+      return fail(500, { error: "Failed to accept suggestion. Please try again.", action: "acceptSuggestion" })
+    }
+
+    return { success: true, action: "acceptSuggestion" }
+  },
+
+  rejectSuggestion: async ({ request, params, locals: { supabase, session } }) => {
+    if (!session) {
+      return fail(401, { error: "Unauthorized", action: "rejectSuggestion" })
+    }
+
+    const { trip_id } = params
+    const formData = await request.formData()
+    const suggestionId = formData.get("suggestionId") as string
+
+    // Check if user is the organizer
+    const { data: membership, error: membershipError } = await supabase
+      .from("trip_members")
+      .select("role")
+      .eq("trip_id", trip_id)
+      .eq("user_id", session.user.id)
+      .single()
+
+    if (membershipError || !membership) {
+      return fail(403, { error: "You are not a member of this trip", action: "rejectSuggestion" })
+    }
+
+    if (membership.role !== "organizer") {
+      return fail(403, { error: "Only the organizer can review suggestions", action: "rejectSuggestion" })
+    }
+
+    // Update suggestion status
+    const { error: updateError } = await supabase
+      .from("activity_suggestions")
+      .update({
+        status: "rejected",
+        reviewed_by: session.user.id,
+        reviewed_at: new Date().toISOString(),
+      })
+      .eq("id", suggestionId)
+      .eq("trip_id", trip_id)
+
+    if (updateError) {
+      console.error("Error rejecting suggestion:", updateError)
+      return fail(500, { error: "Failed to reject suggestion. Please try again.", action: "rejectSuggestion" })
+    }
+
+    return { success: true, action: "rejectSuggestion" }
   },
 }

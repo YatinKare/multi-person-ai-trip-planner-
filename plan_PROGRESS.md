@@ -442,7 +442,7 @@ IN_PROGRESS
   - Store feedback in database (add `itinerary_feedback` table in Phase 1)
   - Show feedback count to organizer
 
-- [ ] **Task 8.5**: Implement activity suggestions (P1 - Should Have)
+- [x] **Task 8.5**: Implement activity suggestions (P1 - Should Have)
   - Add "Suggest Activity" button
   - Modal form: select day, select time slot, enter activity idea
   - Store suggestions in database
@@ -2832,13 +2832,135 @@ Tasks 8.4-8.7 will add feedback, suggestions, regeneration, and finalization fea
 - ✅ Progressive enhancement: Works with or without JavaScript
 - ✅ Accessibility: Modal follows DaisyUI patterns with proper ARIA labels
 
-**Phase 8 Progress:** 5 of 7 tasks complete ✅
+**Phase 8 Progress:** 6 of 7 tasks complete ✅
 - Task 8.1: Implement itinerary generation trigger ✅
 - Task 8.2: Convert "Finalized Trip Itinerary" mockup to Svelte ✅
 - Task 8.3: Implement itinerary activity cards ✅
 - Task 8.4: Implement activity feedback system (P1) ✅
-- Task 8.5: Implement activity suggestions (P1 - Next)
-- Task 8.6: Implement itinerary regeneration (P1)
+- Task 8.5: Implement activity suggestions (P1) ✅
+- Task 8.6: Implement itinerary regeneration (P1 - Next)
 - Task 8.7: Implement itinerary finalization ✅
 
-**Next Task:** Task 8.5 (Implement activity suggestions - P1 Should Have)
+**Next Task:** Task 8.6 (Implement itinerary regeneration - P1 Should Have)
+
+---
+
+## Completed This Iteration (Ralph Run - Task 8.5)
+
+**Summary:** Completed Task 8.5 (Implement activity suggestions)
+
+### Task 8.5: Implement Activity Suggestions (COMPLETE)
+
+- ✅ **Database Migration (supabase/migrations/20260131080000_create_activity_suggestions.sql):**
+  - Created `activity_suggestions` table with comprehensive fields:
+    - Core fields: trip_id, user_id, day_index, time_slot, activity_name
+    - Optional details: activity_description, estimated_cost, location, reason
+    - Review tracking: status (pending/accepted/rejected), reviewed_by, reviewed_at
+    - Timestamps: created_at, updated_at
+  - Constraints: time_slot CHECK (morning/afternoon/evening), status CHECK
+  - Indexes: trip_id, user_id, status for efficient querying
+  - **Row Level Security (RLS) Policies:**
+    - Members can view all suggestions for their trips
+    - Members can create their own suggestions
+    - Users can update/delete their own pending suggestions
+    - Organizers can review (update status) all suggestions
+  - Update trigger for updated_at timestamp
+
+- ✅ **TypeScript Types (src/DatabaseDefinitions.ts):**
+  - Added activity_suggestions table definition with Row, Insert, Update types
+  - Proper relationships to trips and profiles (user_id and reviewed_by)
+  - All fields typed correctly (number for numeric, string for text, etc.)
+
+- ✅ **SuggestActivityModal Component (src/lib/components/SuggestActivityModal.svelte):**
+  - **Modal Form Fields:**
+    - Day selector: dropdown showing "Day 1", "Day 2", etc. based on trip length
+    - Time slot selector: radio buttons for morning/afternoon/evening with icons
+    - Activity name: required text input (max 200 chars)
+    - Description: optional textarea (max 500 chars)
+    - Location: optional text input (max 200 chars)
+    - Estimated cost: optional number input with dollar sign prefix
+    - Reason: optional textarea explaining why suggesting (max 300 chars)
+  - **UI/UX Features:**
+    - Modal opens/closes with state management
+    - Form validation: required fields enforced
+    - Submit button disabled when form invalid
+    - Loading state during submission with spinner
+    - Success/error alerts shown based on action result
+    - Modal closes automatically on successful submission
+    - Progressive enhancement with SvelteKit's use:enhance
+  - **Styling:**
+    - DaisyUI components throughout
+    - Material Symbols Outlined icons for time slots
+    - Primary color for modal header and submit button
+    - Responsive grid layout for location/cost fields
+
+- ✅ **Server Actions (src/routes/(admin)/trips/[trip_id]/itinerary/+page.server.ts):**
+  - **suggestActivity Action:**
+    - Validates user authentication and trip membership
+    - Validates required fields (day_index, time_slot, activity_name)
+    - Checks trip is not finalized (403 error if finalized)
+    - Inserts suggestion with status 'pending'
+    - Returns success/error with action identifier for form handling
+  - **acceptSuggestion Action:**
+    - Organizer-only (403 if not organizer)
+    - Updates suggestion status to 'accepted'
+    - Sets reviewed_by and reviewed_at
+  - **rejectSuggestion Action:**
+    - Organizer-only (403 if not organizer)
+    - Updates suggestion status to 'rejected'
+    - Sets reviewed_by and reviewed_at
+  - **Load Function Update:**
+    - Loads all suggestions for the trip
+    - Loads user profiles for suggestion authors
+    - Attaches user names to suggestions for display
+
+- ✅ **Suggest Activity Button (src/routes/(admin)/trips/[trip_id]/itinerary/+page.svelte):**
+  - Added "Suggest Activity" button in header action area
+  - Visible to all members (not just organizers)
+  - Hidden when trip is finalized
+  - Opens SuggestActivityModal on click
+  - Primary color styling with add_circle icon
+
+- ✅ **Organizer Review Interface (src/routes/(admin)/trips/[trip_id]/itinerary/+page.svelte):**
+  - **Suggestions Section:**
+    - Displayed before day-by-day itinerary
+    - Only visible to organizers
+    - Shows count of pending suggestions in header
+    - Card layout with primary border for prominence
+  - **Suggestion Cards:**
+    - Badge showing day and time slot
+    - Suggester name displayed
+    - Activity name as bold heading
+    - Optional description, location, cost shown
+    - Reason for suggestion displayed in separate box
+  - **Review Actions:**
+    - Accept button (green/success) with check icon
+    - Reject button (red/error) with close icon
+    - Both use form actions with progressive enhancement
+  - **Filtering:**
+    - Only shows pending suggestions (accepted/rejected hidden)
+    - Ordered by creation date (newest first)
+
+- ✅ **Testing & Validation:**
+  - TypeScript type check passes (0 errors)
+  - Build succeeds without errors
+  - All functionality implemented per task requirements
+  - RLS policies ensure proper data access control
+
+**Files Modified:**
+- `supabase/migrations/20260131080000_create_activity_suggestions.sql` (new)
+- `src/DatabaseDefinitions.ts` (updated)
+- `src/lib/components/SuggestActivityModal.svelte` (new)
+- `src/routes/(admin)/trips/[trip_id]/itinerary/+page.server.ts` (updated)
+- `src/routes/(admin)/trips/[trip_id]/itinerary/+page.svelte` (updated)
+
+**User Flow:**
+1. Member views itinerary and clicks "Suggest Activity" button
+2. Modal opens with form to enter activity details
+3. Member fills out day, time slot, activity name (required) and optional fields
+4. On submit, suggestion stored in database with 'pending' status
+5. Organizer sees pending suggestions in special section above itinerary
+6. Organizer can review each suggestion and accept or reject it
+7. Status updates to 'accepted' or 'rejected' with timestamp
+
+**Result:** Activity suggestions feature is fully functional and ready for use. Members can now propose alternative activities, and organizers have a dedicated interface to review and manage these suggestions.
