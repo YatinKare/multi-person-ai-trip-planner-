@@ -285,6 +285,68 @@
   function dismissItineraryError() {
     itineraryError = null
   }
+
+  // Nudge state
+  let nudgingMembers = $state<Set<string>>(new Set())
+  let nudgeSuccess = $state<string | null>(null)
+  let nudgeError = $state<string | null>(null)
+
+  // Check if member can be nudged (24 hour throttle)
+  function canNudgeMember(member: any): boolean {
+    if (!member.nudged_at) return true
+
+    const lastNudged = new Date(member.nudged_at)
+    const now = new Date()
+    const hoursSinceLastNudge = (now.getTime() - lastNudged.getTime()) / (1000 * 60 * 60)
+
+    return hoursSinceLastNudge >= 24
+  }
+
+  // Nudge a member
+  async function nudgeMember(memberUserId: string) {
+    if (nudgingMembers.has(memberUserId)) return
+
+    nudgingMembers = new Set(nudgingMembers).add(memberUserId)
+    nudgeError = null
+    nudgeSuccess = null
+
+    try {
+      const formData = new FormData()
+      formData.append('member_user_id', memberUserId)
+
+      const response = await fetch(`/trips/${data.trip.id}?/nudgeMember`, {
+        method: 'POST',
+        body: formData
+      })
+
+      const result = await response.json()
+
+      if (result.type === 'success') {
+        nudgeSuccess = result.data.message
+        // Refresh page to update nudged_at timestamp
+        setTimeout(() => {
+          window.location.reload()
+        }, 1500)
+      } else if (result.type === 'failure') {
+        nudgeError = result.data.message
+      } else {
+        nudgeError = 'Failed to send nudge. Please try again.'
+      }
+    } catch (err) {
+      console.error('Error nudging member:', err)
+      nudgeError = 'Network error. Please try again.'
+    } finally {
+      const newSet = new Set(nudgingMembers)
+      newSet.delete(memberUserId)
+      nudgingMembers = newSet
+    }
+  }
+
+  // Clear nudge messages
+  function dismissNudgeMessages() {
+    nudgeSuccess = null
+    nudgeError = null
+  }
 </script>
 
 <svelte:head>
@@ -472,6 +534,40 @@
           </button>
         {/if}
       </div>
+    </div>
+  {/if}
+
+  <!-- Nudge Success Banner -->
+  {#if nudgeSuccess}
+    <div role="alert" class="alert alert-success mb-8 shadow-lg">
+      <span class="material-symbols-outlined text-2xl">check_circle</span>
+      <div class="flex-1">
+        <h3 class="font-bold">Nudge Sent!</h3>
+        <div class="text-sm mt-1">{nudgeSuccess}</div>
+      </div>
+      <button
+        class="btn btn-sm btn-ghost"
+        onclick={dismissNudgeMessages}
+      >
+        Dismiss
+      </button>
+    </div>
+  {/if}
+
+  <!-- Nudge Error Banner -->
+  {#if nudgeError}
+    <div role="alert" class="alert alert-error mb-8 shadow-lg">
+      <span class="material-symbols-outlined text-2xl">error</span>
+      <div class="flex-1">
+        <h3 class="font-bold">Failed to Send Nudge</h3>
+        <div class="text-sm mt-1">{nudgeError}</div>
+      </div>
+      <button
+        class="btn btn-sm btn-ghost"
+        onclick={dismissNudgeMessages}
+      >
+        Dismiss
+      </button>
     </div>
   {/if}
 
@@ -786,12 +882,27 @@
                   {#if isOrganizer}
                     <td class="text-right">
                       {#if !member.has_responded && member.user_id !== data.userId}
-                        <button class="btn btn-xs btn-neutral gap-1">
-                          <span class="material-symbols-outlined text-[14px]"
-                            >notifications_active</span
+                        {#if member.nudged_at && !canNudgeMember(member)}
+                          <span class="text-xs text-base-content/60">
+                            Nudged {getRelativeTime(member.nudged_at)}
+                          </span>
+                        {:else}
+                          <button
+                            class="btn btn-xs btn-neutral gap-1"
+                            onclick={() => nudgeMember(member.user_id)}
+                            disabled={nudgingMembers.has(member.user_id)}
                           >
-                          Nudge
-                        </button>
+                            {#if nudgingMembers.has(member.user_id)}
+                              <span class="loading loading-spinner loading-xs"></span>
+                              Sending...
+                            {:else}
+                              <span class="material-symbols-outlined text-[14px]"
+                                >notifications_active</span
+                              >
+                              {member.nudged_at ? 'Nudge Again' : 'Nudge'}
+                            {/if}
+                          </button>
+                        {/if}
                       {:else}
                         <span class="text-base-content/40">-</span>
                       {/if}

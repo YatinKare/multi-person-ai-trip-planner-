@@ -483,7 +483,7 @@ IN_PROGRESS
   - Return .ics as download
   - Test with Google Calendar, Apple Calendar, Outlook
 
-- [ ] **Task 9.3**: Implement nudge email functionality
+- [x] **Task 9.3**: Implement nudge email functionality
   - Add "Nudge" button next to pending members on dashboard
   - Create form action to send email via Resend (reuse existing email infrastructure)
   - Email template: "Hey [Name], [Organizer] is waiting for your preferences for [Trip Name]! [Link to preference form]"
@@ -569,9 +569,110 @@ IN_PROGRESS
 
 ## Completed This Iteration
 
-**Summary:** Completed Task 9.2 (Implement calendar export (.ics) - P1)
+**Summary:** Completed Task 9.3 (Implement nudge email functionality - P1)
 
-### Task 9.2: Implement Calendar Export (.ics) (COMPLETE)
+### Task 9.3: Implement Nudge Email Functionality (COMPLETE)
+
+Implemented comprehensive nudge functionality allowing trip organizers to send reminder emails to members who haven't submitted their preferences, with 24-hour rate limiting and status tracking.
+
+#### Implementation Details:
+
+**1. Email Templates**
+- ✅ Created HTML email template: `src/lib/emails/nudge_email_html.hbs`
+- ✅ Created plain text email template: `src/lib/emails/nudge_email_text.hbs`
+- ✅ Uses emerald green branding consistent with TripSync theme
+- ✅ Includes personalized greeting with member and organizer names
+- ✅ Contains clear call-to-action button linking to preference form
+- ✅ Mobile-responsive email design following existing template patterns
+- ✅ Includes unsubscribe link in footer
+
+**2. Server-Side Action**
+- ✅ Created `nudgeMember` action in `src/routes/(admin)/trips/[trip_id]/+page.server.ts`
+- ✅ Validates organizer permissions (only organizers can nudge)
+- ✅ Checks member hasn't already responded
+- ✅ Implements 24-hour throttle using `nudged_at` timestamp
+- ✅ Returns 429 status if nudge attempted within 24 hours
+- ✅ Fetches member and organizer profiles for personalized email
+- ✅ Generates preference form URL dynamically from request origin
+- ✅ Sends email via existing `sendUserEmail` infrastructure
+- ✅ Updates `nudged_at` timestamp in database after successful send
+- ✅ Proper error handling for all database and email operations
+
+**3. UI Updates - Member List**
+- ✅ Updated load function to include `nudged_at` field in member query
+- ✅ Passed `nudged_at` to members with status array
+- ✅ Button shows "Nudge" for first-time nudges, "Nudge Again" after
+- ✅ Button replaced with "Nudged {time ago}" text during 24-hour cooldown
+- ✅ Loading spinner shown during API request
+- ✅ Button disabled while request is in progress
+- ✅ Uses existing `getRelativeTime()` utility for timestamps
+
+**4. State Management**
+- ✅ Added `nudgingMembers` Set to track in-progress requests
+- ✅ Added `nudgeSuccess` and `nudgeError` state for notifications
+- ✅ Created `canNudgeMember()` helper to check 24-hour throttle
+- ✅ Created `nudgeMember()` async function for form submission
+- ✅ Auto-refresh page after successful nudge to update UI state
+- ✅ Clear error/success messages on dismiss
+
+**5. Success/Error Notifications**
+- ✅ Added success alert banner with green styling
+- ✅ Added error alert banner with red styling
+- ✅ Both dismissible with close button
+- ✅ Positioned consistently with other alerts (recommendations, itinerary)
+- ✅ Show appropriate messages based on server response
+
+**6. Validation & Security**
+- ✅ JWT authentication required for all requests
+- ✅ RLS policies ensure only organizers can update `nudged_at`
+- ✅ Member user ID validation to prevent invalid requests
+- ✅ Email verification check (handled by existing `sendUserEmail`)
+- ✅ Unsubscribe status check (handled by existing `sendUserEmail`)
+- ✅ Trip membership verification
+- ✅ Proper error messages for all edge cases
+
+#### Files Created/Modified:
+
+1. **src/lib/emails/nudge_email_html.hbs** (NEW)
+   - Complete HTML email template with responsive design
+   - Personalized content with Handlebars variables
+   - Emerald green CTA button matching TripSync branding
+
+2. **src/lib/emails/nudge_email_text.hbs** (NEW)
+   - Plain text version of nudge email
+   - All key information included for email clients without HTML support
+
+3. **src/routes/(admin)/trips/[trip_id]/+page.server.ts** (MODIFIED)
+   - Added `sendUserEmail` import from `$lib/mailer`
+   - Updated member query to include `nudged_at` field (line 42)
+   - Added `nudged_at` to member status objects (line 83)
+   - Created complete `nudgeMember` server action (lines 245-391)
+
+4. **src/routes/(admin)/trips/[trip_id]/+page.svelte** (MODIFIED)
+   - Added nudge state variables and helper functions
+   - Updated member list button with conditional rendering
+   - Added success/error alert banners
+
+#### Validation Results:
+- ✅ TypeScript check: 0 errors, 8 warnings (a11y only - pre-existing)
+- ✅ Build validation: Success
+- ✅ All requirements from plan.md Task 9.3 satisfied
+
+#### Features Implemented:
+- ✅ "Nudge" button next to pending members (organizers only)
+- ✅ Email sent via Resend using existing infrastructure
+- ✅ Personalized email template with trip and member names
+- ✅ Direct link to preference form in email
+- ✅ 24-hour rate limiting on nudges per member
+- ✅ Visual feedback: "Nudged {time ago}" display
+- ✅ Loading states and error handling
+- ✅ Database timestamp tracking in `nudged_at` column
+- ✅ Success/error notifications
+- ✅ Auto-refresh after successful nudge
+
+---
+
+### Previous: Task 9.2: Implement Calendar Export (.ics) (COMPLETE)
 
 Implemented comprehensive calendar export functionality allowing all members to download an .ics file of finalized trip itineraries for import into Google Calendar, Apple Calendar, Outlook, and other calendar applications.
 

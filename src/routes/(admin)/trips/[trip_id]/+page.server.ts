@@ -1,6 +1,7 @@
 import { error, redirect, fail } from "@sveltejs/kit"
 import type { PageServerLoad, Actions } from "./$types"
 import { aggregatePreferences } from "$lib/server/aggregatePreferences"
+import { sendUserEmail } from "$lib/mailer"
 
 export const load: PageServerLoad = async ({
   params,
@@ -38,7 +39,7 @@ export const load: PageServerLoad = async ({
   // Load all trip members
   const { data: members, error: membersError } = await supabase
     .from("trip_members")
-    .select("user_id, role, joined_at")
+    .select("user_id, role, joined_at, nudged_at")
     .eq("trip_id", trip_id)
     .order("joined_at", { ascending: true })
 
@@ -78,6 +79,7 @@ export const load: PageServerLoad = async ({
       user_id: member.user_id,
       role: member.role,
       joined_at: member.joined_at,
+      nudged_at: member.nudged_at,
       profile: profile || null,
       has_responded: hasResponded,
     }
@@ -239,5 +241,150 @@ export const actions: Actions = {
 
     // Redirect to trips list page
     throw redirect(303, "/trips")
+  },
+
+  nudgeMember: async ({ request, params, locals: { supabase, session }, url }) => {
+    if (!session) {
+      return fail(401, { message: "Unauthorized" })
+    }
+
+    const { trip_id } = params
+    const formData = await request.formData()
+    const memberUserId = formData.get("member_user_id") as string
+
+    if (!memberUserId) {
+      return fail(400, { message: "Member user ID is required" })
+    }
+
+    // Verify requesting user is the organizer
+    const { data: membership, error: membershipError } = await supabase
+      .from("trip_members")
+      .select("role")
+      .eq("trip_id", trip_id)
+      .eq("user_id", session.user.id)
+      .single()
+
+    if (membershipError || !membership) {
+      return fail(403, { message: "You are not a member of this trip" })
+    }
+
+    if (membership.role !== "organizer") {
+      return fail(403, { message: "Only organizers can nudge members" })
+    }
+
+    // Get trip details
+    const { data: trip, error: tripError } = await supabase
+      .from("trips")
+      .select("name")
+      .eq("id", trip_id)
+      .single()
+
+    if (tripError || !trip) {
+      return fail(404, { message: "Trip not found" })
+    }
+
+    // Get member details and check if they've responded
+    const { data: targetMember, error: targetMemberError } = await supabase
+      .from("trip_members")
+      .select("nudged_at")
+      .eq("trip_id", trip_id)
+      .eq("user_id", memberUserId)
+      .single()
+
+    if (targetMemberError || !targetMember) {
+      return fail(404, { message: "Member not found" })
+    }
+
+    // Check 24-hour throttle
+    if (targetMember.nudged_at) {
+      const lastNudged = new Date(targetMember.nudged_at)
+      const now = new Date()
+      const hoursSinceLastNudge = (now.getTime() - lastNudged.getTime()) / (1000 * 60 * 60)
+
+      if (hoursSinceLastNudge < 24) {
+        return fail(429, {
+          message: "You can only nudge a member once every 24 hours",
+          nudged_at: targetMember.nudged_at
+        })
+      }
+    }
+
+    // Check if member has already responded
+    const { data: preferences, error: preferencesError } = await supabase
+      .from("preferences")
+      .select("id")
+      .eq("trip_id", trip_id)
+      .eq("user_id", memberUserId)
+      .single()
+
+    if (preferences) {
+      return fail(400, { message: "This member has already submitted their preferences" })
+    }
+
+    // Get member's user data for email
+    const { data: memberUserData, error: memberUserError } = await supabase.auth.admin.getUserById(memberUserId)
+
+    if (memberUserError || !memberUserData.user) {
+      return fail(404, { message: "Member user not found" })
+    }
+
+    // Get member's profile
+    const { data: memberProfile, error: memberProfileError } = await supabase
+      .from("profiles")
+      .select("full_name")
+      .eq("id", memberUserId)
+      .single()
+
+    if (memberProfileError) {
+      return fail(404, { message: "Member profile not found" })
+    }
+
+    // Get organizer's profile
+    const { data: organizerProfile, error: organizerProfileError } = await supabase
+      .from("profiles")
+      .select("full_name")
+      .eq("id", session.user.id)
+      .single()
+
+    if (organizerProfileError) {
+      return fail(404, { message: "Organizer profile not found" })
+    }
+
+    // Send nudge email
+    const websiteUrl = url.origin
+    const preferencesUrl = `${websiteUrl}/trips/${trip_id}/preferences`
+
+    try {
+      await sendUserEmail({
+        user: memberUserData.user,
+        subject: `${organizerProfile.full_name} is waiting for your preferences for ${trip.name}`,
+        from_email: "TripSync <noreply@tripsync.com>",
+        template_name: "nudge_email",
+        template_properties: {
+          memberName: memberProfile.full_name || "there",
+          organizerName: organizerProfile.full_name || "Your trip organizer",
+          tripName: trip.name,
+          preferencesUrl: preferencesUrl,
+          WebsiteBaseUrl: websiteUrl,
+        },
+      })
+    } catch (emailError) {
+      console.error("Error sending nudge email:", emailError)
+      return fail(500, { message: "Failed to send nudge email. Please try again." })
+    }
+
+    // Update nudged_at timestamp
+    const { error: updateError } = await supabase
+      .from("trip_members")
+      .update({ nudged_at: new Date().toISOString() })
+      .eq("trip_id", trip_id)
+      .eq("user_id", memberUserId)
+
+    if (updateError) {
+      console.error("Error updating nudged_at:", updateError)
+      return fail(500, { message: "Failed to update nudge timestamp. Please try again." })
+    }
+
+    return { success: true, message: "Nudge sent successfully!" }
   },
 }
