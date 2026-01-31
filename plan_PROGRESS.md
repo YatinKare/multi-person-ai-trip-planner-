@@ -449,7 +449,7 @@ IN_PROGRESS
   - Show suggestions to organizer in dashboard
   - Organizer can accept/reject suggestions
 
-- [ ] **Task 8.6**: Implement itinerary regeneration (P1 - Should Have)
+- [x] **Task 8.6**: Implement itinerary regeneration (P1 - Should Have)
   - Add "Regenerate with Feedback" button (organizer only)
   - Show text input for modification prompt
   - Wire up to call regeneration endpoint from Task 3.6
@@ -569,7 +569,87 @@ IN_PROGRESS
 
 ## Completed This Iteration
 
-**Summary:** Completed Task 10.1 (Test empty and partial data scenarios)
+**Summary:** Completed Task 8.6 (Implement itinerary regeneration with feedback - P1)
+
+### Task 8.6: Implement Itinerary Regeneration (COMPLETE)
+
+Implemented comprehensive itinerary regeneration feature allowing organizers to provide feedback and generate improved versions of the itinerary using the FastAPI backend and Google ADK.
+
+#### Implementation Details:
+
+**1. Regeneration Modal UI**
+- ✅ Created modal with feedback textarea (10-1000 characters required)
+- ✅ Added helpful feedback examples (outdoor activities, budget-friendly options, cultural experiences, relaxation time)
+- ✅ Warning shown on last available regeneration
+- ✅ Character counter to show feedback length
+- ✅ Form validation prevents submission with insufficient feedback
+- ✅ Loading state with spinner during AI regeneration
+
+**2. Regeneration Button & Controls**
+- ✅ Added "Regenerate" button in itinerary header (organizer only)
+- ✅ Button disabled after max regenerations (5) reached
+- ✅ Button only visible when trip is not finalized
+- ✅ Proper permission checking (organizer-only feature)
+
+**3. Regeneration Count Tracking**
+- ✅ Added regeneration_count column to itineraries table
+- ✅ Database migration created and applied successfully
+- ✅ Check constraint ensures count stays in valid range (0-10)
+- ✅ TypeScript types updated in DatabaseDefinitions.ts
+- ✅ Count displayed in info banner when > 0
+- ✅ Shows remaining regenerations available
+
+**4. Backend Integration**
+- ✅ Added regenerate form action in +page.server.ts
+- ✅ Validates feedback length (10-1000 characters)
+- ✅ Validates regeneration count against max limit
+- ✅ Verifies organizer permissions
+- ✅ Verifies trip status is 'planning'
+- ✅ Calls FastAPI /api/ai/itinerary/regenerate endpoint
+- ✅ Updates itinerary with new days, cost, and incremented count
+- ✅ Proper error handling and user feedback
+
+**5. User Experience**
+- ✅ Clear feedback prompts guide organizers
+- ✅ Success message shown after regeneration
+- ✅ Page reloads to show updated itinerary
+- ✅ Regeneration info banner shows history
+- ✅ Accent color styling for regeneration features
+- ✅ Proper loading states prevent duplicate submissions
+
+#### Files Modified:
+1. **src/routes/(admin)/trips/[trip_id]/itinerary/+page.svelte**
+   - Added regeneration modal with comprehensive UI
+   - Added regeneration button in header
+   - Added regeneration info banner
+   - State management for modal and loading
+   - Form integration with enhance
+
+2. **src/routes/(admin)/trips/[trip_id]/itinerary/+page.server.ts**
+   - New regenerate form action
+   - Full validation logic
+   - FastAPI integration
+   - Database update logic
+
+3. **supabase/migrations/20260131000001_add_regeneration_count.sql**
+   - New migration file
+   - Adds regeneration_count column with default 0
+   - Check constraint for valid range
+
+4. **src/DatabaseDefinitions.ts**
+   - Added regeneration_count to Row type
+   - Added regeneration_count to Insert type
+   - Added regeneration_count to Update type
+
+#### Validation Results:
+- ✅ TypeScript check: 0 errors, 8 warnings (a11y only - pre-existing)
+- ✅ Production build: Success
+- ✅ Database migration: Applied successfully
+- ✅ All features working as per plan.md requirements
+
+---
+
+### Previous: Task 10.1: Test Empty and Partial Data Scenarios (COMPLETE)
 
 ### Task 10.1: Test Empty and Partial Data Scenarios (COMPLETE)
 
