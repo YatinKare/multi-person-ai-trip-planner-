@@ -169,6 +169,104 @@
   function dismissError() {
     recommendationError = null
   }
+
+  // Generate itinerary via FastAPI backend
+  async function generateItinerary() {
+    if (!data.selectedDestination || generatingItinerary) return
+
+    generatingItinerary = true
+    itineraryError = null // Clear previous errors
+    itineraryRetryAttempt++
+
+    try {
+      // Get the Supabase session token
+      const {
+        data: { session },
+      } = await data.supabase.auth.getSession()
+
+      if (!session) {
+        itineraryError = "Your session has expired. Please refresh the page and try again."
+        return
+      }
+
+      // Call FastAPI backend with timeout
+      const controller = new AbortController()
+      const timeoutId = setTimeout(() => controller.abort(), 120000) // 2 minute timeout
+
+      const response = await fetch(
+        `http://localhost:8000/api/ai/itinerary/generate`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${session.access_token}`,
+          },
+          body: JSON.stringify({
+            trip_id: data.trip.id,
+            destination_name: data.selectedDestination.destination_name,
+          }),
+          signal: controller.signal,
+        },
+      )
+
+      clearTimeout(timeoutId)
+
+      if (!response.ok) {
+        const error = await response.json().catch(() => ({}))
+
+        // Provide more specific error messages based on status code
+        if (response.status === 400) {
+          throw new Error(error.detail || "Invalid trip status. Trip must be in 'planning' status with a destination selected.")
+        } else if (response.status === 403) {
+          throw new Error("You don't have permission to generate an itinerary for this trip.")
+        } else if (response.status === 404) {
+          throw new Error("Trip not found. Please refresh the page.")
+        } else if (response.status === 500) {
+          throw new Error(error.detail || "AI service error. This could be due to conflicting preferences or temporary service issues.")
+        } else {
+          throw new Error(error.detail || "Failed to generate itinerary. Please try again.")
+        }
+      }
+
+      const result = await response.json()
+
+      // Check if we got valid itinerary
+      if (!result.days || result.days.length === 0) {
+        throw new Error("No itinerary could be generated. Please try again.")
+      }
+
+      // Success - redirect to itinerary page
+      window.location.href = `/trips/${data.trip.id}/itinerary`
+    } catch (err) {
+      console.error("Error generating itinerary:", err)
+
+      if (err instanceof Error) {
+        if (err.name === 'AbortError') {
+          itineraryError = "Request timed out. The AI is taking longer than expected. Please try again."
+        } else if (err.message.includes('fetch')) {
+          itineraryError = "Network error. Please check your connection and try again."
+        } else {
+          itineraryError = err.message
+        }
+      } else {
+        itineraryError = "An unexpected error occurred. Please try again."
+      }
+
+      // Log detailed error for debugging
+      console.error("Generation attempt:", itineraryRetryAttempt, "Error:", err)
+    } finally {
+      generatingItinerary = false
+    }
+  }
+
+  let generatingItinerary = $state(false)
+  let itineraryError = $state<string | null>(null)
+  let itineraryRetryAttempt = $state(0)
+
+  // Clear itinerary error when user dismisses
+  function dismissItineraryError() {
+    itineraryError = null
+  }
 </script>
 
 <svelte:head>
@@ -327,6 +425,38 @@
     </div>
   {/if}
 
+  {#if itineraryError}
+    <div role="alert" class="alert alert-error mb-8 shadow-lg">
+      <span class="material-symbols-outlined text-2xl">error</span>
+      <div class="flex-1">
+        <h3 class="font-bold">Failed to Generate Itinerary</h3>
+        <div class="text-sm mt-1">{itineraryError}</div>
+      </div>
+      <div class="flex gap-2">
+        <button
+          class="btn btn-sm btn-ghost"
+          onclick={dismissItineraryError}
+        >
+          Dismiss
+        </button>
+        {#if isOrganizer && data.selectedDestination}
+          <button
+            class="btn btn-sm btn-primary"
+            onclick={() => generateItinerary()}
+            disabled={generatingItinerary}
+          >
+            {#if generatingItinerary}
+              <span class="loading loading-spinner loading-xs"></span>
+            {:else}
+              <span class="material-symbols-outlined text-sm">refresh</span>
+            {/if}
+            Retry
+          </button>
+        {/if}
+      </div>
+    </div>
+  {/if}
+
   <!-- Invite Action Card -->
   {#if isOrganizer}
     <div
@@ -458,9 +588,18 @@
                   Ready to create your itinerary?
                 </span>
               </div>
-              <button class="btn btn-primary gap-2">
-                <span class="material-symbols-outlined">auto_awesome</span>
-                Generate Itinerary
+              <button
+                class="btn btn-primary gap-2"
+                disabled={generatingItinerary}
+                onclick={() => generateItinerary()}
+              >
+                {#if generatingItinerary}
+                  <span class="loading loading-spinner loading-sm"></span>
+                  Generating...
+                {:else}
+                  <span class="material-symbols-outlined">auto_awesome</span>
+                  Generate Itinerary
+                {/if}
               </button>
             </div>
           </div>

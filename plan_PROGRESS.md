@@ -411,7 +411,7 @@ IN_PROGRESS
 
 ### Phase 8: Itinerary Generation & Display (P0 - Final Output)
 
-- [ ] **Task 8.1**: Implement itinerary generation trigger
+- [x] **Task 8.1**: Implement itinerary generation trigger
   - Add "Generate Itinerary" button on trip dashboard (visible after destination selected)
   - Show only to organizers
   - Wire up to call FastAPI endpoint from Task 3.5
@@ -419,7 +419,7 @@ IN_PROGRESS
   - Redirect to itinerary view on success
   - Handle timeout (show error after 60 seconds, allow retry)
 
-- [ ] **Task 8.2**: Convert "Finalized Trip Itinerary" mockup to Svelte
+- [x] **Task 8.2**: Convert "Finalized Trip Itinerary" mockup to Svelte
   - Create route: `src/routes/(admin)/trips/[trip_id]/itinerary/+page.svelte`
   - Display day-by-day itinerary with timeline layout
   - Each day shows: date, morning/afternoon/evening activities
@@ -2370,3 +2370,121 @@ Implemented complete destination selection functionality that allows organizers 
 ### Next Steps:
 Task 7.3 will implement destination selection functionality for organizers.
 
+
+## Completed This Iteration
+
+**Task 8.1: Implement Itinerary Generation Trigger** ✅
+**Task 8.2: Convert "Finalized Trip Itinerary" mockup to Svelte** ✅
+
+### Summary
+Implemented complete itinerary generation functionality, allowing organizers to generate AI-powered day-by-day itineraries after selecting a destination. The implementation includes both the trigger mechanism and the display page.
+
+### Features Implemented:
+
+#### Task 8.1: Generation Trigger
+- ✅ Added "Generate Itinerary" button on trip dashboard (`src/routes/(admin)/trips/[trip_id]/+page.svelte`)
+  - Only visible when trip status is "planning" (destination selected)
+  - Only accessible to organizers
+  - Shows loading state during generation with spinner
+  - Disabled state during generation
+- ✅ Implemented `generateItinerary()` function to call FastAPI backend
+  - Calls `POST /api/ai/itinerary/generate` endpoint
+  - Sends trip_id and destination_name in request body
+  - Includes Supabase JWT token for authentication
+  - 2-minute timeout with abort controller
+  - Comprehensive error handling for all HTTP status codes
+- ✅ Added error alert display for itinerary generation failures
+  - Dismissible error banner with detailed error messages
+  - Retry button to regenerate after error
+  - Follows same pattern as recommendation error handling
+- ✅ Redirects to itinerary display page on successful generation
+
+#### Task 8.2: Itinerary Display Page
+- ✅ Created route: `src/routes/(admin)/trips/[trip_id]/itinerary/+page.svelte`
+- ✅ Created server loader: `src/routes/(admin)/trips/[trip_id]/itinerary/+page.server.ts`
+  - Loads trip, itinerary, and member data
+  - Verifies user is trip member
+  - Returns 404 if no itinerary exists
+- ✅ Implemented comprehensive itinerary display UI:
+  - **Header Section:**
+    - Destination name as main heading
+    - Trip length badge (calculated from days array)
+    - Total cost badge (per person)
+    - Finalized status badge (if applicable)
+    - Back to Dashboard button
+    - Finalize Itinerary button (organizers only, if not finalized)
+  - **Summary Section:**
+    - Optional trip summary display (if provided by AI)
+  - **Day-by-Day Timeline:**
+    - Each day in collapsible card with day number, optional title, and date
+    - Activities grouped by time slot (morning/afternoon/evening)
+    - Timeline visualization with color-coded icons:
+      - Morning: yellow/warning (sun icon)
+      - Afternoon: primary (light mode icon)
+      - Evening: secondary (nightlight icon)
+    - **Activity Cards:**
+      - Activity name and description
+      - Location with optional clickable link
+      - Duration in hours
+      - Cost per person (prominently displayed)
+      - Category badge (optional)
+      - Tips section (if provided by AI)
+  - **Footer Summary:**
+    - Large total cost display
+    - Trip length summary
+- ✅ Mobile-responsive layout with proper spacing
+- ✅ All TypeScript types properly defined for itinerary data structures
+
+### Technical Implementation:
+
+**Frontend Integration:**
+- Pattern matches existing recommendations page implementation
+- Uses same authentication flow (Supabase session token)
+- Follows same error handling patterns
+- State management with Svelte 5 runes ($state, $derived)
+
+**Data Flow:**
+1. User (organizer) clicks "Generate Itinerary" button
+2. Frontend calls `/api/ai/itinerary/generate` with trip_id and destination_name
+3. Backend validates permissions and trip status
+4. Backend calls AI agent service to generate itinerary
+5. AI generates day-by-day activities with costs
+6. Backend stores itinerary in database
+7. Frontend redirects to itinerary display page
+8. Server loader fetches itinerary and renders timeline view
+
+**Type Safety:**
+- Proper TypeScript interfaces for Activity and DayItinerary
+- Handles optional fields (summary, location_url, tips, category)
+- Null checks for total_cost and other nullable fields
+- Type-safe JSONB parsing
+
+### Files Modified:
+1. `src/routes/(admin)/trips/[trip_id]/+page.svelte` (button handler + error handling)
+2. `src/routes/(admin)/trips/[trip_id]/itinerary/+page.svelte` (new file - display UI)
+3. `src/routes/(admin)/trips/[trip_id]/itinerary/+page.server.ts` (new file - data loader)
+4. `plan_PROGRESS.md` (marking tasks complete)
+
+### Testing:
+- ✅ TypeScript compilation: `npm run check` passes with 0 errors
+- ✅ Type safety: All types properly defined and used
+- ✅ Error handling: Comprehensive error states covered
+- ✅ Loading states: Spinner and disabled button during generation
+
+### Backend Already Complete:
+The backend implementation was already complete from Task 3.6:
+- FastAPI endpoint: `POST /api/ai/itinerary/generate`
+- AI agent: ItineraryDraftAgent, CostSanityAgent, ItineraryPolishAgent
+- Database storage: `itineraries` table with RLS policies
+- Pydantic models: GenerateItineraryRequest/Response
+
+### Notes:
+- Finalization functionality (Task 8.7) is stubbed with TODO comment
+- Export functionality (Tasks 9.1, 9.2) not yet implemented
+- Regeneration with feedback (Task 8.6) not yet implemented
+- Activity feedback system (Task 8.4) not yet implemented
+- Activity suggestions (Task 8.5) not yet implemented
+
+### Next Steps:
+Task 8.3 will implement detailed activity card components (already included in basic form).
+Tasks 8.4-8.7 will add feedback, suggestions, regeneration, and finalization features.
