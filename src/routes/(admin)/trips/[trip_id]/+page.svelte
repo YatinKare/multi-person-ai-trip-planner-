@@ -64,9 +64,26 @@
     }
   }
 
+  // Check if there are warnings before generating recommendations
+  function checkAndGenerateRecommendations() {
+    const hasWarnings =
+      data.responseCount < 2 ||
+      data.aggregated?.conflicts?.noDateOverlap ||
+      data.aggregated?.conflicts?.noBudgetOverlap
+
+    if (hasWarnings) {
+      showRecommendationWarningModal = true
+    } else {
+      generateRecommendations()
+    }
+  }
+
   // Generate recommendations via FastAPI backend
   async function generateRecommendations() {
     if (!canGenerateRecommendations || generatingRecommendations) return
+
+    // Close modal if it was open
+    showRecommendationWarningModal = false
 
     generatingRecommendations = true
     recommendationError = null // Clear previous errors
@@ -152,6 +169,7 @@
   let showCopySuccess = $state(false)
   let showDeleteModal = $state(false)
   let showLeaveModal = $state(false)
+  let showRecommendationWarningModal = $state(false)
   let isOrganizer = $derived(data.userRole === "organizer")
   let generatingRecommendations = $state(false)
   let recommendationError = $state<string | null>(null)
@@ -320,7 +338,7 @@
           <button
             class="btn btn-primary flex items-center gap-2 text-base-300 font-bold hover:shadow-[0_0_20px_rgba(19,236,182,0.3)]"
             disabled={!canGenerateRecommendations || generatingRecommendations}
-            onclick={() => generateRecommendations()}
+            onclick={() => checkAndGenerateRecommendations()}
           >
             {#if generatingRecommendations}
               <span class="loading loading-spinner loading-sm"></span>
@@ -455,6 +473,69 @@
         {/if}
       </div>
     </div>
+  {/if}
+
+  <!-- Edge Case Warning Banners -->
+  {#if data.trip.status === 'collecting' && data.totalMembers === 1 && isOrganizer}
+    <div role="alert" class="alert alert-warning mb-8 shadow-lg">
+      <span class="material-symbols-outlined text-2xl">group_add</span>
+      <div class="flex-1">
+        <h3 class="font-bold">You're Planning Solo!</h3>
+        <div class="text-sm mt-1">
+          You're the only member of this trip. Share the invite link below to collect preferences from your travel companions.
+        </div>
+      </div>
+    </div>
+  {/if}
+
+  {#if data.trip.status === 'collecting' && data.responseCount === 0 && data.totalMembers > 1 && isOrganizer}
+    <div role="alert" class="alert alert-info mb-8 shadow-lg">
+      <span class="material-symbols-outlined text-2xl">pending</span>
+      <div class="flex-1">
+        <h3 class="font-bold">Waiting for Responses</h3>
+        <div class="text-sm mt-1">
+          None of your {data.totalMembers - 1} invited members have submitted their preferences yet. You can still generate recommendations once at least one person responds.
+        </div>
+      </div>
+    </div>
+  {/if}
+
+  {#if data.aggregated?.conflicts && isOrganizer && !data.hasRecommendations}
+    {#if data.aggregated.conflicts.noDateOverlap}
+      <div role="alert" class="alert alert-warning mb-8 shadow-lg">
+        <span class="material-symbols-outlined text-2xl">event_busy</span>
+        <div class="flex-1">
+          <h3 class="font-bold">Date Conflict Detected</h3>
+          <div class="text-sm mt-1">
+            {data.aggregated.conflicts.details?.find(d => d.includes('date'))  || 'No overlapping dates between all members'}.
+            You may want to ask members to expand their date ranges, or proceed with a subset of the group.
+          </div>
+        </div>
+      </div>
+    {/if}
+    {#if data.aggregated.conflicts.noBudgetOverlap}
+      <div role="alert" class="alert alert-warning mb-8 shadow-lg">
+        <span class="material-symbols-outlined text-2xl">payments</span>
+        <div class="flex-1">
+          <h3 class="font-bold">Budget Conflict Detected</h3>
+          <div class="text-sm mt-1">
+            {data.aggregated.conflicts.details?.find(d => d.includes('budget') || d.includes('Budget')) || 'Budget ranges don\'t overlap between members'}.
+            Consider discussing budget expectations before generating recommendations.
+          </div>
+        </div>
+      </div>
+    {/if}
+    {#if data.aggregated.conflicts.noCommonVibes}
+      <div role="alert" class="alert alert-info mb-8 shadow-lg">
+        <span class="material-symbols-outlined text-2xl">explore</span>
+        <div class="flex-1">
+          <h3 class="font-bold">No Common Vibes</h3>
+          <div class="text-sm mt-1">
+            No vibes were selected by all members. The AI will try to find destinations that balance everyone's preferences.
+          </div>
+        </div>
+      </div>
+    {/if}
   {/if}
 
   <!-- Invite Action Card -->
@@ -753,3 +834,65 @@
   tripName={data.trip.name}
   tripId={data.trip.id}
 />
+
+<!-- Recommendation Warning Modal -->
+{#if showRecommendationWarningModal}
+  <div class="modal modal-open">
+    <div class="modal-box max-w-2xl">
+      <h3 class="font-bold text-lg flex items-center gap-2">
+        <span class="material-symbols-outlined text-warning">warning</span>
+        Proceed with Caution
+      </h3>
+      <div class="py-4 space-y-4">
+        <p class="text-base-content/80">
+          We detected some issues that may affect the quality of AI recommendations:
+        </p>
+        <ul class="list-disc list-inside space-y-2 text-sm">
+          {#if data.responseCount < 2}
+            <li class="text-warning">
+              <strong>Few Responses:</strong> Only {data.responseCount} member{data.responseCount === 1 ? ' has' : 's have'} submitted preferences. More responses will help the AI generate better recommendations.
+            </li>
+          {/if}
+          {#if data.aggregated?.conflicts?.noDateOverlap}
+            <li class="text-error">
+              <strong>Date Conflict:</strong> {data.aggregated.conflicts.details?.find(d => d.includes('date')) || 'No overlapping dates between all members'}. The AI may struggle to find suitable options.
+            </li>
+          {/if}
+          {#if data.aggregated?.conflicts?.noBudgetOverlap}
+            <li class="text-error">
+              <strong>Budget Conflict:</strong> {data.aggregated.conflicts.details?.find(d => d.includes('budget') || d.includes('Budget')) || 'Budget ranges don\'t overlap'}. This significantly limits destination options.
+            </li>
+          {/if}
+        </ul>
+        <p class="text-base-content/60 text-sm">
+          You can still proceed, but consider collecting more responses or asking members to adjust their preferences for better results.
+        </p>
+      </div>
+      <div class="modal-action">
+        <button
+          class="btn btn-ghost"
+          onclick={() => showRecommendationWarningModal = false}
+        >
+          Cancel
+        </button>
+        <button
+          class="btn btn-primary"
+          onclick={() => generateRecommendations()}
+          disabled={generatingRecommendations}
+        >
+          {#if generatingRecommendations}
+            <span class="loading loading-spinner loading-sm"></span>
+            Generating...
+          {:else}
+            Proceed Anyway
+          {/if}
+        </button>
+      </div>
+    </div>
+    <button
+      class="modal-backdrop"
+      onclick={() => showRecommendationWarningModal = false}
+      aria-label="Close modal"
+    ></button>
+  </div>
+{/if}

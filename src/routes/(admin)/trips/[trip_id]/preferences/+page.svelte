@@ -251,6 +251,22 @@
         return
       }
 
+      // Validate budget is not zero or unreasonably low
+      if (budgetMin <= 0 || budgetMax <= 0) {
+        errorMessage = "Budget must be greater than $0. Please set a realistic budget for your trip."
+        cancel()
+        window.scrollTo({ top: 0, behavior: "smooth" })
+        return
+      }
+
+      // Warn about very low budgets (less than $100)
+      if (budgetMax < 100) {
+        errorMessage = "Your budget seems very low (under $100). Most trips require a higher budget. Please adjust or contact us if this is intentional."
+        cancel()
+        window.scrollTo({ top: 0, behavior: "smooth" })
+        return
+      }
+
       submitting = true
       return async ({ update }) => {
         await update()
