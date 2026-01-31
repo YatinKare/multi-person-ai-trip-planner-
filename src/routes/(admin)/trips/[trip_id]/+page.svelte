@@ -105,13 +105,16 @@
       const timeoutId = setTimeout(() => controller.abort(), 120000) // 2 minute timeout
 
       const response = await fetch(
-        `http://localhost:8000/api/trips/${data.trip.id}/recommendations`,
+        `http://localhost:8000/api/trips/ai/recommendations/generate`,
         {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
             Authorization: `Bearer ${session.access_token}`,
           },
+          body: JSON.stringify({
+            trip_id: data.trip.id,
+          }),
           signal: controller.signal,
         },
       )
@@ -212,7 +215,7 @@
       const timeoutId = setTimeout(() => controller.abort(), 120000) // 2 minute timeout
 
       const response = await fetch(
-        `http://localhost:8000/api/ai/itinerary/generate`,
+        `http://localhost:8000/api/trips/ai/itinerary/generate`,
         {
           method: "POST",
           headers: {

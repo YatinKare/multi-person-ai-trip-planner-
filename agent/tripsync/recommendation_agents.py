@@ -77,7 +77,7 @@ class RecommendationsPack(BaseModel):
     """
     trip_id: str = Field(description="Trip UUID")
     generated_at_iso: str = Field(description="ISO timestamp of generation")
-    group_summary: Dict[str, str] = Field(description="Summary of group constraints/vibes")
+    group_summary: List[str] = Field(description="Summary of group constraints/vibes")
     conflicts: List[str] = Field(default_factory=list, description="Conflict warnings")
     options: List[DestinationOption] = Field(
         min_length=3, max_length=5, description="3-5 destination options"

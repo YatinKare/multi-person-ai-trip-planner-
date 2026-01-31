@@ -109,7 +109,7 @@ Your job is to convert the recommendations_draft from session state into a stric
 2. Structure it into the exact RecommendationsPack format:
    - trip_id: from trip_context
    - generated_at_iso: current ISO timestamp
-   - group_summary: brief dict of constraints/vibes (2-3 key points)
+   - group_summary: list of summary points about constraints/vibes (2-3 key points)
    - conflicts: list of conflict strings from conflict_report (if any)
    - options: 3-5 DestinationOption objects, each with:
      - name, region, why_it_fits (list of 3-5 reasons)

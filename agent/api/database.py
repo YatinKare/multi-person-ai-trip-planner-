@@ -180,8 +180,19 @@ async def get_trip_members(trip_id: str) -> List[Dict[str, Any]]:
     """
     try:
         client = get_supabase_client()
-        result = client.table("trip_members").select("*, profiles(*)").eq("trip_id", trip_id).execute()
-        return result.data if result.data else []
+        result = client.table("trip_members").select("*").eq("trip_id", trip_id).execute()
+        members = result.data if result.data else []
+        
+        # Manually fetch profiles since join failed
+        if members:
+             user_ids = [m["user_id"] for m in members]
+             profiles_result = client.table("profiles").select("*").in_("id", user_ids).execute()
+             profiles_map = {p["id"]: p for p in (profiles_result.data or [])}
+             
+             for member in members:
+                 member["profiles"] = profiles_map.get(member["user_id"])
+                 
+        return members
     except Exception as e:
         print(f"Error fetching members for trip {trip_id}: {e}")
         return []

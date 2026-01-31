@@ -4,12 +4,12 @@ from .auth import (
     TokenData,
     get_current_user,
     get_current_user_optional,
-    decode_token,
+    verify_token,
 )
 
 __all__ = [
     "TokenData",
     "get_current_user",
     "get_current_user_optional",
-    "decode_token",
+    "verify_token",
 ]

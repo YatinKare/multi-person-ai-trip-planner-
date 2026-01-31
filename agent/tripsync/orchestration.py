@@ -448,7 +448,9 @@ def initialize_session_state(
     trip_id: str,
     raw_preferences: list[Dict[str, Any]],
     trip_context: Optional[Dict[str, Any]] = None,
+    aggregated_group_profile: Optional[Dict[str, Any]] = None,
     selected_destination: Optional[Dict[str, Any]] = None,
+    destination_research: Optional[Dict[str, Any]] = None,
     feedback_items: Optional[list[Dict[str, Any]]] = None,
     max_regen_iterations: int = 5
 ) -> Dict[str, Any]:
@@ -459,7 +461,9 @@ def initialize_session_state(
         trip_id: Trip UUID
         raw_preferences: List of member preferences (from database)
         trip_context: Optional trip metadata (name, status, member_count)
+        aggregated_group_profile: Optional pre-calculated group profile
         selected_destination: Optional selected destination (for itinerary generation)
+        destination_research: Optional research data for destination
         feedback_items: Optional feedback items (for regeneration)
         max_regen_iterations: Max regeneration attempts (default: 5)
 
@@ -476,6 +480,12 @@ def initialize_session_state(
 
     if selected_destination:
         state[SessionStateKeys.SELECTED_DESTINATION] = selected_destination
+
+    if aggregated_group_profile:
+        state[SessionStateKeys.AGGREGATED_GROUP_PROFILE] = aggregated_group_profile
+
+    if destination_research:
+        state[SessionStateKeys.DESTINATION_RESEARCH] = destination_research
 
     if feedback_items:
         state[SessionStateKeys.FEEDBACK_ITEMS] = feedback_items

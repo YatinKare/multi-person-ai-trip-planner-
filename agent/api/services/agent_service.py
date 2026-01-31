@@ -26,8 +26,12 @@ from tripsync.data_access_tools import (
     load_existing_itinerary,
     store_recommendations,
     store_itinerary,
+    store_itinerary,
     store_progress
 )
+from google.adk.runners import Runner
+from google.adk.sessions import InMemorySessionService
+from google.genai.types import Content, Part
 from tripsync.preference_agents import aggregate_preferences
 
 logger = logging.getLogger(__name__)
@@ -37,8 +41,9 @@ class AgentService:
     """Service for orchestrating TripSync AI agents."""
 
     def __init__(self):
-        """Initialize the agent service."""
-        pass
+        """Initialize the agent service with shared session service."""
+        self._session_service = InMemorySessionService()
+        self._app_name = "tripsync"
 
     async def generate_recommendations(
         self,
@@ -78,7 +83,9 @@ class AgentService:
             aggregated_profile = aggregate_preferences(raw_preferences)
 
             # Initialize session state
+            # Initialize session state
             session_state = initialize_session_state(
+                trip_id=trip_id,
                 trip_context=trip_context,
                 raw_preferences=raw_preferences,
                 aggregated_group_profile=aggregated_profile
@@ -88,14 +95,41 @@ class AgentService:
             store_progress(trip_id, "Starting destination recommendation generation", "initialization")
             workflow_agent = create_recommendation_workflow()
 
-            # Run the workflow
-            workflow_result = await workflow_agent.run(
-                user_input="Generate destination recommendations for this trip",
-                session_state=session_state
+            # Create session explicitly to ensure it exists
+            await self._session_service.create_session(
+                app_name=self._app_name,
+                user_id=user_id,
+                session_id=trip_id
+            )
+
+            # Create runner for this workflow
+            runner = Runner(
+                agent=workflow_agent,
+                app_name=self._app_name,
+                session_service=self._session_service,
+            )
+
+            # Execute workflow
+            async for event in runner.run_async(
+                user_id=user_id,
+                session_id=trip_id,
+                new_message=Content(
+                    parts=[Part.from_text(text="Generate destination recommendations for this trip")]
+                ),
+                state_delta=session_state,
+            ):
+                # Events can be logged for debugging/progress tracking
+                pass
+
+            # Retrieve session to access updated state
+            session = await self._session_service.get_session(
+                app_name=self._app_name,
+                user_id=user_id,
+                session_id=trip_id
             )
 
             # Extract recommendations from session state
-            recommendations_final = session_state.get(SessionStateKeys.RECOMMENDATIONS_FINAL)
+            recommendations_final = session.state.get(SessionStateKeys.RECOMMENDATIONS_FINAL)
 
             if not recommendations_final:
                 return {
@@ -206,10 +240,11 @@ class AgentService:
 
             # Initialize session state
             session_state = initialize_session_state(
+                trip_id=trip_id,
                 trip_context=trip_context,
                 raw_preferences=raw_preferences,
                 aggregated_group_profile=aggregated_profile,
-                selected_destination=destination_name,
+                selected_destination={"name": destination_name},
                 destination_research=destination_research
             )
 
@@ -217,14 +252,40 @@ class AgentService:
             store_progress(trip_id, "Starting itinerary generation", "initialization")
             workflow_agent = create_itinerary_workflow()
 
-            # Run the workflow
-            workflow_result = await workflow_agent.run(
-                user_input=f"Generate itinerary for {destination_name}",
-                session_state=session_state
+            # Create session explicitly
+            await self._session_service.create_session(
+                app_name=self._app_name,
+                user_id=user_id,
+                session_id=trip_id
+            )
+
+            # Create runner for this workflow
+            runner = Runner(
+                agent=workflow_agent,
+                app_name=self._app_name,
+                session_service=self._session_service,
+            )
+
+            # Execute workflow
+            async for event in runner.run_async(
+                user_id=user_id,
+                session_id=trip_id,
+                new_message=Content(
+                    parts=[Part.from_text(text=f"Generate itinerary for {destination_name}")]
+                ),
+                state_delta=session_state,
+            ):
+                pass
+            
+            # Retrieve session to access updated state
+            session = await self._session_service.get_session(
+                app_name=self._app_name,
+                user_id=user_id,
+                session_id=trip_id
             )
 
             # Extract itinerary from session state
-            itinerary_final = session_state.get(SessionStateKeys.ITINERARY_FINAL)
+            itinerary_final = session.state.get(SessionStateKeys.ITINERARY_FINAL)
 
             if not itinerary_final:
                 return {
@@ -317,12 +378,13 @@ class AgentService:
 
             # Initialize session state with existing itinerary and feedback
             session_state = initialize_session_state(
+                trip_id=trip_id,
                 trip_context=trip_context,
                 raw_preferences=raw_preferences,
                 aggregated_group_profile=aggregated_profile,
-                selected_destination=existing_itinerary.get("destination_name"),
-                feedback=feedback,
-                regeneration_count=regeneration_count
+                selected_destination={"name": existing_itinerary.get("destination_name")},
+                feedback_items=[{"content": feedback}],
+                max_regen_iterations=MAX_REGENERATIONS
             )
 
             # Add existing itinerary to session state
@@ -336,14 +398,33 @@ class AgentService:
             store_progress(trip_id, f"Starting itinerary regeneration (iteration {regeneration_count + 1})", "regeneration")
             regeneration_agent = create_regeneration_loop_agent(max_iterations=MAX_REGENERATIONS - regeneration_count)
 
-            # Run regeneration
-            regeneration_result = await regeneration_agent.run(
-                user_input=f"Regenerate itinerary with feedback: {feedback}",
-                session_state=session_state
+            # Create runner for regeneration loop
+            runner = Runner(
+                agent=regeneration_agent,
+                app_name=self._app_name,
+                session_service=self._session_service,
+            )
+
+            # Execute regeneration loop
+            async for event in runner.run_async(
+                user_id=user_id,
+                session_id=trip_id,
+                new_message=Content(
+                    parts=[Part.from_text(text=f"Regenerate itinerary with feedback: {feedback}")]
+                ),
+                state_delta=session_state,
+            ):
+                pass
+            
+            # Retrieve session to access updated state
+            session = await self._session_service.get_session(
+                app_name=self._app_name,
+                user_id=user_id,
+                session_id=trip_id
             )
 
             # Extract regenerated itinerary
-            itinerary_final = session_state.get(SessionStateKeys.ITINERARY_FINAL)
+            itinerary_final = session.state.get(SessionStateKeys.ITINERARY_FINAL)
 
             if not itinerary_final:
                 return {

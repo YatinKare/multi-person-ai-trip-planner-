@@ -55,8 +55,19 @@ def load_trip_context(trip_id: str) -> Dict[str, Any]:
         trip_data = trip_result.data[0]
 
         # Get members
-        members_result = client.table("trip_members").select("*, profiles(*)").eq("trip_id", trip_id).execute()
+        members_result = client.table("trip_members").select("*").eq("trip_id", trip_id).execute()
         members = members_result.data if members_result.data else []
+
+        # Manually fetch profiles for these members since direct join is not available
+        if members:
+            user_ids = [m["user_id"] for m in members]
+            profiles_result = client.table("profiles").select("*").in_("id", user_ids).execute()
+            profiles_map = {p["id"]: p for p in (profiles_result.data or [])}
+            
+            # Merge profiles into members
+            for member in members:
+                member["profiles"] = profiles_map.get(member["user_id"])
+
 
         return {
             "trip_id": trip_id,
