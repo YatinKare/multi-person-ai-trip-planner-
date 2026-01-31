@@ -231,6 +231,16 @@
           Finalize Itinerary
         </button>
       {/if}
+      {#if isFinalized}
+        <a
+          href="/trips/{data.trip.id}/export/pdf"
+          class="btn btn-primary flex items-center gap-2 font-bold"
+          download
+        >
+          <span class="material-symbols-outlined">picture_as_pdf</span>
+          Export to PDF
+        </a>
+      {/if}
     </div>
   </div>
 

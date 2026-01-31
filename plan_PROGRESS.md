@@ -467,7 +467,7 @@ IN_PROGRESS
 
 ### Phase 9: Export & Additional Features (P1 - Polish)
 
-- [ ] **Task 9.1**: Implement PDF export
+- [x] **Task 9.1**: Implement PDF export
   - Add "Export to PDF" button on finalized itinerary page
   - Create server-side PDF generation endpoint: `src/routes/(admin)/trips/[trip_id]/export/pdf/+server.ts`
   - Use library like `@pdfme/generator` or `puppeteer` to generate PDF
@@ -569,83 +569,73 @@ IN_PROGRESS
 
 ## Completed This Iteration
 
-**Summary:** Completed Task 8.6 (Implement itinerary regeneration with feedback - P1)
+**Summary:** Completed Task 9.1 (Implement PDF export - P1)
 
-### Task 8.6: Implement Itinerary Regeneration (COMPLETE)
+### Task 9.1: Implement PDF Export (COMPLETE)
 
-Implemented comprehensive itinerary regeneration feature allowing organizers to provide feedback and generate improved versions of the itinerary using the FastAPI backend and Google ADK.
+Implemented comprehensive PDF export functionality allowing all members to download a formatted PDF version of finalized trip itineraries.
 
 #### Implementation Details:
 
-**1. Regeneration Modal UI**
-- ✅ Created modal with feedback textarea (10-1000 characters required)
-- ✅ Added helpful feedback examples (outdoor activities, budget-friendly options, cultural experiences, relaxation time)
-- ✅ Warning shown on last available regeneration
-- ✅ Character counter to show feedback length
-- ✅ Form validation prevents submission with insufficient feedback
-- ✅ Loading state with spinner during AI regeneration
+**1. PDF Generation Library**
+- ✅ Selected jsPDF as the PDF generation library (lightweight, server-side compatible)
+- ✅ Installed jspdf@4.0.0 via bun package manager
+- ✅ No need for headless browser overhead (Puppeteer)
+- ✅ Well-maintained library with good documentation
 
-**2. Regeneration Button & Controls**
-- ✅ Added "Regenerate" button in itinerary header (organizer only)
-- ✅ Button disabled after max regenerations (5) reached
-- ✅ Button only visible when trip is not finalized
-- ✅ Proper permission checking (organizer-only feature)
+**2. Server-Side PDF Endpoint**
+- ✅ Created GET endpoint at `src/routes/(admin)/trips/[trip_id]/export/pdf/+server.ts`
+- ✅ Validates user authentication and trip membership
+- ✅ Only allows export for finalized trips (status check)
+- ✅ Loads trip details, itinerary, and destination information from database
+- ✅ Returns PDF as downloadable file with proper Content-Type headers
+- ✅ Filename sanitized from trip name
 
-**3. Regeneration Count Tracking**
-- ✅ Added regeneration_count column to itineraries table
-- ✅ Database migration created and applied successfully
-- ✅ Check constraint ensures count stays in valid range (0-10)
-- ✅ TypeScript types updated in DatabaseDefinitions.ts
-- ✅ Count displayed in info banner when > 0
-- ✅ Shows remaining regenerations available
+**3. PDF Formatting & Layout**
+- ✅ Professional document structure with proper page margins
+- ✅ Title section: Trip name, destination, and total estimated cost
+- ✅ Day-by-day breakdown with emerald-colored section headers
+- ✅ Activities grouped by time slot (Morning, Afternoon, Evening)
+- ✅ Each activity includes: name, description, location, cost, duration, and tips
+- ✅ Automatic page breaks when content exceeds page height
+- ✅ Word wrapping for long text content
+- ✅ Footer with generation timestamp and TripSync branding
+- ✅ Color-coded costs and tips for visual hierarchy
 
-**4. Backend Integration**
-- ✅ Added regenerate form action in +page.server.ts
-- ✅ Validates feedback length (10-1000 characters)
-- ✅ Validates regeneration count against max limit
-- ✅ Verifies organizer permissions
-- ✅ Verifies trip status is 'planning'
-- ✅ Calls FastAPI /api/ai/itinerary/regenerate endpoint
-- ✅ Updates itinerary with new days, cost, and incremented count
-- ✅ Proper error handling and user feedback
+**4. Export Button UI**
+- ✅ Added "Export to PDF" button to itinerary page header
+- ✅ Button only visible when trip status is 'finalized'
+- ✅ Uses Material Symbols icon (picture_as_pdf)
+- ✅ Primary button styling consistent with design system
+- ✅ Opens PDF in new window with download attribute
 
-**5. User Experience**
-- ✅ Clear feedback prompts guide organizers
-- ✅ Success message shown after regeneration
-- ✅ Page reloads to show updated itinerary
-- ✅ Regeneration info banner shows history
-- ✅ Accent color styling for regeneration features
-- ✅ Proper loading states prevent duplicate submissions
+**5. Security & Validation**
+- ✅ JWT authentication required for all requests
+- ✅ RLS policies ensure users can only export trips they're members of
+- ✅ Status validation prevents export of non-finalized trips (returns 400 error)
+- ✅ Error handling for missing itineraries (404)
+- ✅ Proper error messages for unauthorized access (401, 403)
 
-#### Files Modified:
-1. **src/routes/(admin)/trips/[trip_id]/itinerary/+page.svelte**
-   - Added regeneration modal with comprehensive UI
-   - Added regeneration button in header
-   - Added regeneration info banner
-   - State management for modal and loading
-   - Form integration with enhance
+#### Files Created/Modified:
 
-2. **src/routes/(admin)/trips/[trip_id]/itinerary/+page.server.ts**
-   - New regenerate form action
-   - Full validation logic
-   - FastAPI integration
-   - Database update logic
+1. **src/routes/(admin)/trips/[trip_id]/export/pdf/+server.ts** (NEW)
+   - Complete PDF generation endpoint
+   - Authentication and authorization checks
+   - PDF document assembly with jsPDF
+   - Proper response headers for download
 
-3. **supabase/migrations/20260131000001_add_regeneration_count.sql**
-   - New migration file
-   - Adds regeneration_count column with default 0
-   - Check constraint for valid range
+2. **src/routes/(admin)/trips/[trip_id]/itinerary/+page.svelte** (MODIFIED)
+   - Added Export to PDF button in header section
+   - Conditional rendering based on finalization status
+   - Link to PDF export endpoint
 
-4. **src/DatabaseDefinitions.ts**
-   - Added regeneration_count to Row type
-   - Added regeneration_count to Insert type
-   - Added regeneration_count to Update type
+3. **package.json** (MODIFIED)
+   - Added jspdf@4.0.0 to dependencies
 
 #### Validation Results:
 - ✅ TypeScript check: 0 errors, 8 warnings (a11y only - pre-existing)
 - ✅ Production build: Success
-- ✅ Database migration: Applied successfully
-- ✅ All features working as per plan.md requirements
+- ✅ All requirements from plan.md Task 9.1 satisfied
 
 ---
 
