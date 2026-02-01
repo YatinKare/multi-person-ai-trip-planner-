@@ -105,7 +105,7 @@
       const timeoutId = setTimeout(() => controller.abort(), 120000) // 2 minute timeout
 
       const response = await fetch(
-        `http://localhost:8000/api/trips/ai/recommendations/generate`,
+        `http://localhost:8000/api/v1/generate-reccomendations`,
         {
           method: "POST",
           headers: {
